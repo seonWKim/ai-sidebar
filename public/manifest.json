@@ -1,0 +1,46 @@
+{
+  "manifest_version": 3,
+  "name": "Free AI Side Bar",
+  "version": "1.0",
+  "description": "Free AI Side Bar",
+  "minimum_chrome_version": "116",
+  "background": {
+    "service_worker": "js/service-worker.js"
+  },
+  "side_panel": {
+    "default_path": "index.html"
+  },
+  "icons": {
+    "16": "static/image/favicon-16x16.png",
+    "32": "static/image/favicon-32x32.png",
+    "48": "static/image/favicon-48x48.png",
+    "64": "static/image/favicon-64x64.png"
+  },
+  "content_scripts": [
+    {
+      "js": [ "js/content-script.js" ],
+      "matches": [ "<all_urls>" ]
+    }
+  ],
+  "permissions": [
+    "sidePanel",
+    "contextMenus",
+    "storage"
+  ],
+  "action": {
+    "default_title": "Click to open side bar",
+    "default_icon": {
+      "16": "static/image/favicon-16x16.png",
+      "32": "static/image/favicon-32x32.png"
+    }
+  },
+  "commands": {
+    "open_sidepanel": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+O",
+        "mac": "Command+Shift+O"
+      },
+      "description": "Open or close the side panel"
+    }
+  }
+}

@@ -8,13 +8,16 @@
     <img src="https://shields.io/badge/TypeScript-3178C6?logo=TypeScript&logoColor=FFF&style=flat-square" alt="Typescript" height="20"/>
 </p>
 
-# Why should we pay for AI utility stuff?
+## Why should we have to pay for AI stuff?
 
-Many AI utility chrome extensions require us to pay even though we provide our own api keys. Let's stop paying
+Many AI chrome extensions require us to pay even though we provide our own api keys. Let's stop paying
 and make one for ourselves.
 
-# Build
+## Features 
+![main.png](main.png)
+- Ask questions using chatGPT 
+
+## Build
 
 - `npm run dev`: Build the source code into `./dist` continuously looking for changes
 - `npm run build`: Build the source code into `./dist` and continuously rebuild when changes occur 
-# ai-sidebar
