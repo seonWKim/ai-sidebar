@@ -15,7 +15,7 @@ and make one for ourselves.
 
 ## Features 
 ![main.png](main.png)
-- Ask questions using chatGPT 
+- Ask questions using chatGPT in chrome sidebar 
 
 ## Build
 
