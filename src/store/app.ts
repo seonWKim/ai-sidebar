@@ -14,7 +14,7 @@ export const appStore = defineStore("app", {
       let openApiKey: string = ""
       try {
         const chromeStorage = await chrome?.storage?.local?.get(chromeStorageApiKey);
-        openApiKey = chromeStorage[chromeStorageApiKey] || import.meta.env.VITE_APP_OPENAI_API_KEY || "";
+        openApiKey = chromeStorage[chromeStorageApiKey] || "";
       } catch (e) {
         // skip
       }
