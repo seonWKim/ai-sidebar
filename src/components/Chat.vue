@@ -14,11 +14,13 @@ import { VTextarea } from "vuetify/components";
 import type { Message } from "@/common/message";
 import { eventBus, EventName } from "@/common/event";
 import ChatMessage from "@/components/ChatMessage.vue";
+import Settings from "@/components/Settings.vue";
 
 const messages = ref<Message[]>([]);
+const messageRefs = ref({});
 const newMessage = ref("");
 let received: Ref<Message> = getReceived();
-const scrollTarget: Ref<any> = ref();
+const textarea: Ref<any> = ref();
 const isMessageBeingStreamed = ref(false);
 
 function getReceived(): Ref<Message> {
@@ -31,64 +33,78 @@ function getReceived(): Ref<Message> {
 }
 
 async function sendMessage(event: any) {
-  if (event.key === "Enter" && event.shiftKey) {
+  if (event.key === "Enter") {
+    // Prevent sendMessage function from being called when shift key is pressed with enter
+    if (event.shiftKey) {
+      return;
+    }
+
+    // Prevent new line being inserted after enter key is pressed
+    event.preventDefault();
+  }
+
+  // Return if message to send is empty
+  if (newMessage.value.trim() === "") {
     return;
   }
 
-  if (newMessage.value.trim() !== "") {
-    const message: Message = {
-      id: uuidv4(),
-      type: "sent",
-      text: [newMessage.value],
-      canceled: false
-    };
-    messages.value.push(message);
-    newMessage.value = "";
+  // Construct message to send
+  const messageToSend: Message = {
+    id: uuidv4(),
+    type: "sent",
+    text: [newMessage.value],
+    canceled: false
+  };
+  messages.value.push(messageToSend);
+  newMessage.value = "";
+  const prompt = new OpenaiPrompt(
+    [new OpenaiMessage(OpenaiRole.SYSTEM, messageToSend.text.join(""))],
+    OpenaiModel.gpt_3_5_turbo
+  );
 
-    let messagePushed = false;
-    const prompt = new OpenaiPrompt(
-      [new OpenaiMessage(OpenaiRole.SYSTEM, message.text.join(""))],
-      OpenaiModel.gpt_3_5_turbo
-    );
+  // Send message and receive stream response
+  let isMessagePushed = false;
+  await streamOpenAiResponse(prompt,
+    res => {
+      if (!isMessagePushed) {
+        // Show received message in the UI
+        messages.value.push(received.value);
+        isMessagePushed = true;
+      }
 
-    isMessageBeingStreamed.value = true;
-    await streamOpenAiResponse(prompt, res => {
-        if (!messagePushed) {
-          messages.value.push(received.value);
-          messagePushed = true;
-        }
+      received.value.text.push(res);
+      messageRefs.value[received.value.id]?.scrollIntoView();
+    },
+    () => {
+      isMessageBeingStreamed.value = true;
+      return null;
+    },
+    () => {
+      if (received.value.canceled) {
+        return new ListenerEvent(ListenerEventType.STOP_STREAM, "");
+      }
 
-        received.value.text.push(res);
-        scrollTarget?.value?.scrollIntoView();
-      },
-      () => null,
-      () => {
-        if (received.value.canceled) {
-          return new ListenerEvent(ListenerEventType.STOP_STREAM, "");
-        }
-
-        return null;
-      },
-      () => {
-        received = getReceived();
-        return null;
-      },
-      onApiKeyError);
-  }
-  isMessageBeingStreamed.value = false;
+      return null;
+    },
+    () => {
+      received = getReceived();
+      isMessageBeingStreamed.value = false;
+      return null;
+    },
+    onApiKeyError);
 }
 
 function stopStream() {
   const streamingMessage = messages.value[messages.value.length - 1];
   if (streamingMessage.type === "received" && !streamingMessage.canceled) {
-    streamingMessage.canceled = true
+    streamingMessage.canceled = true;
   }
 }
 
 function getPosition(message: Message) {
   return {
-    "left-card": message.type === "sent",
-    "right-card": message.type === "received"
+    "display": "flex",
+    "justify-content": message.type === "sent" ? "flex-end" : "flex-start"
   };
 }
 
@@ -107,85 +123,84 @@ function onApiKeyError(err: string) {
 </script>
 
 <template>
-  <div class="layout">
-    <div class="top-top-layout">
-      <div class="top-layout">
-        <div>
-          <div v-for="message in messages"
-               :key="message.id"
-               :class="getPosition(message)">
-            <chat-message :message="message"
-                          :class="getMessageCardClass(message.type)" />
-          </div>
-        </div>
+  <div class="parent">
+    <div class="setting">
+      <settings />
+    </div>
+    <div class="top-child">
+      <div v-for="message in messages"
+           :key="message.id"
+           :ref="el => {
+                        messageRefs[message.id] = el
+                      }"
+           :style="getPosition(message)">
+        <chat-message :message="message"
+                      :class="getMessageCardClass(message.type)" />
       </div>
     </div>
-    <div class="bottom-layout">
-      <div v-if="isMessageBeingStreamed"
-           class="text-center">
-        <v-btn size="small"
-               icon="mdi-stop"
-               variant="plain"
-               color="error"
-               class="font-weight-bold"
-               @click="stopStream">
-          Stop
-        </v-btn>
+    <div class="middle-child">
+      <v-btn v-if="isMessageBeingStreamed"
+             size="small"
+             icon="mdi-stop"
+             variant="plain"
+             color="error"
+             class="font-weight-bold"
+             @click="stopStream">
+        Stop
+      </v-btn>
+    </div>
+    <div class="bottom-child">
+      <div class="pa-2">
+        <v-textarea v-model="newMessage"
+                    class="textarea"
+                    label="Write a message"
+                    @keydown.enter="sendMessage"
+                    append-inner-icon="mdi-send"
+                    :on-click:append-inner="sendMessage"
+                    variant="outlined"
+                    shaped
+                    clearable
+                    flat
+                    hide-details
+                    :disabled="isMessageBeingStreamed"
+                    ref="textarea" />
       </div>
-      <v-textarea v-model="newMessage"
-                  class="textarea"
-                  label="Write a message"
-                  @keydown.enter="sendMessage"
-                  append-inner-icon="mdi-send"
-                  :on-click:append-inner="sendMessage"
-                  variant="outlined"
-                  shaped
-                  clearable
-                  flat
-                  hide-details
-                  ref="scrollTarget" />
     </div>
   </div>
 </template>
 
 
 <style scoped>
-.layout {
+.parent {
+  display: grid;
+  grid-template-rows: 48px 1fr  32px 180px;
+  grid-gap: 10px;
+  overflow: hidden;
   height: 100%;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-
-  position: relative;
 }
 
-.top-layout {
-  margin: 0 0 16px 0;
-  overflow-y: auto;
-
-  flex-grow: 1;
-  top: 0;
+.setting {
+  margin: 4px;
 }
 
-.bottom-layout {
-  bottom: 0;
+.top-child {
+  overflow: auto;
+  padding: 0 0 16px 0;
+}
+
+.middle-child {
+  text-align: center;
+  border-bottom: 2px solid #F0F1F5;
+}
+
+.bottom-child {
+  height: 180px;
 }
 
 .message-card {
   background-color: #F0F1F5;
   margin-bottom: 10px;
   width: 70%;
-}
-
-.left-card {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.right-card {
-  display: flex;
-  justify-content: flex-start;
 }
 
 .message-card-sent {
@@ -195,16 +210,4 @@ function onApiKeyError(err: string) {
 .message-card-received {
   border-radius: 0 10px 10px 10px;
 }
-
-.send-button {
-  margin: 0 16px;
-  height: 100%;
-  border-radius: 20px;
-}
-
-*, ::before, ::after {
-  background-repeat: no-repeat;
-  box-sizing: initial;
-}
-
 </style>
