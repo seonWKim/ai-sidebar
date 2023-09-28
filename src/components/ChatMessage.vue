@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Message } from "@/common/message";
 import { defineComponent, ref, watch } from "vue";
-import Markdown from "vue3-markdown-it"
+import Markdown from "vue3-markdown-it";
 import MarkdownItHighlightjs from "markdown-it-highlightjs";
 
 const props = defineProps({
@@ -22,7 +22,7 @@ const plugins = [
     plugin: MarkdownItHighlightjs,
     options: {
       css: {
-        source: import('highlight.js/styles/atom-one-light.css')
+        source: import("highlight.js/styles/atom-one-light.css")
       }
     }
   }
@@ -37,13 +37,17 @@ watch(props.message, (newValue, oldValue) => {
   wholeMessage.value += newText;
 });
 
+function stopStream(message: Message) {
+  message.canceled = true;
+}
+
 </script>
 
 <template>
   <v-card>
-    <v-card-text>
+    <v-card-text class="px-4 py-0">
       <markdown :source="wholeMessage"
-                class="markdown px-4"
+                class="markdown"
                 :plugins="plugins" />
     </v-card-text>
   </v-card>

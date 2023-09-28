@@ -1,7 +1,15 @@
 <script setup lang="ts" xmlns:chat-message-received="http://www.w3.org/1999/XSL/Transform">
 import { Ref, ref } from "vue";
 import { v4 as uuidv4 } from "uuid";
-import { OpenaiMessage, OpenaiModel, OpenaiPrompt, OpenaiRole, streamOpenAiResponse } from "@/service/openai";
+import {
+  ListenerEvent,
+  ListenerEventType,
+  OpenaiMessage,
+  OpenaiModel,
+  OpenaiPrompt,
+  OpenaiRole,
+  streamOpenAiResponse
+} from "@/service/openai";
 import { VTextarea } from "vuetify/components";
 import type { Message } from "@/common/message";
 import { eventBus, EventName } from "@/common/event";
@@ -11,12 +19,14 @@ const messages = ref<Message[]>([]);
 const newMessage = ref("");
 let received: Ref<Message> = getReceived();
 const scrollTarget: Ref<any> = ref();
+const isMessageBeingStreamed = ref(false);
 
 function getReceived(): Ref<Message> {
   return ref<Message>({
     id: uuidv4(),
     type: "received",
-    text: []
+    text: [],
+    canceled: false
   });
 }
 
@@ -29,7 +39,8 @@ async function sendMessage(event: any) {
     const message: Message = {
       id: uuidv4(),
       type: "sent",
-      text: [newMessage.value]
+      text: [newMessage.value],
+      canceled: false
     };
     messages.value.push(message);
     newMessage.value = "";
@@ -39,6 +50,8 @@ async function sendMessage(event: any) {
       [new OpenaiMessage(OpenaiRole.SYSTEM, message.text.join(""))],
       OpenaiModel.gpt_3_5_turbo
     );
+
+    isMessageBeingStreamed.value = true;
     await streamOpenAiResponse(prompt, res => {
         if (!messagePushed) {
           messages.value.push(received.value);
@@ -48,10 +61,27 @@ async function sendMessage(event: any) {
         received.value.text.push(res);
         scrollTarget?.value?.scrollIntoView();
       },
+      () => null,
+      () => {
+        if (received.value.canceled) {
+          return new ListenerEvent(ListenerEventType.STOP_STREAM, "");
+        }
+
+        return null;
+      },
       () => {
         received = getReceived();
+        return null;
       },
       onApiKeyError);
+  }
+  isMessageBeingStreamed.value = false;
+}
+
+function stopStream() {
+  const streamingMessage = messages.value[messages.value.length - 1];
+  if (streamingMessage.type === "received" && !streamingMessage.canceled) {
+    streamingMessage.canceled = true
   }
 }
 
@@ -91,6 +121,17 @@ function onApiKeyError(err: string) {
       </div>
     </div>
     <div class="bottom-layout">
+      <div v-if="isMessageBeingStreamed"
+           class="text-center">
+        <v-btn size="small"
+               icon="mdi-stop"
+               variant="plain"
+               color="error"
+               class="font-weight-bold"
+               @click="stopStream">
+          Stop
+        </v-btn>
+      </div>
       <v-textarea v-model="newMessage"
                   class="textarea"
                   label="Write a message"
@@ -128,9 +169,6 @@ function onApiKeyError(err: string) {
 }
 
 .bottom-layout {
-  height: 124px;
-  display: flex;
-
   bottom: 0;
 }
 
