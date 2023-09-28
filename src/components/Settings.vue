@@ -36,6 +36,7 @@ watch(apiKey, (newValue, oldValue) => {
           class="ma-4"
           icon="mdi-cog"
           dark
+          size="16px"
           v-bind="props"
         />
       </template>
