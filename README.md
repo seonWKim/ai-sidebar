@@ -19,5 +19,11 @@ and make one for ourselves.
 
 ## Build
 
-- `npm run dev`: Build the source code into `./dist` continuously looking for changes
+- `npm run dev`: Start dev server
 - `npm run build`: Build the source code into `./dist` and continuously rebuild when changes occur 
+
+## Test
+1. Run `npm run build` to build source code into `./dist` 
+2. Visit [chrome extensions page](chrome://extensions/)
+3. Enable developer mode 
+4. Load unpacked extension(select `./dist` folder)

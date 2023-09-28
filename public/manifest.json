@@ -14,7 +14,8 @@
     "16": "static/image/favicon-16x16.png",
     "32": "static/image/favicon-32x32.png",
     "48": "static/image/favicon-48x48.png",
-    "64": "static/image/favicon-64x64.png"
+    "64": "static/image/favicon-64x64.png",
+    "128": "static/image/favicon-128x128.png"
   },
   "content_scripts": [
     {
