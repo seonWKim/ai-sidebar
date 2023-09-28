@@ -17,7 +17,10 @@ import ChatMessage from "@/components/ChatMessage.vue";
 import Settings from "@/components/Settings.vue";
 
 const messages = ref<Message[]>([]);
-const messageRefs = ref({});
+type MessageRef = {
+  [key in ReturnType<typeof uuidv4>]: any
+};
+const messageRefs = ref<MessageRef>({});
 const newMessage = ref("");
 let received: Ref<Message> = getReceived();
 const textarea: Ref<any> = ref();
@@ -130,9 +133,7 @@ function onApiKeyError(err: string) {
     <div class="top-child">
       <div v-for="message in messages"
            :key="message.id"
-           :ref="el => {
-                        messageRefs[message.id] = el
-                      }"
+           :ref="el => { messageRefs[message.id] = el  }"
            :style="getPosition(message)">
         <chat-message :message="message"
                       :class="getMessageCardClass(message.type)" />
