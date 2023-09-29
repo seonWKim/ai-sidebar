@@ -10,20 +10,17 @@ import {
   OpenaiRole,
   streamOpenAiResponse
 } from "@/service/openai";
-import { VTextarea } from "vuetify/components";
+import { VBtn, VTextarea } from "vuetify/components";
 import type { Message } from "@/common/message";
 import { eventBus, EventName } from "@/common/event";
 import ChatMessage from "@/components/ChatMessage.vue";
 import Settings from "@/components/Settings.vue";
 
 const messages = ref<Message[]>([]);
-type MessageRef = {
-  [key in ReturnType<typeof uuidv4>]: any
-};
-const messageRefs = ref<MessageRef>({});
 const newMessage = ref("");
-let received: Ref<Message> = getReceived();
+const scrollTarget: Ref<any> = ref();
 const textarea: Ref<any> = ref();
+let received: Ref<Message> = getReceived();
 const isMessageBeingStreamed = ref(false);
 
 function getReceived(): Ref<Message> {
@@ -76,7 +73,7 @@ async function sendMessage(event: any) {
       }
 
       received.value.text.push(res);
-      messageRefs.value[received.value.id]?.scrollIntoView();
+      scrollTarget.value.scrollIntoView();
     },
     () => {
       isMessageBeingStreamed.value = true;
@@ -121,7 +118,7 @@ function getMessageCardClass(type: string) {
 
 function onApiKeyError(err: string) {
   eventBus.emit(EventName.OPEN_SETTINGS, { "err": err });
-  eventBus.emit(EventName.OPEN_SNACKBAR, { text: "API key is invalid", color: "error" })
+  eventBus.emit(EventName.OPEN_SNACKBAR, { text: "API key is invalid", color: "error" });
 }
 
 </script>
@@ -135,12 +132,12 @@ function onApiKeyError(err: string) {
       <div class="chat-messages">
         <div v-for="message in messages"
              :key="message.id"
-             :ref="el => { messageRefs[message.id] = el  }"
              :style="getPosition(message)">
           <chat-message :message="message"
                         :class="getMessageCardClass(message.type)" />
         </div>
       </div>
+      <div ref="scrollTarget"/>
       <div class="chat-message-buttons">
         <v-btn v-if="isMessageBeingStreamed"
                size="small"
@@ -179,7 +176,6 @@ function onApiKeyError(err: string) {
   display: grid;
   grid-template-rows: 24px 1fr 180px;
   grid-gap: 10px;
-  overflow: hidden;
   height: 100%;
 }
 
@@ -193,10 +189,11 @@ function onApiKeyError(err: string) {
   margin: 0 8px;
   border: 2px solid #F0F1F5;
   border-radius: 4px;
+
+  overflow-y: auto;
 }
 
 .chat-messages {
-  overflow: auto;
 }
 
 .chat-message-buttons {
