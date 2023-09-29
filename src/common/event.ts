@@ -1,5 +1,6 @@
 export enum EventName {
   OPEN_SETTINGS = "open-settings",
+  OPEN_SNACKBAR = "open-snackbar",
 }
 
 export class EventBus {

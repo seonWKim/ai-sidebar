@@ -121,6 +121,7 @@ function getMessageCardClass(type: string) {
 
 function onApiKeyError(err: string) {
   eventBus.emit(EventName.OPEN_SETTINGS, { "err": err });
+  eventBus.emit(EventName.OPEN_SNACKBAR, { text: "API key is invalid", color: "error" })
 }
 
 </script>
