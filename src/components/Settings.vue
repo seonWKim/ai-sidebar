@@ -38,6 +38,7 @@ watch(apiKey, (newValue, oldValue) => {
           dark
           size="16px"
           v-bind="props"
+          variant="flat"
         />
       </template>
       <v-card>

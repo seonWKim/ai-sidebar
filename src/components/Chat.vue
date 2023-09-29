@@ -131,27 +131,29 @@ function onApiKeyError(err: string) {
     <div class="setting">
       <settings />
     </div>
-    <div class="top-child">
-      <div v-for="message in messages"
-           :key="message.id"
-           :ref="el => { messageRefs[message.id] = el  }"
-           :style="getPosition(message)">
-        <chat-message :message="message"
-                      :class="getMessageCardClass(message.type)" />
+    <div class="chat-message-container">
+      <div class="chat-messages">
+        <div v-for="message in messages"
+             :key="message.id"
+             :ref="el => { messageRefs[message.id] = el  }"
+             :style="getPosition(message)">
+          <chat-message :message="message"
+                        :class="getMessageCardClass(message.type)" />
+        </div>
+      </div>
+      <div class="chat-message-buttons">
+        <v-btn v-if="isMessageBeingStreamed"
+               size="small"
+               icon="mdi-stop"
+               variant="plain"
+               color="error"
+               class="font-weight-bold"
+               @click="stopStream">
+          Stop
+        </v-btn>
       </div>
     </div>
-    <div class="middle-child">
-      <v-btn v-if="isMessageBeingStreamed"
-             size="small"
-             icon="mdi-stop"
-             variant="plain"
-             color="error"
-             class="font-weight-bold"
-             @click="stopStream">
-        Stop
-      </v-btn>
-    </div>
-    <div class="bottom-child">
+    <div class="chat-textarea">
       <div class="pa-2">
         <v-textarea v-model="newMessage"
                     class="textarea"
@@ -175,7 +177,7 @@ function onApiKeyError(err: string) {
 <style scoped>
 .parent {
   display: grid;
-  grid-template-rows: 48px 1fr  32px 180px;
+  grid-template-rows: 24px 1fr 180px;
   grid-gap: 10px;
   overflow: hidden;
   height: 100%;
@@ -185,24 +187,30 @@ function onApiKeyError(err: string) {
   margin: 4px;
 }
 
-.top-child {
+.chat-message-container {
+  display: grid;
+  grid-template-rows: 1fr 32px;
+  margin: 0 8px;
+  border: 2px solid #F0F1F5;
+  border-radius: 4px;
+}
+
+.chat-messages {
   overflow: auto;
-  padding: 0 0 16px 0;
 }
 
-.middle-child {
+.chat-message-buttons {
   text-align: center;
-  border-bottom: 2px solid #F0F1F5;
 }
 
-.bottom-child {
+.chat-textarea {
   height: 180px;
 }
 
 .message-card {
   background-color: #F0F1F5;
   margin-bottom: 10px;
-  width: 70%;
+  max-width: 70%;
 }
 
 .message-card-sent {
