@@ -7,6 +7,10 @@ const props = defineProps({
   selectedModel: {
     type: String,
     default: OpenaiModel["gpt-3.5-turbo"]
+  },
+  customStyle: {
+    type: String,
+    default: null
   }
 });
 
@@ -15,9 +19,12 @@ const emits = defineEmits(["updateOpenaiModel"]);
 const models = ref(Object.values(OpenaiModel));
 const selectedModel = ref(props.selectedModel);
 
-function selectModel(model) {
-  const index = Object.values(OpenaiModel).indexOf(model);
-  selectedModel.value = Object.keys(OpenaiModel)[index];
+function selectModel(modelStr: string) {
+  const model =
+    Object.values(OpenaiModel).find(key => OpenaiModel[key] === modelStr) ||
+    OpenaiModel["gpt-3.5-turbo"];
+
+  selectedModel.value = model;
   emits("updateOpenaiModel", selectedModel.value);
 }
 </script>
@@ -30,8 +37,8 @@ function selectModel(model) {
              rounded
              variant="outlined"
              color="primary"
-             v-bind="props"
-      >
+             :class="customStyle"
+             v-bind="props">
         {{ selectedModel }}
       </v-btn>
     </template>

@@ -15,6 +15,7 @@ import type { Message } from "@/common/message";
 import { eventBus, EventName } from "@/common/event";
 import ChatMessage from "@/components/ChatMessage.vue";
 import OpenaiModelSelector from "@/components/config/OpenaiModelSelector.vue";
+import OpenaiRoleSelector from "@/components/config/OpenaiRoleSelector.vue";
 
 const messages = ref<Message[]>([]);
 const newMessage = ref("");
@@ -23,6 +24,8 @@ const textarea: Ref<any> = ref();
 let received: Ref<Message> = getReceived();
 const isMessageBeingStreamed = ref(false);
 const selectedModel: Ref<OpenaiModel> = ref(OpenaiModel["gpt-3.5-turbo"]);
+const selectedRole: Ref<OpenaiRole> = ref(OpenaiRole.system);
+
 function getReceived(): Ref<Message> {
   return ref<Message>({
     id: uuidv4(),
@@ -32,8 +35,12 @@ function getReceived(): Ref<Message> {
   });
 }
 
-function updateOpenaiModel(model) {
+function updateOpenaiModel(model: OpenaiModel) {
   selectedModel.value = model;
+}
+
+function updateOpenaiRole(role: OpenaiRole) {
+  selectedRole.value = role;
 }
 
 async function sendMessage(event: any) {
@@ -62,7 +69,11 @@ async function sendMessage(event: any) {
   messages.value.push(messageToSend);
   newMessage.value = "";
   const prompt = new OpenaiPrompt(
-    [new OpenaiMessage(OpenaiRole.SYSTEM, messageToSend.text.join(""))],
+    [
+      new OpenaiMessage(
+        selectedRole.value,
+        messageToSend.text.join(""))
+    ],
     selectedModel.value
   );
 
@@ -153,8 +164,12 @@ function onApiKeyError(err: string) {
     </div>
     <div class="chat-textarea">
       <div class="selectbox-area">
-        <openai-model-selector :selectedModel="selectedModel"
-        @update-openai-model="updateOpenaiModel" />
+        <openai-model-selector :selected-model="selectedModel"
+                               custom-style="mr-2"
+                               @update-openai-model="updateOpenaiModel" />
+        <openai-role-selector :selected-role="selectedRole"
+                              custom-style="mr-2"
+                              @update-openai-role="updateOpenaiRole" />
       </div>
       <v-textarea v-model="newMessage"
                   class="textarea"
