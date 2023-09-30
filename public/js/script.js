@@ -11,12 +11,5 @@ button.addEventListener('click', async () => {
   await chrome.sidePanel.setOptions({
     tabId,
     path: 'index.html',
-    enabled: true
   });
 });
-
-
-chrome.action.onClicked.addListener((tab) => {
-  const tabId = tab.id
-  chrome.sidePanel.open({tabId});
-})
