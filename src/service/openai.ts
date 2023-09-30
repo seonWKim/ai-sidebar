@@ -22,10 +22,9 @@ export class OpenaiMessage {
 }
 
 export enum OpenaiRole {
-  SYSTEM = "system",
-  USER = "user",
-  ASSISTANT = "assistant",
-  FUNCTION = "function"
+  system = "system",
+  user = "user",
+  assistant = "assistant",
 }
 export enum OpenaiModel {
   'gpt-4' = "gpt-4",
