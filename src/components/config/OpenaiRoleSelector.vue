@@ -33,7 +33,7 @@ function selectRole(roleStr: string) {
   <v-menu>
     <template v-slot:activator="{ props }">
       <v-btn size="x-small"
-             prepend-icon="mdi-brain"
+             prepend-icon="mdi-account-outline"
              rounded
              variant="outlined"
              color="primary"
