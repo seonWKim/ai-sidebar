@@ -17,12 +17,14 @@ and make one for ourselves.
 ![main.png](main.gif)
 - Ask questions using chatGPT in chrome sidebar 
 
-## Build
+## Commands 
 
 - `npm run dev`: Start dev server
-- `npm run build`: Build the source code into `./dist` and continuously rebuild when changes occur 
+- `npm run build`: Build the source code into './dist'
+- `npm run build-watch`: Build the source code into `./dist` and continuously rebuild when changes occur
+- `npm run test`: Run tests below `./src/tests` directory 
 
-## Test
+## Build and Test Chrome Extension 
 1. Run `npm run build` to build source code into `./dist` 
 2. Visit [chrome extensions page](chrome://extensions/)
 3. Enable developer mode 
