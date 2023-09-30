@@ -10,22 +10,19 @@ import {
   OpenaiRole,
   streamOpenAiResponse
 } from "@/service/openai";
-import { VTextarea } from "vuetify/components";
+import { VBtn, VTextarea } from "vuetify/components";
 import type { Message } from "@/common/message";
 import { eventBus, EventName } from "@/common/event";
 import ChatMessage from "@/components/ChatMessage.vue";
-import Settings from "@/components/Settings.vue";
+import OpenaiModelSelector from "@/components/config/OpenaiModelSelector.vue";
 
 const messages = ref<Message[]>([]);
-type MessageRef = {
-  [key in ReturnType<typeof uuidv4>]: any
-};
-const messageRefs = ref<MessageRef>({});
 const newMessage = ref("");
-let received: Ref<Message> = getReceived();
+const scrollTarget: Ref<any> = ref();
 const textarea: Ref<any> = ref();
+let received: Ref<Message> = getReceived();
 const isMessageBeingStreamed = ref(false);
-
+const selectedModel: Ref<OpenaiModel> = ref(OpenaiModel["gpt-3.5-turbo"]);
 function getReceived(): Ref<Message> {
   return ref<Message>({
     id: uuidv4(),
@@ -33,6 +30,10 @@ function getReceived(): Ref<Message> {
     text: [],
     canceled: false
   });
+}
+
+function updateOpenaiModel(model) {
+  selectedModel.value = model;
 }
 
 async function sendMessage(event: any) {
@@ -62,7 +63,7 @@ async function sendMessage(event: any) {
   newMessage.value = "";
   const prompt = new OpenaiPrompt(
     [new OpenaiMessage(OpenaiRole.SYSTEM, messageToSend.text.join(""))],
-    OpenaiModel.gpt_3_5_turbo
+    selectedModel.value
   );
 
   // Send message and receive stream response
@@ -76,7 +77,7 @@ async function sendMessage(event: any) {
       }
 
       received.value.text.push(res);
-      messageRefs.value[received.value.id]?.scrollIntoView();
+      scrollTarget.value.scrollIntoView();
     },
     () => {
       isMessageBeingStreamed.value = true;
@@ -121,52 +122,53 @@ function getMessageCardClass(type: string) {
 
 function onApiKeyError(err: string) {
   eventBus.emit(EventName.OPEN_SETTINGS, { "err": err });
-  eventBus.emit(EventName.OPEN_SNACKBAR, { text: "API key is invalid", color: "error" })
+  eventBus.emit(EventName.OPEN_SNACKBAR, { text: "API key is invalid", color: "error" });
 }
 
 </script>
 
 <template>
   <div class="parent">
-    <div class="setting">
-      <settings />
-    </div>
-    <div class="top-child">
-      <div v-for="message in messages"
-           :key="message.id"
-           :ref="el => { messageRefs[message.id] = el  }"
-           :style="getPosition(message)">
-        <chat-message :message="message"
-                      :class="getMessageCardClass(message.type)" />
+    <div class="chat-message-container">
+      <div class="chat-messages">
+        <div v-for="message in messages"
+             :key="message.id"
+             :style="getPosition(message)">
+          <chat-message :message="message"
+                        :class="getMessageCardClass(message.type)" />
+        </div>
+      </div>
+      <div ref="scrollTarget" />
+      <div class="chat-message-buttons">
+        <v-btn v-if="isMessageBeingStreamed"
+               size="small"
+               icon="mdi-stop"
+               variant="plain"
+               color="error"
+               class="font-weight-bold"
+               @click="stopStream">
+          Stop
+        </v-btn>
       </div>
     </div>
-    <div class="middle-child">
-      <v-btn v-if="isMessageBeingStreamed"
-             size="small"
-             icon="mdi-stop"
-             variant="plain"
-             color="error"
-             class="font-weight-bold"
-             @click="stopStream">
-        Stop
-      </v-btn>
-    </div>
-    <div class="bottom-child">
-      <div class="pa-2">
-        <v-textarea v-model="newMessage"
-                    class="textarea"
-                    label="Write a message"
-                    @keydown.enter="sendMessage"
-                    append-inner-icon="mdi-send"
-                    :on-click:append-inner="sendMessage"
-                    variant="outlined"
-                    shaped
-                    clearable
-                    flat
-                    hide-details
-                    :disabled="isMessageBeingStreamed"
-                    ref="textarea" />
+    <div class="chat-textarea">
+      <div class="selectbox-area">
+        <openai-model-selector :selectedModel="selectedModel"
+        @update-openai-model="updateOpenaiModel" />
       </div>
+      <v-textarea v-model="newMessage"
+                  class="textarea"
+                  label="Write a message"
+                  @keydown.enter="sendMessage"
+                  append-inner-icon="mdi-send"
+                  :on-click:append-inner="sendMessage"
+                  variant="outlined"
+                  shaped
+                  clearable
+                  flat
+                  hide-details
+                  :disabled="isMessageBeingStreamed"
+                  ref="textarea" />
     </div>
   </div>
 </template>
@@ -175,34 +177,48 @@ function onApiKeyError(err: string) {
 <style scoped>
 .parent {
   display: grid;
-  grid-template-rows: 48px 1fr  32px 180px;
+  grid-template-rows: 1fr 210px;
   grid-gap: 10px;
-  overflow: hidden;
   height: 100%;
+
+  overflow-y: auto;
 }
 
-.setting {
-  margin: 4px;
-}
-
-.top-child {
-  overflow: auto;
-  padding: 0 0 16px 0;
-}
-
-.middle-child {
-  text-align: center;
+.chat-message-container {
+  display: grid;
+  grid-template-rows: 1fr 32px;
+  margin: 0 8px;
+  border-top: 2px solid #F0F1F5;
   border-bottom: 2px solid #F0F1F5;
+
+  overflow-y: auto;
 }
 
-.bottom-child {
-  height: 180px;
+.chat-messages {
+  padding: 16px;
+}
+
+.chat-message-buttons {
+  text-align: center;
+}
+
+.chat-textarea {
+  margin: 0 24px 0 8px;
+
+  display: grid;
+  grid-template-rows: 32px 1fr;
+  grid-gap: 10px;
+}
+
+.selectbox-area {
+  display: flex;
+  align-items: center;
 }
 
 .message-card {
   background-color: #F0F1F5;
   margin-bottom: 10px;
-  width: 70%;
+  max-width: 70%;
 }
 
 .message-card-sent {

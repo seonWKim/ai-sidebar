@@ -37,10 +37,6 @@ watch(props.message, (newValue, oldValue) => {
   wholeMessage.value += newText;
 });
 
-function stopStream(message: Message) {
-  message.canceled = true;
-}
-
 </script>
 
 <template>
@@ -54,6 +50,14 @@ function stopStream(message: Message) {
 </template>
 
 <style scoped>
+.markdown {
+  padding: 0 8px;
+}
+
+.markdown ::v-deep(code) {
+  white-space : pre-wrap !important;
+}
+
 .markdown ::v-deep(pre) {
   margin: 12px 0;
 }
