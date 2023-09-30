@@ -5,7 +5,7 @@ export class OpenaiPrompt {
   model: OpenaiModel;
 
   constructor(messages: OpenaiMessage[],
-              model: OpenaiModel = OpenaiModel.gpt_3_5_turbo) {
+              model: OpenaiModel = OpenaiModel["gpt-3.5-turbo"]) {
     this.messages = messages;
     this.model = model;
   }
@@ -27,16 +27,15 @@ export enum OpenaiRole {
   ASSISTANT = "assistant",
   FUNCTION = "function"
 }
-
 export enum OpenaiModel {
-  gpt_4 = "gpt-4",
-  gpt_4_0613 = "gpt-4-0613",
-  gpt_4_32k = "gpt-4-32k",
-  gpt_4_32k_0613 = "gpt-4-32k-0613",
-  gpt_3_5_turbo = "gpt-3.5-turbo",
-  gpt_3_5_turbo_0613 = "gpt-3.5-turbo-0613",
-  gpt_3_5_turbo_16k = "gpt-3.5-turbo-16k",
-  gpt_3_5_turbo_16k_0613 = "gpt-3.5-turbo-16k-0613"
+  'gpt-4' = "gpt-4",
+  'gpt-4-0613' = "gpt-4-0613",
+  'gpt-4-32k' = "gpt-4-32k",
+  'gpt-4-32k-0613' = "gpt-4-32k-0613",
+  'gpt-3.5-turbo' = "gpt-3.5-turbo",
+  'gpt-3.5-turbo-0613' = "gpt-3.5-turbo-0613",
+  'gpt-3.5-turbo-16k' = "gpt-3.5-turbo-16k",
+  'gpt-3.5-turbo-16k-0613' = "gpt-3.5-turbo-16k-0613"
 }
 
 export class ListenerEvent {

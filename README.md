@@ -14,7 +14,7 @@ Many AI chrome extensions require us to pay even though we provide our own api k
 and make one for ourselves.
 
 ## Features 
-![main.png](main.png)
+![main.png](main.gif)
 - Ask questions using chatGPT in chrome sidebar 
 
 ## Build

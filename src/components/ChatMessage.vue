@@ -50,6 +50,10 @@ watch(props.message, (newValue, oldValue) => {
 </template>
 
 <style scoped>
+.markdown {
+  padding: 0 8px;
+}
+
 .markdown ::v-deep(code) {
   white-space : pre-wrap !important;
 }

@@ -14,7 +14,7 @@ import { VBtn, VTextarea } from "vuetify/components";
 import type { Message } from "@/common/message";
 import { eventBus, EventName } from "@/common/event";
 import ChatMessage from "@/components/ChatMessage.vue";
-import Settings from "@/components/Settings.vue";
+import OpenaiModelSelector from "@/components/config/OpenaiModelSelector.vue";
 
 const messages = ref<Message[]>([]);
 const newMessage = ref("");
@@ -22,7 +22,7 @@ const scrollTarget: Ref<any> = ref();
 const textarea: Ref<any> = ref();
 let received: Ref<Message> = getReceived();
 const isMessageBeingStreamed = ref(false);
-
+const selectedModel: Ref<OpenaiModel> = ref(OpenaiModel["gpt-3.5-turbo"]);
 function getReceived(): Ref<Message> {
   return ref<Message>({
     id: uuidv4(),
@@ -30,6 +30,10 @@ function getReceived(): Ref<Message> {
     text: [],
     canceled: false
   });
+}
+
+function updateOpenaiModel(model) {
+  selectedModel.value = model;
 }
 
 async function sendMessage(event: any) {
@@ -59,7 +63,7 @@ async function sendMessage(event: any) {
   newMessage.value = "";
   const prompt = new OpenaiPrompt(
     [new OpenaiMessage(OpenaiRole.SYSTEM, messageToSend.text.join(""))],
-    OpenaiModel.gpt_3_5_turbo
+    selectedModel.value
   );
 
   // Send message and receive stream response
@@ -125,9 +129,6 @@ function onApiKeyError(err: string) {
 
 <template>
   <div class="parent">
-    <div class="setting">
-      <settings />
-    </div>
     <div class="chat-message-container">
       <div class="chat-messages">
         <div v-for="message in messages"
@@ -137,7 +138,7 @@ function onApiKeyError(err: string) {
                         :class="getMessageCardClass(message.type)" />
         </div>
       </div>
-      <div ref="scrollTarget"/>
+      <div ref="scrollTarget" />
       <div class="chat-message-buttons">
         <v-btn v-if="isMessageBeingStreamed"
                size="small"
@@ -151,21 +152,23 @@ function onApiKeyError(err: string) {
       </div>
     </div>
     <div class="chat-textarea">
-      <div class="pa-2">
-        <v-textarea v-model="newMessage"
-                    class="textarea"
-                    label="Write a message"
-                    @keydown.enter="sendMessage"
-                    append-inner-icon="mdi-send"
-                    :on-click:append-inner="sendMessage"
-                    variant="outlined"
-                    shaped
-                    clearable
-                    flat
-                    hide-details
-                    :disabled="isMessageBeingStreamed"
-                    ref="textarea" />
+      <div class="selectbox-area">
+        <openai-model-selector :selectedModel="selectedModel"
+        @update-openai-model="updateOpenaiModel" />
       </div>
+      <v-textarea v-model="newMessage"
+                  class="textarea"
+                  label="Write a message"
+                  @keydown.enter="sendMessage"
+                  append-inner-icon="mdi-send"
+                  :on-click:append-inner="sendMessage"
+                  variant="outlined"
+                  shaped
+                  clearable
+                  flat
+                  hide-details
+                  :disabled="isMessageBeingStreamed"
+                  ref="textarea" />
     </div>
   </div>
 </template>
@@ -174,26 +177,25 @@ function onApiKeyError(err: string) {
 <style scoped>
 .parent {
   display: grid;
-  grid-template-rows: 24px 1fr 180px;
+  grid-template-rows: 1fr 210px;
   grid-gap: 10px;
   height: 100%;
-}
 
-.setting {
-  margin: 4px;
+  overflow-y: auto;
 }
 
 .chat-message-container {
   display: grid;
   grid-template-rows: 1fr 32px;
   margin: 0 8px;
-  border: 2px solid #F0F1F5;
-  border-radius: 4px;
+  border-top: 2px solid #F0F1F5;
+  border-bottom: 2px solid #F0F1F5;
 
   overflow-y: auto;
 }
 
 .chat-messages {
+  padding: 16px;
 }
 
 .chat-message-buttons {
@@ -201,7 +203,16 @@ function onApiKeyError(err: string) {
 }
 
 .chat-textarea {
-  height: 180px;
+  margin: 0 24px 0 8px;
+
+  display: grid;
+  grid-template-rows: 32px 1fr;
+  grid-gap: 10px;
+}
+
+.selectbox-area {
+  display: flex;
+  align-items: center;
 }
 
 .message-card {

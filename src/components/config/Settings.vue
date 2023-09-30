@@ -24,22 +24,23 @@ watch(apiKey, (newValue, oldValue) => {
 </script>
 
 <template>
-  <v-row class="justify-end">
+  <v-row>
     <v-dialog
       v-model="dialog"
       fullscreen
       :scrim="false"
-      transition="dialog-bottom-transition"
+      transition="scroll-x-reverse-transition"
     >
       <template v-slot:activator="{ props }">
-        <v-btn
-          class="ma-4"
-          icon="mdi-cog"
-          dark
-          size="16px"
-          v-bind="props"
-          variant="flat"
-        />
+        <div class="text-center ma-4">
+          <v-btn
+            icon="mdi-cog"
+            dark
+            size="16px"
+            v-bind="props"
+            variant="flat"
+          />
+        </div>
       </template>
       <v-card>
         <v-toolbar
@@ -81,8 +82,5 @@ watch(apiKey, (newValue, oldValue) => {
 </template>
 
 <style>
-.dialog-bottom-transition-enter-active,
-.dialog-bottom-transition-leave-active {
-  transition: transform .2s ease-in-out;
-}
+
 </style>
