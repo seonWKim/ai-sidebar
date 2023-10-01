@@ -15,6 +15,7 @@ import Settings from "@/components/config/Settings.vue";
   display: grid;
   grid-template-columns: 1fr 32px;
   height: 100vh;
+  overflow: hidden;
 }
 
 .settings {
