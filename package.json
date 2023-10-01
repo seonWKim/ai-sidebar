@@ -6,7 +6,7 @@
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "build-watch": "vue-tsc --noEmit && vite build --watch",
-    "zip": "bestzip dist.zip dist/",
+    "zip": "npm run build && bestzip dist.zip dist/",
     "test": "vitest --run",
     "preview": "vite preview",
     "lint": "eslint . --fix --ignore-path .gitignore"
