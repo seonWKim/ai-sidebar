@@ -1,3 +1,5 @@
+🤩 [Donwload Chrome Extension](https://chromewebstore.google.com/detail/free-ai-side-bar/bphjdepgpbodffelhponjdfpjdajghgc)
+
 # Free AI Side Bar
 
 - Chrome extension sidebar for all sort of AI things
@@ -14,7 +16,7 @@ Many AI chrome extensions require us to pay even though we provide our own api k
 and make one for ourselves.
 
 ## Features 
-![main.png](main.gif)
+![main.png](public/static/main.gif)
 - Ask questions using chatGPT in chrome sidebar 
 
 ## Commands 
