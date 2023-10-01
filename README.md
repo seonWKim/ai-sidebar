@@ -1,3 +1,5 @@
+🤩 [Donwload Chrome Extension](https://chromewebstore.google.com/detail/free-ai-side-bar/bphjdepgpbodffelhponjdfpjdajghgc)
+
 # Free AI Side Bar
 
 - Chrome extension sidebar for all sort of AI things
