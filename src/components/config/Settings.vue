@@ -7,6 +7,7 @@ import { appStore } from "@/store/app";
 const dialog = ref(false);
 const apiKey = ref("");
 const store = appStore();
+const showApiKey = ref(false);
 
 eventBus.on(EventName.OPEN_SETTINGS, () => {
   dialog.value = true;
@@ -70,7 +71,10 @@ watch(apiKey, (newValue, oldValue) => {
           <v-responsive>
             <v-text-field
               v-model="apiKey"
+              :type="showApiKey ? 'text' : 'password'"
               clearable
+              :append-inner-icon="showApiKey ? 'mdi-eye' : 'mdi-eye-off'"
+              @click:append-inner="showApiKey = !showApiKey"
               :rules="[value => (value && value.length > 0) ? true : 'Set your OpenAI API key.']"
               messages="Set your OpenAI API key. Visit https://platform.openai.com/account/api-keys to get your API key."
               label="API Key" />
