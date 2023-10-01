@@ -3,9 +3,163 @@
 <head>
   <link rel="icon" href="../static/image/favicon.ico">
   <link rel="manifest" href="../static/image/site.webmanifest">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@100;200;300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@200;300&display=swap">
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Raleway', sans-serif;
+    }
+
+    .container {
+      width: 930px;
+    }
+
+    .logo-and-link {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 213px;
+    }
+
+    .logo-and-link-inner-container {
+      margin-bottom: 32px;
+    }
+
+    .logo-container {
+      text-align: center;
+      margin: 30px 40px 25px 40px;
+    }
+
+    .about-container {
+      text-align: center;
+      line-height: 30px;
+    }
+
+    .remove-anchor-default {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .about-text {
+      font-size: 14px;
+      color: #8B8B8B;
+    }
+
+    .github-icon {
+      margin-left: 4px;
+    }
+
+    .name-container {
+      margin: 0 0 20px 0;
+      text-align: center;
+      line-height: 1.25em;
+      font-size: 72px;
+    }
+
+    .subtitle-container {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .subtitle {
+      font-size: 18px;
+      font-weight: 300;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    .description-container {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .description {
+      font-size: 14px;
+      font-weight: 200;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    .gif-container {
+      border-left: 1px solid #EFF0F3;
+      border-right: 1px solid #EFF0F3;
+    }
+
+    .gif {
+      max-width: 930px;
+    }
+
+    .footer {
+      height: 163px;
+    }
+
+    .footer-text-container {
+      margin-top: 108px;
+      text-align: center;
+    }
+
+    .footer-text {
+      font-size: 12px;
+      font-weight: 200;
+    }
+  </style>
 </head>
 <body>
-<button id="openSidePanel">Open side panel</button>
-<script src="../js/script.js" type="module"></script>
+<!--<script src="../js/script.js" type="module"></script>-->
+
+<div class="container">
+  <div class="logo-and-link">
+    <div class="logo-and-link-inner-container">
+      <div class="logo-container">
+        <img src="../static/image/favicon-64x64.png"
+             alt="AI Sidebar Logo"
+             width="80px"
+             height="80px">
+      </div>
+      <div class="about-container">
+        <a class="remove-anchor-default about-text"
+           href="https://github.com/seonwoo960000/ai-sidebar"
+           target="_blank">
+          Contribute on GitHub
+        </a>
+        <a href="https://github.com/seonwoo960000/ai-sidebar"
+           target="_blank"
+           class="remove-anchor-default github-icon">
+          <i class="fab fa-github fa-lg"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="name-container">
+    <span>AI Sidebar</span>
+  </div>
+
+  <div class="subtitle-container">
+    <span class="subtitle">Free Open Source Chrome Extension</span>
+  </div>
+
+  <div class="description-container">
+    <span class="description">To start, press Ctrl/Cmd + Shift + O</span>
+  </div>
+
+  <div class="gif-container">
+    <img class="gif"
+         src="../static/main.gif">
+  </div>
+
+  <div class="footer">
+
+    <div class="footer-text-container">
+      <span class="footer-text">&#169;2023 by Seon Woo Kim.</span>
+    </div>
+  </div>
+</div>
 </body>
 </html>
