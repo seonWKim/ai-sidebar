@@ -1,0 +1,27 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "commitType": "docs",
+  "commitConvention": "angular",
+  "contributors": [
+    {
+      "login": "seonwoo960000",
+      "name": "Kim Seon Woo",
+      "avatar_url": "https://avatars.githubusercontent.com/u/69591622?v=4",
+      "profile": "https://github.com/seonwoo960000",
+      "contributions": [
+        "code",
+        "doc"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "skipCi": true,
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "projectName": "ai-sidebar",
+  "projectOwner": "seonwoo960000"
+}
