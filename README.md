@@ -11,25 +11,43 @@
 # AI Side Bar
 - Chrome extension sidebar for all sort of AI things
 - Community driven, open source
-
-## Stop Paying 🛑 
-
-Many AI chrome extensions require us to pay even though we provide our own api keys. Let's stop paying
-and make one for ourselves.
+- OpenAI Plugin
 
 ## Features 
 ![main.png](public/static/main.gif)
 - Ask questions using chatGPT in chrome sidebar 
 
+## Requirements
+- Node v16>=
+
 ## Commands
-- `npm run dev`: Start dev server
+- `npm i`: Install dependencies
+- `npm run dev`: Start dev server 
 - `npm run build`: Build the source code into './dist'
 - `npm run build-watch`: Build the source code into `./dist` and continuously rebuild when changes occur
 - `npm run test`: Run tests below `./src/tests` directory 
 
 ## Build and Test Chrome Extension 👨‍💻 
 ![instruction.png](images/instruction.png)
-1. Run `npm run build` to build source code into `./dist` 
-2. Visit [chrome extensions page](chrome://extensions/)
-3. Enable developer mode 
-4. Load unpacked extension(select `./dist` folder)
+1. [Login to OpenAI Account](https://platform.openai.com/login)
+2. [Visit OpenAI API Keys Page](https://platform.openai.com/account/api-keys)
+3. Create a new API key
+4. Make sure the organization is set to 'Personal'
+5. Copy the API Key
+6. Run `npm i` to install the necessary dependencies
+7. Run `npm run build` to build source code into `./dist` 
+8. Visit [chrome extensions page](chrome://extensions/)
+9. Enable developer mode 
+10. Load unpacked extension(select `./dist` folder)
+11. Paste API Key in OpenAI API Key input box
+
+## Note
+- By providing a personal API key the user may subject to billing
+- For pricing references refer to [OpenAI's pricing policy](https://openai.com/pricing)
+- API key is a secret do not share it with others
+- Users should understand the [rate limits](https://platform.openai.com/account/rate-limits) that the API holds
+- This extension will only work within a chrome browser
+
+## Contributions
+- Submit a pull request with a clear title and description
+- [Commit message best practices](https://www.freecodecamp.org/news/how-to-write-better-git-commit-messages/)
