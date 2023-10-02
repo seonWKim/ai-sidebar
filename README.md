@@ -1,6 +1,6 @@
 <p>
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
     <img src="public/static/image/favicon-64x64.png" alt="ai-sidebar logo" />
 </p>
@@ -70,6 +70,7 @@
   <tbody>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/seonwoo960000"><img src="https://avatars.githubusercontent.com/u/69591622?v=4?s=100" width="100px;" alt="Kim Seon Woo"/><br /><sub><b>Kim Seon Woo</b></sub></a><br /><a href="https://github.com/seonwoo960000/ai-sidebar/commits?author=seonwoo960000" title="Code">💻</a> <a href="https://github.com/seonwoo960000/ai-sidebar/commits?author=seonwoo960000" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://www.linkedin.com/in/rhythm-sharma-708a421a8/"><img src="https://avatars.githubusercontent.com/u/64489317?v=4?s=100" width="100px;" alt="Rhythm Sharma"/><br /><sub><b>Rhythm Sharma</b></sub></a><br /><a href="#design-Rhythm-08" title="Design">🎨</a></td>
     </tr>
   </tbody>
 </table>
