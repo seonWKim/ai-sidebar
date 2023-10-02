@@ -25,6 +25,15 @@
       "contributions": [
         "design"
       ]
+    },
+    {
+      "login": "CainanConway",
+      "name": "CainanConway",
+      "avatar_url": "https://avatars.githubusercontent.com/u/37641258?v=4",
+      "profile": "https://github.com/CainanConway",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
