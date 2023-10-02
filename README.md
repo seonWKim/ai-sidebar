@@ -1,7 +1,4 @@
 <p>
-<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
     <img src="public/static/image/favicon-64x64.png" alt="ai-sidebar logo" />
 </p>
 
@@ -14,7 +11,6 @@
 # AI Side Bar
 
 <a href="https://github.com/seonwoo960000/ai-sidebar"><img src="https://img.shields.io/github/stars/seonwoo960000/ai-sidebar.svg?style=social" /></a>
-<a href="https://github.com/seonwoo960000/ai-sidebar/contributors"><img src="https://img.shields.io/github/contributors/seonwoo960000/ai-sidebar.svg" /></a>
 <a href="https://github.com/seonwoo960000/ai-sidebar/pulse"><img src="https://img.shields.io/github/commit-activity/m/seonwoo960000/ai-sidebar.svg?label=commits" /></a>
 <a href="https://github.com/seonwoo960000/ai-sidebar/commits"><img src="https://img.shields.io/github/release-date/seonwoo960000/ai-sidebar.svg?label=release" /></a>
 
@@ -62,6 +58,9 @@
 - [Commit message best practices](https://www.freecodecamp.org/news/how-to-write-better-git-commit-messages/)
 
 ## Contributors 
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
