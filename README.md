@@ -9,6 +9,12 @@
 </p>
 
 # AI Side Bar
+
+<a href="https://github.com/seonwoo960000/ai-sidebar"><img src="https://img.shields.io/github/stars/seonwoo960000/ai-sidebar.svg?style=social" /></a>
+<a href="https://github.com/seonwoo960000/ai-sidebar/contributors"><img src="https://img.shields.io/github/contributors/seonwoo960000/ai-sidebar.svg" /></a>
+<a href="https://github.com/seonwoo960000/ai-sidebar/pulse"><img src="https://img.shields.io/github/commit-activity/m/seonwoo960000/ai-sidebar.svg?label=commits" /></a>
+<a href="https://github.com/seonwoo960000/ai-sidebar/commits"><img src="https://img.shields.io/github/release-date/seonwoo960000/ai-sidebar.svg?label=release" /></a>
+
 - Chrome extension sidebar for all sort of AI things
 - Community driven, open source
 - OpenAI Plugin
@@ -43,7 +49,7 @@
 
 ## Note
 - By providing a personal API key the user may subject to billing
-- For pricing references refer to [OpenAI's pricing policy](https://openai.com/pricing)
+- For pricing, refer to [OpenAI's pricing policy](https://openai.com/pricing)
 - API key is a secret do not share it with others
 - Users should understand the [rate limits](https://platform.openai.com/account/rate-limits) that the API holds
 - This extension will only work within a chrome browser
@@ -51,3 +57,14 @@
 ## Contributions
 - Submit a pull request with a clear title and description
 - [Commit message best practices](https://www.freecodecamp.org/news/how-to-write-better-git-commit-messages/)
+
+## Contributors 
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
