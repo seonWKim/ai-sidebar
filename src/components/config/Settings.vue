@@ -3,11 +3,13 @@ import { onMounted, ref, watch } from "vue";
 import { eventBus, EventName } from "@/common/event";
 import { VTextField } from "vuetify/components";
 import { appStore } from "@/store/app";
+import OpenaiApiKeyGuide from "@/components/config/OpenaiApiKeyGuide.vue";
 
 const dialog = ref(false);
 const apiKey = ref("");
 const store = appStore();
 const showApiKey = ref(false);
+const openaiApiKeyGuideDialog = ref(false);
 
 eventBus.on(EventName.OPEN_SETTINGS, () => {
   dialog.value = true;
@@ -21,6 +23,10 @@ onMounted(async () => {
 watch(apiKey, (newValue, oldValue) => {
   store.setOpenAiKey(newValue);
 });
+
+function updateOpenaiApiKeyGuideDialog(value: boolean) {
+  openaiApiKeyGuideDialog.value = value;
+}
 
 </script>
 
@@ -43,6 +49,9 @@ watch(apiKey, (newValue, oldValue) => {
           />
         </div>
       </template>
+      <openai-api-key-guide hidden
+                            :dialog="openaiApiKeyGuideDialog"
+                            @update:dialog="updateOpenaiApiKeyGuideDialog" />
       <v-card>
         <v-toolbar
           dark
@@ -67,17 +76,47 @@ watch(apiKey, (newValue, oldValue) => {
             </v-btn>
           </v-toolbar-items>
         </v-toolbar>
-        <v-container>
-          <v-responsive>
-            <v-text-field
-              v-model="apiKey"
-              :type="showApiKey ? 'text' : 'password'"
-              clearable
-              :append-inner-icon="showApiKey ? 'mdi-eye' : 'mdi-eye-off'"
-              @click:append-inner="showApiKey = !showApiKey"
-              :rules="[value => (value && value.length > 0) ? true : 'Set your OpenAI API key.']"
-              messages="Set your OpenAI API key. Visit https://platform.openai.com/account/api-keys to get your API key."
-              label="API Key" />
+        <v-container class="fill-height">
+          <v-responsive class="fill-height">
+            <v-card class="mx-auto pa-12 pb-8"
+                    density="compact"
+                    elevation="8"
+                    max-width="660"
+                    rounded="lg">
+              <div class="text-subtitle-1 text-medium-emphasis mb-2">
+                OpenAI API Key
+              </div>
+
+              <v-text-field
+                class="mb-4"
+                density="compact"
+                placeholder="API Key"
+                prepend-inner-icon="mdi-lock-outline"
+                variant="outlined"
+                v-model="apiKey"
+                :type="showApiKey ? 'text' : 'password'"
+                clearable
+                :append-inner-icon="showApiKey ? 'mdi-eye' : 'mdi-eye-off'"
+                @click:append-inner="showApiKey = !showApiKey"
+                :rules="[value => (value && value.length > 0) ? true : 'Set your OpenAI API key.']" />
+              <v-card class="mb-6"
+                      color="blue"
+                      variant="tonal">
+                <v-card-item class="mt-2">
+                  <template v-slot:subtitle>
+                    Note
+                  </template>
+                </v-card-item>
+                <v-card-text class="text-medium-emphasis text-caption">
+                  Click
+                  <span class="text-light-blue guide"
+                        @click="openaiApiKeyGuideDialog = true">
+                    OpenAi API Key Guide
+                  </span>
+                  for more information.
+                </v-card-text>
+              </v-card>
+            </v-card>
           </v-responsive>
         </v-container>
       </v-card>
@@ -85,6 +124,8 @@ watch(apiKey, (newValue, oldValue) => {
   </v-row>
 </template>
 
-<style>
-
+<style scoped>
+.guide {
+  cursor: pointer;
+}
 </style>
