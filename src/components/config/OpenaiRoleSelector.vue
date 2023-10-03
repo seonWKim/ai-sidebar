@@ -19,11 +19,7 @@ const roles = ref(Object.values(OpenaiRole));
 const selectedRole = ref(props.selectedRole);
 
 function selectRole(roleStr: string) {
-  const role =
-    Object.values(OpenaiRole).find(key => OpenaiRole[key] === roleStr) ||
-    OpenaiRole.system;
-
-  selectedRole.value = role;
+  selectedRole.value = Object.values(OpenaiRole).find(key => OpenaiRole[key] === roleStr) || OpenaiRole.system;
   emits("updateOpenaiRole", selectedRole.value);
 }
 

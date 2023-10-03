@@ -21,8 +21,8 @@ const showDialog = computed({
   }
 });
 
-const stepNameClass = "text-caption text-lg-body-1 mt-4 mb-2";
-const stepDetailClass = "text-light-blue-accent-4 text-caption remove-anchor-default";
+const stepNameClass = "text-caption text-lg-body-1 mt-8 mb-2";
+const stepDetailClass = "text-primary text-caption remove-anchor-default";
 const imageBoxClass = "border-lg my-4";
 
 </script>

@@ -146,6 +146,7 @@ function onApiKeyError(err: string) {
              :key="message.id"
              :style="getPosition(message)">
           <chat-message :message="message"
+                        color="grey"
                         :class="getMessageCardClass(message.type)" />
         </div>
       </div>
@@ -231,7 +232,6 @@ function onApiKeyError(err: string) {
 }
 
 .message-card {
-  background-color: #F0F1F5;
   margin-bottom: 10px;
   max-width: 70%;
 }
