@@ -4,10 +4,12 @@ import Openai from "openai";
 const chromeStorageApiKey = "freesidebar_api_key";
 export const appStore = defineStore("app", {
   state: () => ({
-    openai: null as (Openai | null)
+    openai: null as (Openai | null),
   }),
   getters: {
-    openaiReadOny: (state) => state.openai
+    openaiReadOny: (state) => state.openai,
+    mockOpenai: (state) => import.meta.env.VITE_MOCK_OPENAI_API === 'true',
+    mockOpenaiApiResponseInterval: (state) => import.meta.env.VITE_MOCK_OPENAI_API_RESPONSE_INTERVAL_MILLIS || 50
   },
   actions: {
     async initializeOpenAi() {

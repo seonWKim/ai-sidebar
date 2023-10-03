@@ -33,6 +33,11 @@
 - `npm run test`: Run tests below `./src/tests` directory 
 
 ## Build and Test Chrome Extension 👨‍💻 
+
+### Mocking Openai API 
+1. Set `VITE_MOCK_OPENAI_API` to `true` in `.env` file
+
+### Using Openai API 
 ![instruction.png](images/instruction.png)
 1. [Login to OpenAI Account](https://platform.openai.com/login)
 2. [Visit OpenAI API Keys Page](https://platform.openai.com/account/api-keys)
