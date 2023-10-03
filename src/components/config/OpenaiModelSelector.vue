@@ -20,11 +20,7 @@ const models = ref(Object.values(OpenaiModel));
 const selectedModel = ref(props.selectedModel);
 
 function selectModel(modelStr: string) {
-  const model =
-    Object.values(OpenaiModel).find(key => OpenaiModel[key] === modelStr) ||
-    OpenaiModel["gpt-3.5-turbo"];
-
-  selectedModel.value = model;
+  selectedModel.value = Object.values(OpenaiModel).find(key => OpenaiModel[key] === modelStr) || OpenaiModel["gpt-3.5-turbo"];
   emits("updateOpenaiModel", selectedModel.value);
 }
 </script>

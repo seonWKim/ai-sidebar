@@ -100,7 +100,7 @@ function updateOpenaiApiKeyGuideDialog(value: boolean) {
                 @click:append-inner="showApiKey = !showApiKey"
                 :rules="[value => (value && value.length > 0) ? true : 'Set your OpenAI API key.']" />
               <v-card class="mb-6"
-                      color="blue"
+                      color="primary"
                       variant="tonal">
                 <v-card-item class="mt-2">
                   <template v-slot:subtitle>
@@ -109,7 +109,7 @@ function updateOpenaiApiKeyGuideDialog(value: boolean) {
                 </v-card-item>
                 <v-card-text class="text-medium-emphasis text-caption">
                   Click
-                  <span class="text-light-blue guide"
+                  <span class="text-primary guide"
                         @click="openaiApiKeyGuideDialog = true">
                     OpenAi API Key Guide
                   </span>
