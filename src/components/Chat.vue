@@ -1,4 +1,8 @@
-<script setup lang="ts" xmlns:chat-message-received="http://www.w3.org/1999/XSL/Transform">
+<script
+  setup
+  lang="ts"
+  xmlns:chat-message-received="http://www.w3.org/1999/XSL/Transform"
+>
 import { Ref, ref } from "vue";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -8,7 +12,7 @@ import {
   OpenaiModel,
   OpenaiPrompt,
   OpenaiRole,
-  streamOpenAiResponse
+  streamOpenAiResponse,
 } from "@/service/openai";
 import { VBtn, VTextarea } from "vuetify/components";
 import type { Message } from "@/common/message";
@@ -31,7 +35,7 @@ function getReceived(): Ref<Message> {
     id: uuidv4(),
     type: "received",
     text: [],
-    canceled: false
+    canceled: false,
   });
 }
 
@@ -64,23 +68,20 @@ async function sendMessage(event: any) {
     id: uuidv4(),
     type: "sent",
     text: [newMessage.value],
-    canceled: false
+    canceled: false,
   };
   messages.value.push(messageToSend);
   newMessage.value = "";
   const prompt = new OpenaiPrompt(
-    [
-      new OpenaiMessage(
-        selectedRole.value,
-        messageToSend.text.join(""))
-    ],
+    [new OpenaiMessage(selectedRole.value, messageToSend.text.join(""))],
     selectedModel.value
   );
 
   // Send message and receive stream response
   let isMessagePushed = false;
-  await streamOpenAiResponse(prompt,
-    res => {
+  await streamOpenAiResponse(
+    prompt,
+    (res) => {
       if (!isMessagePushed) {
         // Show received message in the UI
         messages.value.push(received.value);
@@ -106,7 +107,8 @@ async function sendMessage(event: any) {
       isMessageBeingStreamed.value = false;
       return null;
     },
-    onApiKeyError);
+    onApiKeyError
+  );
 }
 
 function stopStream() {
@@ -118,8 +120,8 @@ function stopStream() {
 
 function getPosition(message: Message) {
   return {
-    "display": "flex",
-    "justify-content": message.type === "sent" ? "flex-end" : "flex-start"
+    display: "flex",
+    "justify-content": message.type === "sent" ? "flex-end" : "flex-start",
   };
 }
 
@@ -127,68 +129,81 @@ function getMessageCardClass(type: string) {
   return {
     "message-card": true,
     "message-card-sent": type === "sent",
-    "message-card-received": type === "received"
+    "message-card-received": type === "received",
   };
 }
 
 function onApiKeyError(err: string) {
-  eventBus.emit(EventName.OPEN_SETTINGS, { "err": err });
-  eventBus.emit(EventName.OPEN_SNACKBAR, { text: "API key is invalid", color: "error" });
+  eventBus.emit(EventName.OPEN_SETTINGS, { err: err });
+  eventBus.emit(EventName.OPEN_SNACKBAR, {
+    text: "API key is invalid",
+    color: "error",
+  });
 }
-
 </script>
 
 <template>
   <div class="parent">
     <div class="chat-message-container">
       <div class="chat-messages">
-        <div v-for="message in messages"
-             :key="message.id"
-             :style="getPosition(message)">
-          <chat-message :message="message"
-                        color="grey"
-                        :class="getMessageCardClass(message.type)" />
+        <div
+          v-for="message in messages"
+          :key="message.id"
+          :style="getPosition(message)"
+        >
+          <chat-message
+            :message="message"
+            color="grey"
+            :class="getMessageCardClass(message.type)"
+          />
         </div>
       </div>
       <div ref="scrollTarget" />
       <div class="chat-message-buttons">
-        <v-btn v-if="isMessageBeingStreamed"
-               size="small"
-               icon="mdi-stop"
-               variant="plain"
-               color="error"
-               class="font-weight-bold"
-               @click="stopStream">
+        <v-btn
+          v-if="isMessageBeingStreamed"
+          size="small"
+          icon="mdi-stop"
+          variant="plain"
+          color="error"
+          class="font-weight-bold"
+          @click="stopStream"
+        >
           Stop
         </v-btn>
       </div>
     </div>
     <div class="chat-textarea">
       <div class="selectbox-area">
-        <openai-model-selector :selected-model="selectedModel"
-                               custom-style="mr-2"
-                               @update-openai-model="updateOpenaiModel" />
-        <openai-role-selector :selected-role="selectedRole"
-                              custom-style="mr-2"
-                              @update-openai-role="updateOpenaiRole" />
+        <openai-model-selector
+          :selected-model="selectedModel"
+          custom-style="mr-2"
+          @update-openai-model="updateOpenaiModel"
+        />
+        <openai-role-selector
+          :selected-role="selectedRole"
+          custom-style="mr-2"
+          @update-openai-role="updateOpenaiRole"
+        />
       </div>
-      <v-textarea v-model="newMessage"
-                  class="textarea"
-                  label="Write a message"
-                  @keydown.enter="sendMessage"
-                  append-inner-icon="mdi-send"
-                  :on-click:append-inner="sendMessage"
-                  variant="outlined"
-                  shaped
-                  clearable
-                  flat
-                  hide-details
-                  :disabled="isMessageBeingStreamed"
-                  ref="textarea" />
+      <v-textarea
+        v-model="newMessage"
+        class="textarea"
+        label="Write a message"
+        @keydown.enter="sendMessage"
+        append-inner-icon="mdi-send"
+        :on-click:append-inner="sendMessage"
+        variant="outlined"
+        shaped
+        clearable
+        flat
+        hide-details
+        :disabled="isMessageBeingStreamed"
+        ref="textarea"
+      />
     </div>
   </div>
 </template>
-
 
 <style scoped>
 .parent {
@@ -198,14 +213,15 @@ function onApiKeyError(err: string) {
   height: 100%;
 
   overflow-y: auto;
+  position: relative;
 }
 
 .chat-message-container {
   display: grid;
   grid-template-rows: 1fr 32px;
   margin: 0 8px;
-  border-top: 2px solid #F0F1F5;
-  border-bottom: 2px solid #F0F1F5;
+  border-top: 2px solid #f0f1f5;
+  border-bottom: 2px solid #f0f1f5;
 
   overflow-y: auto;
 }
@@ -215,7 +231,9 @@ function onApiKeyError(err: string) {
 }
 
 .chat-message-buttons {
-  text-align: center;
+  position: absolute;
+  bottom: 220px;
+  left: 50%;
 }
 
 .chat-textarea {
