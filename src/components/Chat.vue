@@ -12,7 +12,7 @@ import {
   OpenaiModel,
   OpenaiPrompt,
   OpenaiRole,
-  streamOpenAiResponse,
+  streamOpenAiResponse
 } from "@/service/openai";
 import { VBtn, VTextarea } from "vuetify/components";
 import type { Message } from "@/common/message";
@@ -35,7 +35,7 @@ function getReceived(): Ref<Message> {
     id: uuidv4(),
     type: "received",
     text: [],
-    canceled: false,
+    canceled: false
   });
 }
 
@@ -68,7 +68,7 @@ async function sendMessage(event: any) {
     id: uuidv4(),
     type: "sent",
     text: [newMessage.value],
-    canceled: false,
+    canceled: false
   };
   messages.value.push(messageToSend);
   newMessage.value = "";
@@ -121,7 +121,7 @@ function stopStream() {
 function getPosition(message: Message) {
   return {
     display: "flex",
-    "justify-content": message.type === "sent" ? "flex-end" : "flex-start",
+    "justify-content": message.type === "sent" ? "flex-end" : "flex-start"
   };
 }
 
@@ -129,7 +129,7 @@ function getMessageCardClass(type: string) {
   return {
     "message-card": true,
     "message-card-sent": type === "sent",
-    "message-card-received": type === "received",
+    "message-card-received": type === "received"
   };
 }
 
@@ -137,7 +137,7 @@ function onApiKeyError(err: string) {
   eventBus.emit(EventName.OPEN_SETTINGS, { err: err });
   eventBus.emit(EventName.OPEN_SNACKBAR, {
     text: "API key is invalid",
-    color: "error",
+    color: "error"
   });
 }
 </script>
@@ -206,6 +206,7 @@ function onApiKeyError(err: string) {
 </template>
 
 <style scoped>
+// if you want to update the grid-template-rows, you need to update the .chat-message-buttons as well
 .parent {
   display: grid;
   grid-template-rows: 1fr 210px;
@@ -220,8 +221,8 @@ function onApiKeyError(err: string) {
   display: grid;
   grid-template-rows: 1fr 32px;
   margin: 0 8px;
-  border-top: 2px solid #f0f1f5;
-  border-bottom: 2px solid #f0f1f5;
+  border-top: 2px solid #F0F1F5;
+  border-bottom: 2px solid #F0F1F5;
 
   overflow-y: auto;
 }
@@ -230,6 +231,7 @@ function onApiKeyError(err: string) {
   padding: 16px;
 }
 
+// because the size of the textbox is 210px from the bottom(refer to .parent), if can fix the position of the buttons by using absolute position
 .chat-message-buttons {
   position: absolute;
   bottom: 220px;
