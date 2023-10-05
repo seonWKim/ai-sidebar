@@ -16,6 +16,7 @@ import { eventBus, EventName } from "@/common/event";
 import ChatMessage from "@/components/ChatMessage.vue";
 import OpenaiModelSelector from "@/components/config/OpenaiModelSelector.vue";
 import OpenaiRoleSelector from "@/components/config/OpenaiRoleSelector.vue";
+import OpenaiTemperatureSlider from "@/components/config/OpenaiTemperatureSlider.vue";
 
 const messages = ref<Message[]>([]);
 const newMessage = ref("");
@@ -25,6 +26,7 @@ let received: Ref<Message> = getReceived();
 const isMessageBeingStreamed = ref(false);
 const selectedModel: Ref<OpenaiModel> = ref(OpenaiModel["gpt-3.5-turbo"]);
 const selectedRole: Ref<OpenaiRole> = ref(OpenaiRole.system);
+const selectedTemperature: Ref<Number> = ref(1.0);
 
 function getReceived(): Ref<Message> {
   return ref<Message>({
@@ -41,6 +43,10 @@ function updateOpenaiModel(model: OpenaiModel) {
 
 function updateOpenaiRole(role: OpenaiRole) {
   selectedRole.value = role;
+}
+
+function updateOpenaiTemperature(temperature: number) {
+  selectedTemperature.value = temperature;
 }
 
 async function sendMessage(event: any) {
@@ -70,7 +76,8 @@ async function sendMessage(event: any) {
   newMessage.value = "";
   const prompt = new OpenaiPrompt(
     [new OpenaiMessage(selectedRole.value, messageToSend.text.join(""))],
-    selectedModel.value
+    selectedModel.value,
+    selectedTemperature.value
   );
 
   // Send message and receive stream response
@@ -171,16 +178,21 @@ function onApiKeyError(err: string) {
     </div>
     <div class="chat-textarea">
       <div class="selectbox-area">
-        <openai-model-selector
-          :selected-model="selectedModel"
-          custom-style="mr-2"
-          @update-openai-model="updateOpenaiModel"
-        />
-        <openai-role-selector
-          :selected-role="selectedRole"
-          custom-style="mr-2"
-          @update-openai-role="updateOpenaiRole"
-        />
+        <div>
+          <openai-model-selector
+            :selected-model="selectedModel"
+            custom-style="mr-2"
+            @update-openai-model="updateOpenaiModel"
+          />
+          <openai-role-selector
+            :selected-role="selectedRole"
+            custom-style="mr-2"
+            @update-openai-role="updateOpenaiRole"
+          />
+        </div>
+        <openai-temperature-slider :selected-temperature="selectedTemperature"
+                                   @update-openai-temperature="updateOpenaiTemperature"
+                                   class="temperature" />
       </div>
       <v-textarea
         v-model="newMessage"
@@ -244,6 +256,7 @@ function onApiKeyError(err: string) {
 
 .selectbox-area {
   display: flex;
+  justify-content: space-between;
   align-items: center;
 }
 
@@ -259,4 +272,10 @@ function onApiKeyError(err: string) {
 .message-card-received {
   border-radius: 0 10px 10px 10px;
 }
+
+.temperature {
+  width: 200px;
+  height: 100%;
+}
+
 </style>
