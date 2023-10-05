@@ -26,7 +26,7 @@ let received: Ref<Message> = getReceived();
 const isMessageBeingStreamed = ref(false);
 const selectedModel: Ref<OpenaiModel> = ref(OpenaiModel["gpt-3.5-turbo"]);
 const selectedRole: Ref<OpenaiRole> = ref(OpenaiRole.system);
-const selectedTemperature: Ref<Number> = ref(1.0);
+const selectedTemperature: Ref<number> = ref(1.0);
 
 function getReceived(): Ref<Message> {
   return ref<Message>({
