@@ -7,11 +7,13 @@ const MOCK_RESPONSE_STREAM: string[] = "Lorem ipsum dolor sit amet consectetur a
 export class OpenaiPrompt {
   messages: OpenaiMessage[];
   model: OpenaiModel;
-
+  temperature: number;
   constructor(messages: OpenaiMessage[],
-              model: OpenaiModel = OpenaiModel["gpt-3.5-turbo"]) {
+              model: OpenaiModel = OpenaiModel["gpt-3.5-turbo"],
+              temperature: number = 1) {
     this.messages = messages;
     this.model = model;
+    this.temperature = temperature;
   }
 }
 
@@ -101,7 +103,8 @@ const streamOpenAiResponse = appStore().mockOpenai ?
           content: message.content
         })),
         model: prompt.model,
-        stream: true
+        temperature: prompt.temperature,
+        stream: true,
       });
 
       beforeStreamListener();
