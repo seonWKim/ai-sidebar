@@ -1,8 +1,4 @@
-<script
-  setup
-  lang="ts"
-  xmlns:chat-message-received="http://www.w3.org/1999/XSL/Transform"
->
+<script setup lang="ts">
 import { Ref, ref } from "vue";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -206,7 +202,7 @@ function onApiKeyError(err: string) {
 </template>
 
 <style scoped>
-// if you want to update the grid-template-rows, you need to update the .chat-message-buttons as well
+/* if you want to update the grid-template-rows, you need to update the .chat-message-buttons as well */
 .parent {
   display: grid;
   grid-template-rows: 1fr 210px;
@@ -231,7 +227,7 @@ function onApiKeyError(err: string) {
   padding: 16px;
 }
 
-// because the size of the textbox is 210px from the bottom(refer to .parent), if can fix the position of the buttons by using absolute position
+/* because the size of the textbox is 210px from the bottom(refer to .parent), if can fix the position of the buttons by using absolute position */
 .chat-message-buttons {
   position: absolute;
   bottom: 220px;
