@@ -123,7 +123,7 @@ function stopStream() {
   }
 }
 
-function constructMessage(template: String, message: String) {
+function constructMessage(template: string, message: string): string {
   if (!template || template.trim() === "") {
     return message;
   }
