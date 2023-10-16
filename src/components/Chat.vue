@@ -20,8 +20,10 @@ import OpenaiTemperatureSlider from "@/components/config/OpenaiTemperatureSlider
 
 const messages = ref<Message[]>([]);
 const newMessage = ref("");
+const messageTemplate = ref("")
+const messageTemplateInputPlaceholder = "{{message}}"
+const messageTemplatePlaceholder = `Summarize the following text: ${messageTemplateInputPlaceholder}`
 const scrollTarget: Ref<any> = ref();
-const textarea: Ref<any> = ref();
 let received: Ref<Message> = getReceived();
 const isMessageBeingStreamed = ref(false);
 const selectedModel: Ref<OpenaiModel> = ref(OpenaiModel["gpt-3.5-turbo"]);
@@ -69,7 +71,7 @@ async function sendMessage(event: any) {
   const messageToSend: Message = {
     id: uuidv4(),
     type: "sent",
-    text: [newMessage.value],
+    text: [constructMessage(messageTemplate.value, newMessage.value)],
     canceled: false
   };
   messages.value.push(messageToSend);
@@ -121,6 +123,26 @@ function stopStream() {
   }
 }
 
+function constructMessage(template: String, message: String) {
+  if (!template || template.trim() === "") {
+    return message;
+  }
+
+  if (template.includes(messageTemplateInputPlaceholder)) {
+    return  template.replace("{{message}}", message);
+  } else {
+    return template + "\n" + message
+  }
+}
+
+function onApiKeyError(err: string) {
+  eventBus.emit(EventName.OPEN_SETTINGS, { err: err });
+  eventBus.emit(EventName.OPEN_SNACKBAR, {
+    text: "API key is invalid",
+    color: "error"
+  });
+}
+
 function getPosition(message: Message) {
   return {
     display: "flex",
@@ -136,13 +158,6 @@ function getMessageCardClass(type: string) {
   };
 }
 
-function onApiKeyError(err: string) {
-  eventBus.emit(EventName.OPEN_SETTINGS, { err: err });
-  eventBus.emit(EventName.OPEN_SNACKBAR, {
-    text: "API key is invalid",
-    color: "error"
-  });
-}
 </script>
 
 <template>
@@ -195,9 +210,23 @@ function onApiKeyError(err: string) {
                                    class="temperature" />
       </div>
       <v-textarea
+        v-model="messageTemplate"
+        class="preface-textarea"
+        label="Add message template"
+        :placeholder=messageTemplatePlaceholder
+        variant="outlined"
+        rows="1"
+        shaped
+        clearable
+        flat
+        hide-details
+        :disabled="isMessageBeingStreamed"
+      />
+      <v-textarea
         v-model="newMessage"
-        class="textarea"
+        class="main-textarea"
         label="Write a message"
+        placeholder="Write an application that uses AI to..."
         @keydown.enter="sendMessage"
         append-inner-icon="mdi-send"
         :on-click:append-inner="sendMessage"
@@ -207,7 +236,6 @@ function onApiKeyError(err: string) {
         flat
         hide-details
         :disabled="isMessageBeingStreamed"
-        ref="textarea"
       />
     </div>
   </div>
@@ -217,7 +245,7 @@ function onApiKeyError(err: string) {
 /* if you want to update the grid-template-rows, you need to update the .chat-message-buttons as well */
 .parent {
   display: grid;
-  grid-template-rows: 1fr 210px;
+  grid-template-rows: 1fr 278px;
   grid-gap: 10px;
   height: 100%;
 
@@ -242,7 +270,7 @@ function onApiKeyError(err: string) {
 /* because the size of the textbox is 210px from the bottom(refer to .parent), if can fix the position of the buttons by using absolute position */
 .chat-message-buttons {
   position: absolute;
-  bottom: 220px;
+  bottom: 288px;
   left: 50%;
 }
 
@@ -250,8 +278,8 @@ function onApiKeyError(err: string) {
   margin: 0 24px 0 8px;
 
   display: grid;
-  grid-template-rows: 32px 1fr;
-  grid-gap: 10px;
+  grid-template-rows: 32px 48px 1fr;
+  grid-gap: 16px;
 }
 
 .selectbox-area {
@@ -276,6 +304,13 @@ function onApiKeyError(err: string) {
 .temperature {
   width: 200px;
   height: 100%;
+}
+
+.preface-textarea {
+}
+
+.main-textarea {
+
 }
 
 </style>
