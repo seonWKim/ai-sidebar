@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Message } from "@/common/message";
-import { defineComponent, ref, watch } from "vue";
+import { defineComponent, onMounted, ref, watch } from "vue";
 import Markdown from "vue3-markdown-it";
 import MarkdownItHighlightjs from "markdown-it-highlightjs";
 
@@ -44,6 +44,7 @@ watch(props.message, (newValue, oldValue) => {
     <v-card-text class="px-4 py-0">
       <markdown :source="wholeMessage"
                 class="markdown"
+                :breaks="true"
                 :plugins="plugins" />
     </v-card-text>
   </v-card>
@@ -55,7 +56,7 @@ watch(props.message, (newValue, oldValue) => {
 }
 
 .markdown ::v-deep(code) {
-  white-space : pre-wrap !important;
+  white-space: pre-wrap !important;
 }
 
 .markdown ::v-deep(pre) {
