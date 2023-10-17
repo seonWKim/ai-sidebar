@@ -17,12 +17,12 @@ import ChatMessage from "@/components/ChatMessage.vue";
 import OpenaiModelSelector from "@/components/config/OpenaiModelSelector.vue";
 import OpenaiRoleSelector from "@/components/config/OpenaiRoleSelector.vue";
 import OpenaiTemperatureSlider from "@/components/config/OpenaiTemperatureSlider.vue";
+import MessageTemplateModal from "@/components/config/MessageTemplateModal.vue";
 
 const messages = ref<Message[]>([]);
 const newMessage = ref("");
 const messageTemplate = ref("")
 const messageTemplateInputPlaceholder = "{{message}}"
-const messageTemplatePlaceholder = `Summarize the following text: ${messageTemplateInputPlaceholder}`
 const scrollTarget: Ref<any> = ref();
 let received: Ref<Message> = getReceived();
 const isMessageBeingStreamed = ref(false);
@@ -37,6 +37,10 @@ function getReceived(): Ref<Message> {
     text: [],
     canceled: false
   });
+}
+
+function updateMessageTemplate(template: string) {
+  messageTemplate.value = template;
 }
 
 function updateOpenaiModel(model: OpenaiModel) {
@@ -194,6 +198,10 @@ function getMessageCardClass(type: string) {
     <div class="chat-textarea">
       <div class="selectbox-area">
         <div>
+          <message-template-modal
+            custom-style="mr-2"
+            @update-message-template="updateMessageTemplate"
+          />
           <openai-model-selector
             :selected-model="selectedModel"
             custom-style="mr-2"
@@ -209,19 +217,6 @@ function getMessageCardClass(type: string) {
                                    @update-openai-temperature="updateOpenaiTemperature"
                                    class="temperature" />
       </div>
-      <v-textarea
-        v-model="messageTemplate"
-        class="preface-textarea"
-        label="Add message template"
-        :placeholder=messageTemplatePlaceholder
-        variant="outlined"
-        rows="1"
-        shaped
-        clearable
-        flat
-        hide-details
-        :disabled="isMessageBeingStreamed"
-      />
       <v-textarea
         v-model="newMessage"
         class="main-textarea"
@@ -245,7 +240,7 @@ function getMessageCardClass(type: string) {
 /* if you want to update the grid-template-rows, you need to update the .chat-message-buttons as well */
 .parent {
   display: grid;
-  grid-template-rows: 1fr 278px;
+  grid-template-rows: 1fr 210px;
   grid-gap: 10px;
   height: 100%;
 
@@ -270,15 +265,14 @@ function getMessageCardClass(type: string) {
 /* because the size of the textbox is 210px from the bottom(refer to .parent), if can fix the position of the buttons by using absolute position */
 .chat-message-buttons {
   position: absolute;
-  bottom: 288px;
+  bottom: 220px;
   left: 50%;
 }
 
 .chat-textarea {
   margin: 0 24px 0 8px;
-
   display: grid;
-  grid-template-rows: 32px 48px 1fr;
+  grid-template-rows: 32px 1fr;
   grid-gap: 16px;
 }
 
@@ -304,9 +298,6 @@ function getMessageCardClass(type: string) {
 .temperature {
   width: 200px;
   height: 100%;
-}
-
-.preface-textarea {
 }
 
 .main-textarea {

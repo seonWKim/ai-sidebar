@@ -1,33 +1,26 @@
 import { defineStore } from "pinia";
 import Openai from "openai";
+import { ChromeStorageKeys } from "@/common/keys";
 
-const chromeStorageApiKey = "freesidebar_api_key";
 export const appStore = defineStore("app", {
   state: () => ({
-    openai: null as (Openai | null),
+    openai: null as (Openai | null)
   }),
   getters: {
     openaiReadOny: (state) => state.openai,
-    mockOpenai: (state) => import.meta.env.VITE_MOCK_OPENAI_API === 'true',
+    mockOpenai: (state) => import.meta.env.VITE_MOCK_OPENAI_API === "true",
     mockOpenaiApiResponseInterval: (state) => import.meta.env.VITE_MOCK_OPENAI_API_RESPONSE_INTERVAL_MILLIS || 50
   },
   actions: {
     async initializeOpenAi() {
-      let openApiKey: string = ""
-      try {
-        const chromeStorage = await chrome?.storage?.local?.get(chromeStorageApiKey);
-        openApiKey = chromeStorage[chromeStorageApiKey] || "";
-      } catch (e) {
-        // skip
-      }
-
+      const openApiKey = await this.getFromChromeStorage(ChromeStorageKeys.API_KEY);
       this.openai = new Openai({
         apiKey: openApiKey,
         dangerouslyAllowBrowser: true
       });
     },
     setOpenAiKey(apiKey: string) {
-      chrome?.storage?.local?.set({ [chromeStorageApiKey]: apiKey });
+      this.saveToChromeStorage(ChromeStorageKeys.API_KEY, apiKey);
       if (this.openai) {
         this.openai.apiKey = apiKey;
       } else {
@@ -36,6 +29,13 @@ export const appStore = defineStore("app", {
           dangerouslyAllowBrowser: true
         });
       }
+    },
+    saveToChromeStorage(key: string, value: string) {
+      chrome?.storage?.local?.set({ [key]: value });
+    },
+    async getFromChromeStorage(key: string): Promise<string> {
+      const result = await chrome?.storage?.local?.get(key);
+      return result ? result[key] : "";
     }
   }
 });
