@@ -58,7 +58,7 @@ watch(template, (newVal) => {
               mdi-close
             </v-icon>
           </v-btn>
-          <v-toolbar-title>Message Template</v-toolbar-title>
+          <v-toolbar-title>Template</v-toolbar-title>
         </v-toolbar>
         <v-container class="fill-height">
           <v-responsive class="fill-height pa-6">
