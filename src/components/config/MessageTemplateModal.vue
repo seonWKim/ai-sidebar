@@ -15,10 +15,10 @@ const props = defineProps({
 onMounted(async () => {
   store.getFromChromeStorage(ChromeStorageKeys.MESSAGE_TEMPLATE)
     .then(result => {
-      console.log("result: ", result)
-      template.value = result
-    })
-})
+      console.log("result: ", result);
+      template.value = result;
+    });
+});
 
 const emits = defineEmits(["updateMessageTemplate"]);
 
@@ -29,10 +29,8 @@ const messageTemplateInputPlaceholder = "{{message}}";
 const messageTemplatePlaceholder = `Summarize the following text: ${messageTemplateInputPlaceholder}`;
 
 watch(template, (newVal) => {
-  if (newVal) {
-    store.saveToChromeStorage(ChromeStorageKeys.MESSAGE_TEMPLATE, newVal);
-    emits("updateMessageTemplate", newVal);
-  }
+  store.saveToChromeStorage(ChromeStorageKeys.MESSAGE_TEMPLATE, newVal);
+  emits("updateMessageTemplate", newVal);
 });
 
 </script>
@@ -82,8 +80,9 @@ watch(template, (newVal) => {
                 </template>
               </v-card-item>
               <v-card-text class="text-medium-emphasis text-caption">
-                Message will be formatted by using the message template if configured.
-                <span>{{messageTemplateInputPlaceholder}}</span> is a placeholder for the original message.
+                <span>{{ messageTemplateInputPlaceholder }}</span> is a placeholder for the original message.
+                Original message is formatted by using the template if configured.
+                By default, the original message is added at the end.
               </v-card-text>
             </v-card>
           </v-responsive>
