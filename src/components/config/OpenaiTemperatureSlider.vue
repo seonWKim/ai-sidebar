@@ -20,10 +20,6 @@ const temperature = computed({
 });
 
 const description = "What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.";
-function getTemperature() {
-  return temperature.value?.toFixed(1);
-}
-
 </script>
 
 <template>
@@ -36,13 +32,10 @@ function getTemperature() {
       color="primary"
       thumb-size="10"
       track-size="2"
+      :hint="temperature.toString()"
       :ticks="{ 0: '', 1: '', 2: ''}"
       show-ticks="always">
       <template v-slot:append>
-        <div class="temperature-text text-primary">
-          {{ getTemperature() }}
-        </div>
-
         <div>
           <v-icon class="ml-1"
                   color="primary">
@@ -62,15 +55,7 @@ function getTemperature() {
 </template>
 
 <style scoped>
-
 .slider {
   font-size: 10px;
 }
-
-.temperature-text {
-  width: 20px;
-  text-align: center;
-}
-
-
 </style>

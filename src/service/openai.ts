@@ -14,6 +14,12 @@ const MOCK_RESPONSE_STREAM: string[] = ("Lorem ipsum dolor sit amet consectetur 
   "```")
   .split(" ");
 
+/**
+ * Stores values which are used to construct OpenAI API request.
+ * @field messages - list of {@link OpenaiMessage} objects which are used as a prompt for OpenAI API.
+ * @field model - {@link OpenaiModel} which is used to set OpenAI model
+ * @field temperature - temperature which is used to set OpenAI temperature. Should be between 0 and 2.
+ */
 export class OpenaiPrompt {
   messages: OpenaiMessage[];
   model: OpenaiModel;
@@ -27,6 +33,11 @@ export class OpenaiPrompt {
   }
 }
 
+/**
+ * Stores values which are used to construct OpenAI API request's messages.
+ * @field content - content of the message
+ * @field role - {@link OpenaiRole} which is used to set OpenAI role
+ */
 export class OpenaiMessage {
   content: string;
   role: OpenaiRole = OpenaiRole.user;
@@ -45,12 +56,18 @@ export class OpenaiMessage {
   }
 }
 
+/**
+ * OpenAI Role - The role of the author of this message.
+ */
 export enum OpenaiRole {
   system = "system",
   user = "user",
   assistant = "assistant",
 }
 
+/**
+ * OpenAI Model - The model used for the chat completion.
+ */
 export enum OpenaiModel {
   "gpt-4" = "gpt-4",
   "gpt-4-0613" = "gpt-4-0613",
@@ -62,6 +79,9 @@ export enum OpenaiModel {
   "gpt-3.5-turbo-16k-0613" = "gpt-3.5-turbo-16k-0613"
 }
 
+/**
+ * Event that might happen during {@link streamOpenAiResponse} function call.
+ */
 export class ListenerEvent {
   type: ListenerEventType;
   data: any;

@@ -18,6 +18,11 @@ const emits = defineEmits(["updateOpenaiRole"]);
 const roles = ref(Object.values(OpenaiRole));
 const selectedRole = ref(props.selectedRole);
 
+/**
+ * Select a role from the list of {@link OpenaiRole} values.
+ * Used as a parameter for OpenAI API request.
+ * @param roleStr OpenAi Role
+ */
 function selectRole(roleStr: string) {
   selectedRole.value = Object.values(OpenaiRole).find(key => OpenaiRole[key] === roleStr) || OpenaiRole.system;
   emits("updateOpenaiRole", selectedRole.value);
