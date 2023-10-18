@@ -24,6 +24,7 @@ export class OpenaiPrompt {
   messages: OpenaiMessage[];
   model: OpenaiModel;
   temperature: number;
+
   constructor(messages: OpenaiMessage[],
               model: OpenaiModel = OpenaiModel["gpt-3.5-turbo"],
               temperature: number = 1) {
@@ -130,6 +131,7 @@ const streamOpenAiResponse = appStore().mockOpenai ?
                  onError: (error: any) => void = () => {
                  }
   ): Promise<void> {
+    console.log(prompt.messages);
     try {
       if (!appStore().openai) {
         throw new Error("OpenAI is not initialized");
@@ -142,7 +144,7 @@ const streamOpenAiResponse = appStore().mockOpenai ?
         })),
         model: prompt.model,
         temperature: prompt.temperature,
-        stream: true,
+        stream: true
       });
 
       beforeStreamListener();

@@ -13,10 +13,7 @@ const props = defineProps({
 });
 
 onMounted(async () => {
-  store.getFromChromeStorage(ChromeStorageKeys.MESSAGE_TEMPLATE)
-    .then(result => {
-      template.value = result;
-    });
+  template.value = await store.getFromChromeStorage(ChromeStorageKeys.MESSAGE_TEMPLATE)
 });
 
 const emits = defineEmits(["updateMessageTemplate"]);

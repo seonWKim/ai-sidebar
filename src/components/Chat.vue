@@ -18,6 +18,7 @@ import OpenaiModelSelector from "@/components/config/OpenaiModelSelector.vue";
 import OpenaiTemperatureSlider from "@/components/config/OpenaiTemperatureSlider.vue";
 import MessageTemplateModal from "@/components/config/MessageTemplateModal.vue";
 import _ from "lodash";
+import OpenaiContextMemorizer from "@/components/config/OpenaiContextMemorizer.vue";
 
 const messageTemplate = ref("");
 const messageTemplateInputPlaceholder = "{{message}}";
@@ -35,8 +36,8 @@ const summarizeContextOpenaiMessage = OpenaiMessage.of1(
           "'Previous context: {{previousContext}}\n",
   OpenaiRole.user
 );
-const contextMaxNo: Ref<number> = ref(2);
-const rememberContext: Ref<boolean> = ref(true);
+const contextMaxNo: Ref<number> = ref(5);
+const rememberContext: Ref<boolean> = ref(false);
 
 function getReceived(): Ref<Message> {
   return ref<Message>({
@@ -62,6 +63,17 @@ function updateMessageTemplate(template: string) {
  */
 function updateOpenaiModel(model: OpenaiModel) {
   selectedModel.value = model;
+}
+
+/**
+ * Update {@link rememberContext}
+ * @param shouldRememberContext Whether to remember context or not
+ */
+function updateRememberContext(shouldRememberContext: boolean) {
+  if (!shouldRememberContext) {
+    messageContexts = [];
+  }
+  rememberContext.value = shouldRememberContext;
 }
 
 /**
@@ -290,6 +302,10 @@ function getMessageCardClass(type: string) {
             :selected-model="selectedModel"
             custom-style="mr-2"
             @update-openai-model="updateOpenaiModel"
+          />
+          <openai-context-memorizer
+            custom-style="mr-2"
+            @update-remember-context="updateRememberContext"
           />
         </div>
         <openai-temperature-slider :selected-temperature="selectedTemperature"
