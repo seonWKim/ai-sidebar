@@ -28,12 +28,20 @@ export class OpenaiPrompt {
 }
 
 export class OpenaiMessage {
-  role: OpenaiRole;
   content: string;
+  role: OpenaiRole = OpenaiRole.user;
 
-  constructor(role: OpenaiRole, content: string) {
-    this.role = role;
+  constructor(content: string, role: OpenaiRole) {
     this.content = content;
+    this.role = role;
+  }
+
+  static of0(content: string): OpenaiMessage {
+    return new OpenaiMessage(content, OpenaiRole.user);
+  }
+
+  static of1(content: string, role: OpenaiRole) {
+    return new OpenaiMessage(content, role);
   }
 }
 
