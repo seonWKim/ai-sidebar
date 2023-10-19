@@ -293,6 +293,7 @@ function getMessageCardClass(type: string) {
       </div>
     </div>
     <div class="chat-textarea">
+      {{  }}
       <div class="selectbox-area">
         <v-slide-group v-model="model"
                        show-arrows>

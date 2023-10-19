@@ -1,6 +1,8 @@
 <script setup lang="ts">
 
-import { computed, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
+import { ChromeStorageKeys } from "@/common/keys";
+import { appStore } from "@/store/app";
 
 const props = defineProps({
   customStyle: {
@@ -14,18 +16,21 @@ const props = defineProps({
   }
 });
 
+onMounted(async () => {
+  temperature.value = parseFloat(await store.getFromChromeStorage(ChromeStorageKeys.TEMPERATURE)) || 1.0;
+});
 
 const emits = defineEmits(["updateOpenaiTemperature"]);
 
-const temperature = computed({
-  get() {
-    return props.selectedTemperature;
-  },
-  set(value: number) {
-    emits("updateOpenaiTemperature", parseFloat(value.toFixed(1)));
-  }
-});
+const store = appStore();
 const dialog = ref(false);
+
+const temperature = ref(1.0)
+
+watch(temperature, (newVal) => {
+  store.saveToChromeStorage(ChromeStorageKeys.TEMPERATURE, newVal.toString());
+  emits("updateOpenaiTemperature", newVal);
+});
 
 </script>
 

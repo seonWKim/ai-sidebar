@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { appStore } from "@/store/app";
 import { ChromeStorageKeys } from "@/common/keys";
 
@@ -11,6 +11,11 @@ const props = defineProps({
     default: null
   }
 });
+
+onMounted(async () => {
+  rememberContext.value = await store.getFromChromeStorage(ChromeStorageKeys.REMEMBER_CONTEXT) === "true";
+  contextMaxNo.value = parseInt(await store.getFromChromeStorage(ChromeStorageKeys.CONTEXT_MAX_NO)) || 10;
+})
 
 const emits = defineEmits(["updateRememberContext"]);
 const store = appStore();
