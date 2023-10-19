@@ -33,7 +33,7 @@ const selectedTemperature: Ref<number> = ref(1.0);
 let messageContexts: OpenaiMessage[] = [];
 const summarizeContextOpenaiMessage = OpenaiMessage.of1(
   "Summarize all the messages in a format as follows. The placeholder for previousContext is where you have to fill in." +
-          "'Previous context: {{previousContext}}\n",
+  "'Previous context: {{previousContext}}\n",
   OpenaiRole.user
 );
 const contextMaxNo: Ref<number> = ref(5);
@@ -128,7 +128,7 @@ async function sendMessage(event: any) {
 
   // Send message and receive stream response
   let isMessagePushed = false;
-  const received = getReceived()
+  const received = getReceived();
   await streamOpenAiResponse(
     prompt,
     (res) => {
@@ -154,7 +154,7 @@ async function sendMessage(event: any) {
     },
     () => {
       if (rememberContext.value) {
-        addContext(OpenaiMessage.of1(received.value.text.join(""), OpenaiRole.system))
+        addContext(OpenaiMessage.of1(received.value.text.join(""), OpenaiRole.system));
       }
       // received = getReceived();
       isMessageBeingStreamed.value = false;
@@ -200,7 +200,7 @@ async function constructOpenaiMessages(): Promise<OpenaiMessage[]> {
     return [];
   }
 
-  const messageToBeSent = messages.value[messages.value.length - 1]
+  const messageToBeSent = messages.value[messages.value.length - 1];
   if (!rememberContext.value) {
     return [OpenaiMessage.of1(messageToBeSent.text.join(""), OpenaiRole.user)];
   }
@@ -218,13 +218,13 @@ async function constructOpenaiMessages(): Promise<OpenaiMessage[]> {
       prompt,
       (res) => {
         summarizedContext.push(res);
-      },
+      }
     );
     messageContexts = [OpenaiMessage.of1(summarizedContext.join(""), OpenaiRole.system)];
   }
 
   addContext(OpenaiMessage.of1(messageToBeSent.text.join(""), OpenaiRole.user));
-  return _.cloneDeep(messageContexts)
+  return _.cloneDeep(messageContexts);
 }
 
 /**
@@ -293,24 +293,33 @@ function getMessageCardClass(type: string) {
     </div>
     <div class="chat-textarea">
       <div class="selectbox-area">
-        <div>
-          <message-template-modal
-            custom-style="mr-2"
-            @update-message-template="updateMessageTemplate"
-          />
-          <openai-model-selector
-            :selected-model="selectedModel"
-            custom-style="mr-2"
-            @update-openai-model="updateOpenaiModel"
-          />
-          <openai-context-memorizer
-            custom-style="mr-2"
-            @update-remember-context="updateRememberContext"
-          />
-        </div>
-        <openai-temperature-slider :selected-temperature="selectedTemperature"
-                                   @update-openai-temperature="updateOpenaiTemperature"
-                                   class="temperature" />
+        <v-slide-group class="slide-group-area"
+          show-arrows>
+          <v-slide-group-item>
+            <message-template-modal
+              custom-style="mr-2"
+              @update-message-template="updateMessageTemplate"
+            />
+          </v-slide-group-item>
+          <v-slide-group-item>
+            <openai-model-selector
+              :selected-model="selectedModel"
+              custom-style="mr-2"
+              @update-openai-model="updateOpenaiModel"
+            />
+          </v-slide-group-item>
+          <v-slide-group-item>
+            <openai-context-memorizer
+              custom-style="mr-2"
+              @update-remember-context="updateRememberContext"
+            />
+          </v-slide-group-item>
+          <v-slide-group-item>
+            <openai-temperature-slider :selected-temperature="selectedTemperature"
+                                       @update-openai-temperature="updateOpenaiTemperature"
+                                       class="temperature" />
+          </v-slide-group-item>
+        </v-slide-group>
       </div>
       <v-textarea
         v-model="newMessage"
@@ -372,6 +381,9 @@ function getMessageCardClass(type: string) {
 }
 
 .selectbox-area {
+}
+
+.slide-group-area {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -391,7 +403,7 @@ function getMessageCardClass(type: string) {
 }
 
 .temperature {
-  width: 200px;
+  width: 150px;
   height: 100%;
 }
 

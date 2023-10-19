@@ -23,7 +23,7 @@ const description = "What sampling temperature to use, between 0 and 2. Higher v
 </script>
 
 <template>
-  <div>
+  <div class="temperature">
     <v-slider
       class="slider"
       max="2"
@@ -57,5 +57,9 @@ const description = "What sampling temperature to use, between 0 and 2. Higher v
 <style scoped>
 .slider {
   font-size: 10px;
+}
+
+.temperature ::v-deep(.v-input--horizontal .v-input__append) {
+  margin-inline-start: 4px !important;
 }
 </style>

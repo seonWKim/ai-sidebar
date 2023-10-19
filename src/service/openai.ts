@@ -131,7 +131,6 @@ const streamOpenAiResponse = appStore().mockOpenai ?
                  onError: (error: any) => void = () => {
                  }
   ): Promise<void> {
-    console.log(prompt.messages);
     try {
       if (!appStore().openai) {
         throw new Error("OpenAI is not initialized");
