@@ -61,10 +61,9 @@ const dialog = ref(false);
                 class="slider"
                 max="2"
                 min="0"
+                :step="0.1"
                 v-model="temperature"
                 color="primary"
-                thumb-size="10"
-                track-size="2"
                 thumb-label
                 :ticks="{ 0: '', 1: '', 2: ''}"
                 show-ticks="always">

@@ -65,7 +65,7 @@ watch(contextMaxNo, (newVal) => {
       </v-toolbar>
       <v-container class="fill-height">
         <v-responsive class="fill-height pa-6">
-          <div class="mb-8">
+          <div class="mb-4">
             <v-checkbox
               v-model="rememberContext"
               class="mb-4"
@@ -79,23 +79,10 @@ watch(contextMaxNo, (newVal) => {
               color="primary"
               :max="50"
               :step="1"
-              hide-details
+              thumb-label
               :ticks="{ 10: '', 20: '', 30: '', 40: '', 50: ''}"
               show-ticks="always"
-            >
-              <template v-slot:append>
-                <v-text-field
-                  v-model="contextMaxNo"
-                  flat
-                  type="number"
-                  style="width: 80px"
-                  density="compact"
-                  hide-details
-                  variant="outlined"
-                >
-                </v-text-field>
-              </template>
-            </v-slider>
+            />
           </div>
           <v-card color="primary"
                   variant="tonal">
