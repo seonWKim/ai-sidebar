@@ -15,14 +15,15 @@ import type { Message } from "@/common/message";
 import { eventBus, EventName } from "@/common/event";
 import ChatMessage from "@/components/ChatMessage.vue";
 import OpenaiModelSelector from "@/components/config/OpenaiModelSelector.vue";
-import OpenaiTemperatureSlider from "@/components/config/OpenaiTemperatureSlider.vue";
 import MessageTemplateModal from "@/components/config/MessageTemplateModal.vue";
+import OpenaiTemperatureModal from "@/components/config/OpenaiTemperatureModal.vue";
 import _ from "lodash";
-import OpenaiContextMemorizer from "@/components/config/OpenaiContextMemorizer.vue";
+import OpenaiContextMemorizerModal from "@/components/config/OpenaiContextMemorizerModal.vue";
 
 const messageTemplate = ref("");
 const messageTemplateInputPlaceholder = "{{message}}";
 const scrollTarget: Ref<any> = ref();
+const model = ref(null);
 
 const messages = ref<Message[]>([]);
 const newMessage = ref("");
@@ -293,31 +294,28 @@ function getMessageCardClass(type: string) {
     </div>
     <div class="chat-textarea">
       <div class="selectbox-area">
-        <v-slide-group class="slide-group-area"
-          show-arrows>
+        <v-slide-group v-model="model"
+                       show-arrows>
           <v-slide-group-item>
             <message-template-modal
               custom-style="mr-2"
-              @update-message-template="updateMessageTemplate"
-            />
+              @update-message-template="updateMessageTemplate" />
           </v-slide-group-item>
           <v-slide-group-item>
             <openai-model-selector
               :selected-model="selectedModel"
               custom-style="mr-2"
-              @update-openai-model="updateOpenaiModel"
-            />
+              @update-openai-model="updateOpenaiModel" />
           </v-slide-group-item>
           <v-slide-group-item>
-            <openai-context-memorizer
+            <openai-context-memorizer-modal
               custom-style="mr-2"
-              @update-remember-context="updateRememberContext"
-            />
+              @update-remember-context="updateRememberContext" />
           </v-slide-group-item>
           <v-slide-group-item>
-            <openai-temperature-slider :selected-temperature="selectedTemperature"
-                                       @update-openai-temperature="updateOpenaiTemperature"
-                                       class="temperature" />
+            <openai-temperature-modal
+              :selected-temperature="selectedTemperature"
+              @update-openai-temperature="updateOpenaiTemperature" />
           </v-slide-group-item>
         </v-slide-group>
       </div>
@@ -381,12 +379,9 @@ function getMessageCardClass(type: string) {
 }
 
 .selectbox-area {
-}
-
-.slide-group-area {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  width: 100%;
 }
 
 .message-card {
@@ -400,11 +395,6 @@ function getMessageCardClass(type: string) {
 
 .message-card-received {
   border-radius: 0 10px 10px 10px;
-}
-
-.temperature {
-  width: 150px;
-  height: 100%;
 }
 
 .main-textarea {
