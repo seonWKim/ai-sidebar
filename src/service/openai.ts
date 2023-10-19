@@ -14,10 +14,17 @@ const MOCK_RESPONSE_STREAM: string[] = ("Lorem ipsum dolor sit amet consectetur 
   "```")
   .split(" ");
 
+/**
+ * Stores values which are used to construct OpenAI API request.
+ * @field messages - list of {@link OpenaiMessage} objects which are used as a prompt for OpenAI API.
+ * @field model - {@link OpenaiModel} which is used to set OpenAI model
+ * @field temperature - temperature which is used to set OpenAI temperature. Should be between 0 and 2.
+ */
 export class OpenaiPrompt {
   messages: OpenaiMessage[];
   model: OpenaiModel;
   temperature: number;
+
   constructor(messages: OpenaiMessage[],
               model: OpenaiModel = OpenaiModel["gpt-3.5-turbo"],
               temperature: number = 1) {
@@ -27,22 +34,41 @@ export class OpenaiPrompt {
   }
 }
 
+/**
+ * Stores values which are used to construct OpenAI API request's messages.
+ * @field content - content of the message
+ * @field role - {@link OpenaiRole} which is used to set OpenAI role
+ */
 export class OpenaiMessage {
-  role: OpenaiRole;
   content: string;
+  role: OpenaiRole = OpenaiRole.user;
 
-  constructor(role: OpenaiRole, content: string) {
-    this.role = role;
+  constructor(content: string, role: OpenaiRole) {
     this.content = content;
+    this.role = role;
+  }
+
+  static of0(content: string): OpenaiMessage {
+    return new OpenaiMessage(content, OpenaiRole.user);
+  }
+
+  static of1(content: string, role: OpenaiRole) {
+    return new OpenaiMessage(content, role);
   }
 }
 
+/**
+ * OpenAI Role - The role of the author of this message.
+ */
 export enum OpenaiRole {
   system = "system",
   user = "user",
   assistant = "assistant",
 }
 
+/**
+ * OpenAI Model - The model used for the chat completion.
+ */
 export enum OpenaiModel {
   "gpt-4" = "gpt-4",
   "gpt-4-0613" = "gpt-4-0613",
@@ -54,6 +80,9 @@ export enum OpenaiModel {
   "gpt-3.5-turbo-16k-0613" = "gpt-3.5-turbo-16k-0613"
 }
 
+/**
+ * Event that might happen during {@link streamOpenAiResponse} function call.
+ */
 export class ListenerEvent {
   type: ListenerEventType;
   data: any;
@@ -114,7 +143,7 @@ const streamOpenAiResponse = appStore().mockOpenai ?
         })),
         model: prompt.model,
         temperature: prompt.temperature,
-        stream: true,
+        stream: true
       });
 
       beforeStreamListener();

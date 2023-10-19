@@ -19,6 +19,11 @@ const emits = defineEmits(["updateOpenaiModel"]);
 const models = ref(Object.values(OpenaiModel));
 const selectedModel = ref(props.selectedModel);
 
+/**
+ * Select a role from the list of {@link OpenaiModel} values.
+ * Used as a parameter for OpenAI API request.
+ * @param modelStr OpenAi Model
+ */
 function selectModel(modelStr: string) {
   selectedModel.value = Object.values(OpenaiModel).find(key => OpenaiModel[key] === modelStr) || OpenaiModel["gpt-3.5-turbo"];
   emits("updateOpenaiModel", selectedModel.value);
