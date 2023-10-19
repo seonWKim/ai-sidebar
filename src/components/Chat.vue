@@ -293,7 +293,6 @@ function getMessageCardClass(type: string) {
       </div>
     </div>
     <div class="chat-textarea">
-      {{  }}
       <div class="selectbox-area">
         <v-slide-group v-model="model"
                        show-arrows>
@@ -303,15 +302,15 @@ function getMessageCardClass(type: string) {
               @update-message-template="updateMessageTemplate" />
           </v-slide-group-item>
           <v-slide-group-item>
+            <openai-context-memorizer-modal
+              custom-style="mr-2"
+              @update-remember-context="updateRememberContext" />
+          </v-slide-group-item>
+          <v-slide-group-item>
             <openai-model-selector
               :selected-model="selectedModel"
               custom-style="mr-2"
               @update-openai-model="updateOpenaiModel" />
-          </v-slide-group-item>
-          <v-slide-group-item>
-            <openai-context-memorizer-modal
-              custom-style="mr-2"
-              @update-remember-context="updateRememberContext" />
           </v-slide-group-item>
           <v-slide-group-item>
             <openai-temperature-modal
