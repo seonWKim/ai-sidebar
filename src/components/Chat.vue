@@ -375,7 +375,7 @@ function getMessageCardClass(type: string) {
   margin: 0 24px 0 8px;
   display: grid;
   grid-template-rows: 32px 1fr;
-  grid-gap: 16px;
+  grid-gap: 10px;
 }
 
 .selectbox-area {
