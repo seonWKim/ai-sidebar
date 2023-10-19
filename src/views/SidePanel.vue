@@ -20,5 +20,6 @@ import Settings from "@/components/config/Settings.vue";
 
 .settings {
   background-color: #F0F1F5;
+  height: 100%;
 }
 </style>

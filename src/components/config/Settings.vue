@@ -39,7 +39,7 @@ function updateOpenaiApiKeyGuideDialog(value: boolean) {
       transition="scroll-x-reverse-transition"
     >
       <template v-slot:activator="{ props }">
-        <div class="text-center ma-4">
+        <div class="text-center mx-4 mt-6">
           <v-btn
             icon="mdi-cog"
             dark
