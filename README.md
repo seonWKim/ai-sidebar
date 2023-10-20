@@ -15,12 +15,13 @@
 <a href="https://github.com/seonwoo960000/ai-sidebar/commits"><img src="https://img.shields.io/github/release-date/seonwoo960000/ai-sidebar.svg?label=release" /></a>
 
 - Chrome extension sidebar for all sort of AI things
-- Community driven, open source
-- OpenAI Plugin
+- Community driven and open source
 
 ## Features 
 ![main.png](public/static/main.gif)
-- Ask questions using chatGPT in chrome sidebar 
+- Ask questions using chatGPT in chrome sidebar
+  - Message Template
+  - Memorize Context 
 
 ## Requirements
 - Node v16>=
@@ -34,14 +35,14 @@
 
 ## Build and Test Chrome Extension 👨‍💻 
 
-### Mocking Openai API 
+### Mocking OpenAI API 
 1. Set `VITE_MOCK_OPENAI_API` to `true` in `.env` file
 
-### Using Openai API 
+### Using OpenAI API 
 ![instruction.png](images/instruction.png)
 1. [Login to OpenAI Account](https://platform.openai.com/login)
 2. [Visit OpenAI API Keys Page](https://platform.openai.com/account/api-keys)
-3. Create a new API key
+3. Create a new API key(Make sure 
 4. Make sure the organization is set to 'Personal'
 5. Copy the API Key
 6. Run `npm i` to install the necessary dependencies
@@ -54,7 +55,7 @@
 ## Note
 - By providing a personal API key the user may subject to billing
 - For pricing, refer to [OpenAI's pricing policy](https://openai.com/pricing)
-- API key is a secret do not share it with others
+- API key is a secret. <b>DO NOT</b> share it with others
 - Users should understand the [rate limits](https://platform.openai.com/account/rate-limits) that the API holds
 - This extension will only work within a chrome browser
 
