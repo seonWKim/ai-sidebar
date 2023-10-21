@@ -165,11 +165,23 @@ async function sendMessage(event: any) {
   );
 }
 
+/**
+ * Stop streaming response.
+ */
 function stopStream() {
   const streamingMessage = messages.value[messages.value.length - 1];
   if (streamingMessage.type === "received" && !streamingMessage.canceled) {
     streamingMessage.canceled = true;
   }
+}
+
+/**
+ * Clear all messages and contexts.
+ */
+function clearMessages() {
+  messages.value = [];
+  newMessage.value = "";
+  messageContexts = [];
 }
 
 /**
@@ -282,13 +294,21 @@ function getMessageCardClass(type: string) {
         <v-btn
           v-if="isMessageBeingStreamed"
           size="small"
-          icon="mdi-stop"
           variant="plain"
           color="error"
           class="font-weight-bold"
           @click="stopStream"
         >
           Stop
+        </v-btn>
+        <v-btn
+          v-if="!isMessageBeingStreamed && messages.length > 0"
+          size="small"
+          variant="plain"
+          color="error"
+          class="font-weight-bold"
+          @click="clearMessages">
+          Clear
         </v-btn>
       </div>
     </div>
@@ -365,12 +385,14 @@ function getMessageCardClass(type: string) {
 /* because the size of the textbox is 210px from the bottom(refer to .parent), if can fix the position of the buttons by using absolute position */
 .chat-message-buttons {
   position: absolute;
+  width: 100%;
   bottom: 220px;
-  left: 50%;
+  display: flex;
+  justify-content: center;
 }
 
 .chat-textarea {
-  margin: 0 24px 0 8px;
+  margin: 0 8px 0 8px;
   display: grid;
   grid-template-rows: 32px 1fr;
   grid-gap: 10px;
