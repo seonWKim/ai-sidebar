@@ -14,10 +14,12 @@ export const appStore = defineStore("app", {
   actions: {
     async initializeOpenAi() {
       const openApiKey = await this.getFromChromeStorage(ChromeStorageKeys.API_KEY);
-      this.openai = new Openai({
-        apiKey: openApiKey,
-        dangerouslyAllowBrowser: true
-      });
+      if (openApiKey) {
+        this.openai = new Openai({
+          apiKey: openApiKey,
+          dangerouslyAllowBrowser: true
+        });
+      }
     },
     setOpenAiKey(apiKey: string) {
       this.saveToChromeStorage(ChromeStorageKeys.API_KEY, apiKey);
