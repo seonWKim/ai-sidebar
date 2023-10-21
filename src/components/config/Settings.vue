@@ -39,10 +39,9 @@ function updateOpenaiApiKeyGuideDialog(value: boolean) {
       transition="scroll-x-reverse-transition"
     >
       <template v-slot:activator="{ props }">
-        <div class="text-center mx-4 mt-6">
+        <div class="mx-auto mt-6">
           <v-btn
             icon="mdi-cog"
-            dark
             size="16px"
             v-bind="props"
             variant="flat"
@@ -78,17 +77,11 @@ function updateOpenaiApiKeyGuideDialog(value: boolean) {
         </v-toolbar>
         <v-container class="fill-height">
           <v-responsive class="fill-height">
-            <v-card class="mx-auto pa-12 pb-8"
-                    density="compact"
-                    elevation="8"
-                    max-width="660"
-                    rounded="lg">
+            <div class="inner-container">
               <div class="text-subtitle-1 text-medium-emphasis mb-2">
                 OpenAI API Key
               </div>
-
               <v-text-field
-                class="mb-4"
                 density="compact"
                 placeholder="API Key"
                 prepend-inner-icon="mdi-lock-outline"
@@ -116,7 +109,7 @@ function updateOpenaiApiKeyGuideDialog(value: boolean) {
                   for more information.
                 </v-card-text>
               </v-card>
-            </v-card>
+            </div>
           </v-responsive>
         </v-container>
       </v-card>
@@ -127,5 +120,10 @@ function updateOpenaiApiKeyGuideDialog(value: boolean) {
 <style scoped>
 .guide {
   cursor: pointer;
+}
+
+.inner-container {
+  margin: auto;
+  padding: 40px;
 }
 </style>
