@@ -17,6 +17,10 @@ import { registerPlugins } from "@/plugins";
 const app = createApp(App);
 const landing = createApp(Landing)
 
+import AOS from 'aos';
+import 'aos/dist/aos.css';
+AOS.init();
+
 registerPlugins(app);
 registerPlugins(landing);
 

@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@mdi/font": "7.0.96",
+    "aos": "^3.0.0-beta.6",
     "core-js": "^3.29.0",
     "lodash": "^4.17.21",
     "markdown-it": "^13.0.1",
@@ -27,6 +28,7 @@
   },
   "devDependencies": {
     "@babel/types": "^7.21.4",
+    "@types/aos": "^3.0.6",
     "@types/chrome": "^0.0.246",
     "@types/lodash": "^4.14.199",
     "@types/markdown-it": "^13.0.1",
