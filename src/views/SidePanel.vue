@@ -1,25 +1,25 @@
 <template>
   <div class="sidepanel-layout">
     <chat />
-    <settings class="settings"/>
+    <div class="h-100 bg-settings">
+      <settings />
+      <themes />
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import Chat from "@/components/Chat.vue";
 import Settings from "@/components/config/Settings.vue";
+import Themes from "@/components/config/Themes.vue";
 </script>
 
 <style scoped>
 .sidepanel-layout {
   display: grid;
-  grid-template-columns: 1fr 32px;
+  grid-template-columns: 1fr 36px;
   height: 100vh;
   overflow: hidden;
 }
 
-.settings {
-  background-color: #F0F1F5;
-  height: 100%;
-}
 </style>

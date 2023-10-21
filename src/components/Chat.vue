@@ -272,7 +272,7 @@ function getMessageCardClass(type: string) {
         >
           <chat-message
             :message="message"
-            color="grey"
+            color="messages"
             :class="getMessageCardClass(message.type)"
           />
         </div>
@@ -353,8 +353,6 @@ function getMessageCardClass(type: string) {
 .chat-message-container {
   display: grid;
   grid-template-rows: 1fr 32px;
-  margin: 0 8px;
-  border-top: 2px solid #F0F1F5;
   border-bottom: 2px solid #F0F1F5;
 
   overflow-y: auto;

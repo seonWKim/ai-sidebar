@@ -6,6 +6,7 @@ enum ChromeStorageKeys {
   REMEMBER_CONTEXT = "freesidebar_remember_context",
   CONTEXT_MAX_NO = "free_sidebar_context_max_no",
   TEMPERATURE = "freesidebar_temperature",
+  THEME = "free_sidebar_theme",
 }
 
 export {
