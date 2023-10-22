@@ -4,7 +4,8 @@ import { onMounted, ref, watch } from "vue";
 import { VTextarea } from "vuetify/components";
 import { appStore } from "@/store/app";
 import { ChromeStorageKeys } from "@/common/keys";
-import { messageTemplateInputPlaceholder, defaultTemplates, Template } from "@/common/templates";
+import { messageTemplateInputPlaceholder, defaultTemplates } from "@/common/templates";
+import MessageTemplateAddModal from "@/components/config/MessageTemplateAddModal.vue";
 
 const props = defineProps({
   customStyle: {
@@ -16,6 +17,7 @@ const props = defineProps({
 onMounted(async () => {
   template.value = await store.getFromChromeStorage(ChromeStorageKeys.MESSAGE_TEMPLATE);
   showMessageTemplate.value = await store.getFromChromeStorage(ChromeStorageKeys.SHOW_MESSAGE_TEMPLATE) === "true";
+  await store.initializeCustomTemplates();
 });
 
 const emits = defineEmits(["updateMessageTemplate", "updateShowMessageTemplate"]);
@@ -25,7 +27,9 @@ const dialog = ref(false);
 const template = ref("");
 const messageTemplatePlaceholder = `Summarize the following text: ${messageTemplateInputPlaceholder}`;
 const showMessageTemplate = ref(false);
-const selectedTemplateHint: ref<string | undefined> = ref(null);
+const selectedTemplateHint = ref<string | undefined>("");
+const selectedDefaultTemplate = ref<number | undefined>(undefined);
+const selectedCustomTemplate = ref<number | undefined>(undefined);
 
 watch(template, (newVal) => {
   store.saveToChromeStorage(ChromeStorageKeys.MESSAGE_TEMPLATE, newVal);
@@ -38,8 +42,15 @@ watch(showMessageTemplate, (newVal) => {
 });
 
 function onDefaultTemplateChange(value: number) {
+  selectedCustomTemplate.value = undefined;
   template.value = defaultTemplates.find(template => template.id === value)?.template || "";
   selectedTemplateHint.value = defaultTemplates.find(template => template.id === value)?.example;
+}
+
+function onCustomTemplateChange(value: number) {
+  selectedDefaultTemplate.value = undefined;
+  template.value = store.customTemplates.find(template => template.id === value)?.template || "";
+  selectedTemplateHint.value = store.customTemplates.find(template => template.id === value)?.example;
 }
 
 </script>
@@ -51,15 +62,13 @@ function onDefaultTemplateChange(value: number) {
          variant="outlined"
          color="primary"
          :class="customStyle"
-         v-bind="props"
          @click="dialog = !dialog">
     Template
     <v-dialog class="dialog"
               v-model="dialog"
               :scrim="false">
       <v-card>
-        <v-toolbar dark
-                   color="primary">
+        <v-toolbar color="primary">
           <v-btn icon
                  dark
                  @click="dialog=false">
@@ -71,13 +80,29 @@ function onDefaultTemplateChange(value: number) {
         </v-toolbar>
         <v-container class="fill-height">
           <v-responsive class="fill-height pa-6">
-            <v-autocomplete :items="defaultTemplates"
+            <message-template-add-modal class="mb-4" />
+            <v-autocomplete v-model="selectedDefaultTemplate"
+                            :items="defaultTemplates"
                             clearable
                             item-title="name"
                             item-value="id"
                             label="Example Templates"
                             @update:modelValue="onDefaultTemplateChange" />
+            <v-autocomplete v-model="selectedCustomTemplate"
+                            :items="store.customTemplates"
+                            clearable
+                            item-title="name"
+                            item-value="id"
+                            label="Custom Templates"
+                            no-data-text="No custom templates found"
+                            @update:modelValue="onCustomTemplateChange" />
+            <div v-if="!!selectedTemplateHint"
+                 class="selectedTemplateExample"
+            >
+              Example: {{ selectedTemplateHint }}
+            </div>
             <v-textarea
+              class="mb-4"
               v-model="template"
               :placeholder="messageTemplatePlaceholder"
               variant="outlined"
@@ -85,11 +110,7 @@ function onDefaultTemplateChange(value: number) {
               flat
               hide-details
             />
-            <div v-if="!!selectedTemplateHint"
-                 class="selectedTemplateExample"
-            >
-              Example: {{ selectedTemplateHint }}
-            </div>
+
             <v-checkbox
               v-model="showMessageTemplate"
               class="mb-4"
@@ -125,9 +146,9 @@ function onDefaultTemplateChange(value: number) {
 }
 
 .selectedTemplateExample {
-  padding-top: 4px;
+  padding: 4px 4px;
   font-size: 12px;
   letter-spacing: 0.03em;
-  text-align: right;
+  text-align: left;
 }
 </style>

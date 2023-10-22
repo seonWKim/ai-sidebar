@@ -1,15 +1,17 @@
 import { defineStore } from "pinia";
 import Openai from "openai";
 import { ChromeStorageKeys } from "@/common/keys";
+import { Template } from "@/common/templates";
 
 export const appStore = defineStore("app", {
   state: () => ({
-    openai: null as (Openai | null)
+    openai: null as (Openai | null),
+    customTemplates: [] as Template[]
   }),
   getters: {
     openaiReadOny: (state) => state.openai,
     mockOpenai: (state) => import.meta.env.VITE_MOCK_OPENAI_API === "true",
-    mockOpenaiApiResponseInterval: (state) => import.meta.env.VITE_MOCK_OPENAI_API_RESPONSE_INTERVAL_MILLIS || 50
+    mockOpenaiApiResponseInterval: (state) => import.meta.env.VITE_MOCK_OPENAI_API_RESPONSE_INTERVAL_MILLIS || 50,
   },
   actions: {
     async initializeOpenAi() {
@@ -32,12 +34,20 @@ export const appStore = defineStore("app", {
         });
       }
     },
-    saveToChromeStorage(key: string, value: string) {
-      chrome?.storage?.local?.set({ [key]: value });
+    async saveToChromeStorage(key: string, value: string) {
+      await chrome?.storage?.local?.set({ [key]: value });
     },
     async getFromChromeStorage(key: string): Promise<string> {
       const result = await chrome?.storage?.local?.get(key);
       return result ? result[key] : "";
+    },
+    async initializeCustomTemplates() {
+      const customTemplatesStr = await this.getFromChromeStorage(ChromeStorageKeys.CUSTOM_TEMPLATES) || "[]";
+      this.customTemplates = JSON.parse(customTemplatesStr);
+    },
+    async saveCustomTemplate(customTemplate: Template) {
+      this.customTemplates.push(customTemplate);
+      await this.saveToChromeStorage(ChromeStorageKeys.CUSTOM_TEMPLATES, JSON.stringify(this.customTemplates));
     }
   }
 });
