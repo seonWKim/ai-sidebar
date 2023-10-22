@@ -4,7 +4,7 @@ import { onMounted, ref, watch } from "vue";
 import { VTextarea } from "vuetify/components";
 import { appStore } from "@/store/app";
 import { ChromeStorageKeys } from "@/common/keys";
-import { messageTemplateInputPlaceholder } from "@/common/templates";
+import { messageTemplateInputPlaceholder, defaultTemplates, Template } from "@/common/templates";
 
 const props = defineProps({
   customStyle: {
@@ -14,7 +14,7 @@ const props = defineProps({
 });
 
 onMounted(async () => {
-  template.value = await store.getFromChromeStorage(ChromeStorageKeys.MESSAGE_TEMPLATE)
+  template.value = await store.getFromChromeStorage(ChromeStorageKeys.MESSAGE_TEMPLATE);
   showMessageTemplate.value = await store.getFromChromeStorage(ChromeStorageKeys.SHOW_MESSAGE_TEMPLATE) === "true";
 });
 
@@ -25,6 +25,7 @@ const dialog = ref(false);
 const template = ref("");
 const messageTemplatePlaceholder = `Summarize the following text: ${messageTemplateInputPlaceholder}`;
 const showMessageTemplate = ref(false);
+const selectedTemplateHint: ref<string | undefined> = ref(null);
 
 watch(template, (newVal) => {
   store.saveToChromeStorage(ChromeStorageKeys.MESSAGE_TEMPLATE, newVal);
@@ -35,6 +36,11 @@ watch(showMessageTemplate, (newVal) => {
   store.saveToChromeStorage(ChromeStorageKeys.SHOW_MESSAGE_TEMPLATE, newVal.toString());
   emits("updateShowMessageTemplate", newVal);
 });
+
+function onDefaultTemplateChange(value: number) {
+  template.value = defaultTemplates.find(template => template.id === value)?.template || "";
+  selectedTemplateHint.value = defaultTemplates.find(template => template.id === value)?.example;
+}
 
 </script>
 
@@ -65,15 +71,25 @@ watch(showMessageTemplate, (newVal) => {
         </v-toolbar>
         <v-container class="fill-height">
           <v-responsive class="fill-height pa-6">
+            <v-autocomplete :items="defaultTemplates"
+                            clearable
+                            item-title="name"
+                            item-value="id"
+                            label="Example Templates"
+                            @update:modelValue="onDefaultTemplateChange" />
             <v-textarea
               v-model="template"
               :placeholder="messageTemplatePlaceholder"
               variant="outlined"
               shaped
-              clearable
               flat
               hide-details
             />
+            <div v-if="!!selectedTemplateHint"
+                 class="selectedTemplateExample"
+            >
+              Example: {{ selectedTemplateHint }}
+            </div>
             <v-checkbox
               v-model="showMessageTemplate"
               class="mb-4"
@@ -108,4 +124,10 @@ watch(showMessageTemplate, (newVal) => {
   width: 80%;
 }
 
+.selectedTemplateExample {
+  padding-top: 4px;
+  font-size: 12px;
+  letter-spacing: 0.03em;
+  text-align: right;
+}
 </style>

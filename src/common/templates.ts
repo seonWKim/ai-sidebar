@@ -1,4 +1,5 @@
 interface Template {
+  id: number,
   name: string,
   template: string,
   example: string
@@ -7,6 +8,7 @@ interface Template {
 const messageTemplateInputPlaceholder = "{{message}}";
 const defaultTemplates: Template[] = [
   {
+    id: 100,
     name: "Linux Terminal",
     template: "I want you to act as a linux terminal. " +
       "I will type commands and you will reply with what the terminal should show. " +
@@ -19,6 +21,7 @@ const defaultTemplates: Template[] = [
     example: "pwd"
   },
   {
+    id: 200,
     name: "SQL Terminal",
     template: "I want you to act as a SQL terminal in front of an example database. " +
       "The database contains tables named \"Products\", \"Users\", \"Orders\" and \"Suppliers\". " +
@@ -31,6 +34,7 @@ const defaultTemplates: Template[] = [
     example: "SELECT TOP 10 * FROM Products ORDER BY Id DESC"
   },
   {
+    id: 300,
     name: "Javascript Console",
     template: "I want you to act as a javascript console. " +
       "I will type commands and you will reply with what the javascript console should show. " +
@@ -43,6 +47,7 @@ const defaultTemplates: Template[] = [
     example: "console.log('Hello World')"
   },
   {
+    id: 400,
     name: "Ascii Artist",
     template: "I want you to act as an ascii artist. " +
       "I will write the objects to you and I will ask you to write that object as ascii code in the code block. " +
@@ -54,6 +59,7 @@ const defaultTemplates: Template[] = [
     example: "cat"
   },
   {
+    id: 500,
     name: "English Translator and Improver",
     template: "I want you to act as an English translator, spelling corrector and improver. " +
       "I will speak to you in any language and you will detect the language, translate it and answer in the corrected and improved version of my text, in English. " +
@@ -65,6 +71,7 @@ const defaultTemplates: Template[] = [
     example: "istanbulu cok seviyom burada olmak cok guzel"
   },
   {
+    id: 600,
     name: "Debater",
     template: "I want you to act as a debater. " +
       "I will provide you with some topics related to current events and your task is to research both sides of the debates, present valid arguments for each side, refute opposing points of view, and draw persuasive conclusions based on evidence. " +
@@ -74,6 +81,7 @@ const defaultTemplates: Template[] = [
     example: "I want an opinion piece about Deno"
   },
   {
+    id: 700,
     name: "UI/UX Developer",
     template: "I want you to act as a UX/UI developer. " +
       "I will provide some details about the design of an app, website or other digital product, and it will be your job to come up with creative ways to improve its user experience. " +
@@ -83,6 +91,7 @@ const defaultTemplates: Template[] = [
     example: "I need help designing an intuitive navigation system for my new mobile application."
   },
   {
+    id: 800,
     name: "Prompt Generator",
     template: "I want you to act as a prompt generator. " +
       "Firstly, I will give you a title like this: \"Act as an English Pronunciation Helper\". " +
@@ -99,6 +108,7 @@ const defaultTemplates: Template[] = [
     example: "Act as a Code Review Helper"
   },
   {
+    id: 900,
     name: "Algorithm Teacher",
     template: "I want you to act as an instructor in a school, teaching algorithms to beginners. " +
       "You will provide code examples using python programming language. " +
@@ -110,6 +120,7 @@ const defaultTemplates: Template[] = [
     example: "How to implement bubble sort?"
   },
   {
+    id: 1000,
     name: "Fullstack Software Developer",
     template: "I want you to act as a software developer. " +
       "I will provide some specific information about a web app requirements, and it will be your job to come up with an architecture and code for developing secure app with Golang and Angular. " +
@@ -118,6 +129,7 @@ const defaultTemplates: Template[] = [
     example: "I want a system that allow users to register and save their vehicle information according to their roles and there will be admin, user and company roles. I want the system to use JWT for security."
   },
   {
+    id: 1100,
     name: "Machine Learning Engineer",
     template: "I want you to act as a machine learning engineer. " +
       "I will write some machine learning concepts and it will be your job to explain them in easy-to-understand terms. " +
@@ -127,6 +139,7 @@ const defaultTemplates: Template[] = [
     example: "I have a dataset without labels. Which machine learning algorithm should I use?"
   },
   {
+    id: 1200,
     name: "Tech Reviewer",
     template: "I want you to act as a tech reviewer. " +
       "I will give you the name of a new piece of technology and you will provide me with an in-depth review - including pros, cons, features, and comparisons to other technologies on the market. " +
@@ -135,6 +148,7 @@ const defaultTemplates: Template[] = [
     example: "I am reviewing iPhone 11 Pro Max"
   },
   {
+    id: 1300,
     name: "Tech Writer",
     template: "Act as a tech writer. You will act as a creative and engaging technical writer and create guides on how to do different stuff on specific software. " +
       "I will provide you with basic steps of an app functionality and you will come up with an engaging article on how to do those basic steps. " +
@@ -146,6 +160,7 @@ const defaultTemplates: Template[] = [
       "3.Double click to open the app"
   },
   {
+    id: 1400,
     name: "IT Architect",
     template: "I want you to act as an IT Architect. " +
       "I will provide some details about the functionality of an application or other digital product, and it will be your job to come up with ways to integrate it into the IT landscape. " +
@@ -156,6 +171,7 @@ const defaultTemplates: Template[] = [
     example: "I need help to integrate a CMS system."
   },
   {
+    id: 1500,
     name: "Essay Writer",
     template: "I want you to act as an essay writer. " +
       "You will need to research a given topic, formulate a thesis statement, and create a persuasive piece of work that is both informative and engaging. " +
@@ -164,6 +180,7 @@ const defaultTemplates: Template[] = [
     example: "I need help writing a persuasive essay about the importance of reducing plastic waste in our environment"
   },
   {
+    id: 1600,
     name: "Regex Generator",
     template: "I want you to act as a regex generator. " +
       "Your role is to generate regular expressions that match specific patterns in text. " +
