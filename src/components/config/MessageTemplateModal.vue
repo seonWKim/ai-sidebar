@@ -4,6 +4,7 @@ import { onMounted, ref, watch } from "vue";
 import { VTextarea } from "vuetify/components";
 import { appStore } from "@/store/app";
 import { ChromeStorageKeys } from "@/common/keys";
+import { messageTemplateInputPlaceholder } from "@/common/templates";
 
 const props = defineProps({
   customStyle: {
@@ -22,7 +23,6 @@ const emits = defineEmits(["updateMessageTemplate", "updateShowMessageTemplate"]
 const store = appStore();
 const dialog = ref(false);
 const template = ref("");
-const messageTemplateInputPlaceholder = "{{message}}";
 const messageTemplatePlaceholder = `Summarize the following text: ${messageTemplateInputPlaceholder}`;
 const showMessageTemplate = ref(false);
 
