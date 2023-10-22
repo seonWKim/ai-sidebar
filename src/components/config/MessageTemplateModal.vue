@@ -87,6 +87,7 @@ function onCustomTemplateChange(value: number) {
                             item-title="name"
                             item-value="id"
                             label="Example Templates"
+                            no-data-text="No example templates found"
                             @update:modelValue="onDefaultTemplateChange" />
             <v-autocomplete v-model="selectedCustomTemplate"
                             :items="store.customTemplates"
