@@ -19,10 +19,10 @@ import MessageTemplateModal from "@/components/config/MessageTemplateModal.vue";
 import OpenaiTemperatureModal from "@/components/config/OpenaiTemperatureModal.vue";
 import _ from "lodash";
 import OpenaiContextMemorizerModal from "@/components/config/OpenaiContextMemorizerModal.vue";
+import { messageTemplateInputPlaceholder } from "@/common/templates";
 
 const messageTemplate = ref("");
 const showMessageTemplate = ref(false);
-const messageTemplateInputPlaceholder = "{{message}}";
 const scrollTarget: Ref<any> = ref();
 const model = ref(null);
 
@@ -207,7 +207,7 @@ function constructMessage(template: string, message: string): string {
   }
 
   if (template.includes(messageTemplateInputPlaceholder)) {
-    return template.replace("{{message}}", message);
+    return template.replace(messageTemplateInputPlaceholder, message);
   } else {
     return template + "\n" + message;
   }

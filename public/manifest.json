@@ -27,7 +27,8 @@
     "activeTab",
     "sidePanel",
     "contextMenus",
-    "storage"
+    "storage",
+    "unlimitedStorage"
   ],
   "action": {
     "default_title": "Click to open side bar",
