@@ -113,7 +113,7 @@ function onCustomTemplateChange(value: number) {
             <div class="d-flex justify-end">
               <v-btn size="x-small"
                      @click="saveTemplate"
-                     prepend-icon="mdi-account-outline"
+                     prepend-icon="mdi-plus"
                      rounded
                      variant="outlined"
                      color="primary">
@@ -123,7 +123,7 @@ function onCustomTemplateChange(value: number) {
                      class="ml-2"
                      size="x-small"
                      @click="deleteTemplate"
-                     prepend-icon="mdi-account-outline"
+                     prepend-icon="mdi-delete-outline"
                      rounded
                      variant="outlined"
                      color="primary">
