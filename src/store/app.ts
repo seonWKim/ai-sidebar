@@ -11,7 +11,7 @@ export const appStore = defineStore("app", {
   getters: {
     openaiReadOny: (state) => state.openai,
     mockOpenai: (state) => import.meta.env.VITE_MOCK_OPENAI_API === "true",
-    mockOpenaiApiResponseInterval: (state) => import.meta.env.VITE_MOCK_OPENAI_API_RESPONSE_INTERVAL_MILLIS || 50,
+    mockOpenaiApiResponseInterval: (state) => import.meta.env.VITE_MOCK_OPENAI_API_RESPONSE_INTERVAL_MILLIS || 50
   },
   actions: {
     async initializeOpenAi() {
@@ -48,6 +48,13 @@ export const appStore = defineStore("app", {
     async saveCustomTemplate(customTemplate: Template) {
       this.customTemplates.push(customTemplate);
       await this.saveToChromeStorage(ChromeStorageKeys.CUSTOM_TEMPLATES, JSON.stringify(this.customTemplates));
+    },
+    async deleteCustomTemplate(customTemplateId: number) {
+      const index = this.customTemplates.findIndex(t => t.id === customTemplateId);
+      if (index > -1) {
+        this.customTemplates.splice(index, 1);
+        await this.saveToChromeStorage(ChromeStorageKeys.CUSTOM_TEMPLATES, JSON.stringify(this.customTemplates));
+      }
     }
   }
 });
