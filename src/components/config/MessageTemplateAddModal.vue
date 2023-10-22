@@ -54,7 +54,7 @@ function onCustomTemplateChange(value: number) {
 
 <template>
   <v-btn size="x-small"
-         prepend-icon="mdi-account-outline"
+         prepend-icon="mdi-text-long"
          rounded
          variant="outlined"
          color="primary"
