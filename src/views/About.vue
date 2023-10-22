@@ -3,9 +3,10 @@
 import { ref } from "vue";
 
 const tab = ref(0);
-const tabs = ["Description", "Features", "Contact"];
-const startUsing = "Press \"Command + Shift + O\" for Mac. " +
-  "Press \"Ctrl + Shift + O\" for Windows.";
+const tabs = ["Description", "Features", "Links"];
+const startUsing = "Press the Free Ai Sidebar icon on the top right corner of your browser."
+// const startUsing = "Press \"Command + Shift + O\" for Mac. " +
+//   "Press \"Ctrl + Shift + O\" for Windows.";
 
 function toGithub() {
   window.open("https://github.com/seonwoo960000/ai-sidebar", "_blank");
@@ -13,6 +14,10 @@ function toGithub() {
 
 function toChromeStore() {
   window.open("https://chromewebstore.google.com/detail/free-ai-side-bar/bphjdepgpbodffelhponjdfpjdajghgc?hl=ko", "_blank");
+}
+
+function scrollTo(tab: string) {
+  document.getElementById(tab.toLowerCase())?.scrollIntoView({ behavior: "smooth" })
 }
 </script>
 
@@ -35,6 +40,7 @@ function toChromeStore() {
                    class="tab text-capitalize mx-2"
                    hide-slider
                    :key="tab"
+                   @click="scrollTo(tab)"
                    :value="tab">
               {{ tab }}
             </v-tab>
@@ -46,7 +52,8 @@ function toChromeStore() {
           </div>
         </v-card>
       </v-col>
-      <v-col cols="12">
+      <v-col cols="12"
+             id="description">
         <div class="description text-center">
           <div class="description-1">
             Introducing Free AI Sidebar
@@ -90,7 +97,8 @@ function toChromeStore() {
       </span>
       </v-col>
     </v-row>
-    <v-row class="box-2">
+    <v-row class="box-2"
+           id="features">
       <v-col class="theme-left-column"
              cols="7">
         <v-img class="theme-image"
@@ -129,7 +137,8 @@ function toChromeStore() {
                max-width="640" />
       </v-col>
     </v-row>
-    <v-row class="box-4">
+    <v-row class="box-4"
+           id="links">
       <div class="mx-auto">
         <div class="footer-title">Links</div>
         <div class="footer-item"
@@ -258,7 +267,8 @@ function toChromeStore() {
 }
 
 .template-description {
-  color: #555555
+  color: #555555;
+  font-size: 16px;
 }
 
 .template-right-column {
@@ -282,7 +292,8 @@ function toChromeStore() {
 }
 
 .memorization-description {
-  color: #555555
+  color: #555555;
+  font-size: 16px;
 }
 
 .footer-title {

@@ -8,6 +8,11 @@ const props = defineProps({
   message: {
     type: Object as () => Message,
     required: true
+  },
+  showMessageTemplate: {
+    type: Boolean,
+    required: false,
+    default: false
   }
 });
 
@@ -15,6 +20,35 @@ defineComponent({
   components: {
     Markdown
   }
+});
+
+onMounted(() => {
+  if (props.message?.type !== "sent") {
+    return;
+  }
+
+  if (props.showMessageTemplate) {
+    wholeMessage.value = props.message.text[0];
+  } else {
+    wholeMessage.value = props.message.originalText[0];
+  }
+});
+
+let lastSeenIdx = 0;
+const wholeMessage = ref(props.message?.text?.join("") || "");
+
+/**
+ * Watch streaming response and concatenate the strings. Only received messages are applicable
+ */
+watch(props.message, (newValue, oldValue) => {
+  if (props.message?.type !== "received") {
+    return;
+  }
+
+  const newLastIdx = newValue?.text.length || 0;
+  const newText = newValue?.text?.slice(lastSeenIdx, newLastIdx + 1)?.join("") || "";
+  lastSeenIdx = newLastIdx;
+  wholeMessage.value += newText;
 });
 
 const plugins = [
@@ -27,15 +61,6 @@ const plugins = [
     }
   }
 ];
-
-let lastSeenIdx = 0;
-const wholeMessage = ref(props.message?.text?.join("") || "");
-watch(props.message, (newValue, oldValue) => {
-  const newLastIdx = newValue?.text.length || 0;
-  const newText = newValue?.text?.slice(lastSeenIdx, newLastIdx + 1)?.join("") || "";
-  lastSeenIdx = newLastIdx;
-  wholeMessage.value += newText;
-});
 
 </script>
 

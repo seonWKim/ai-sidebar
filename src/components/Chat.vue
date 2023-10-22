@@ -21,6 +21,7 @@ import _ from "lodash";
 import OpenaiContextMemorizerModal from "@/components/config/OpenaiContextMemorizerModal.vue";
 
 const messageTemplate = ref("");
+const showMessageTemplate = ref(false);
 const messageTemplateInputPlaceholder = "{{message}}";
 const scrollTarget: Ref<any> = ref();
 const model = ref(null);
@@ -46,12 +47,13 @@ function getReceived(): Ref<Message> {
     role: OpenaiRole.system,
     type: "received",
     text: [],
+    originalText: [],
     canceled: false
   });
 }
 
 /**
- * Update the message template to use for formatting the original message typed by the user.
+ * Update the {@link messageTemplate} which is used for formatting the original message typed by the user.
  * @param template Message template
  */
 function updateMessageTemplate(template: string) {
@@ -59,7 +61,15 @@ function updateMessageTemplate(template: string) {
 }
 
 /**
- * Update the OpenAI model to use.
+ * Update {@link showMessageTemplate} which is used to determine whether to show message formatted with message template.
+ * @param showMessage Whether to show message formatted with message template
+ */
+function updateShowMessageTemplate(showMessage: boolean) {
+  showMessageTemplate.value = showMessage;
+}
+
+/**
+ * Update the {@link selectedModel} to use.
  * @param model OpenAI model
  */
 function updateOpenaiModel(model: OpenaiModel) {
@@ -78,7 +88,7 @@ function updateRememberContext(shouldRememberContext: boolean) {
 }
 
 /**
- * Update the temperature of OpenAI API.
+ * Update the {@link selectedTemperature} of OpenAI API.
  * @param temperature Temperature
  */
 function updateOpenaiTemperature(temperature: number) {
@@ -117,6 +127,7 @@ async function sendMessage(event: any) {
     role: OpenaiRole.user,
     type: "sent",
     text: [constructMessage(messageTemplate.value, newMessage.value)],
+    originalText: [newMessage.value],
     canceled: false
   };
   messages.value.push(messageToSend);
@@ -284,6 +295,7 @@ function getMessageCardClass(type: string) {
         >
           <chat-message
             :message="message"
+            :show-message-template="showMessageTemplate"
             color="messages"
             :class="getMessageCardClass(message.type)"
           />
@@ -319,7 +331,8 @@ function getMessageCardClass(type: string) {
           <v-slide-group-item>
             <message-template-modal
               custom-style="mr-2"
-              @update-message-template="updateMessageTemplate" />
+              @update-message-template="updateMessageTemplate"
+              @update-show-message-template="updateShowMessageTemplate" />
           </v-slide-group-item>
           <v-slide-group-item>
             <openai-context-memorizer-modal
