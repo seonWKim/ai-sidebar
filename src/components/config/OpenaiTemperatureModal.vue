@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { computed, onMounted, ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { ChromeStorageKeys } from "@/common/keys";
 import { appStore } from "@/store/app";
 
@@ -25,7 +25,7 @@ const emits = defineEmits(["updateOpenaiTemperature"]);
 const store = appStore();
 const dialog = ref(false);
 
-const temperature = ref(1.0)
+const temperature = ref(1.0);
 
 watch(temperature, (newVal) => {
   store.saveToChromeStorage(ChromeStorageKeys.TEMPERATURE, newVal.toString());

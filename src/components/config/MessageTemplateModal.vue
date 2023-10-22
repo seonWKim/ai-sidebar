@@ -14,19 +14,26 @@ const props = defineProps({
 
 onMounted(async () => {
   template.value = await store.getFromChromeStorage(ChromeStorageKeys.MESSAGE_TEMPLATE)
+  showMessageTemplate.value = await store.getFromChromeStorage(ChromeStorageKeys.SHOW_MESSAGE_TEMPLATE) === "true";
 });
 
-const emits = defineEmits(["updateMessageTemplate"]);
+const emits = defineEmits(["updateMessageTemplate", "updateShowMessageTemplate"]);
 
 const store = appStore();
 const dialog = ref(false);
 const template = ref("");
 const messageTemplateInputPlaceholder = "{{message}}";
 const messageTemplatePlaceholder = `Summarize the following text: ${messageTemplateInputPlaceholder}`;
+const showMessageTemplate = ref(false);
 
 watch(template, (newVal) => {
   store.saveToChromeStorage(ChromeStorageKeys.MESSAGE_TEMPLATE, newVal);
   emits("updateMessageTemplate", newVal);
+});
+
+watch(showMessageTemplate, (newVal) => {
+  store.saveToChromeStorage(ChromeStorageKeys.SHOW_MESSAGE_TEMPLATE, newVal.toString());
+  emits("updateShowMessageTemplate", newVal);
 });
 
 </script>
@@ -61,13 +68,20 @@ watch(template, (newVal) => {
             <v-textarea
               v-model="template"
               :placeholder="messageTemplatePlaceholder"
-              class="mb-6"
               variant="outlined"
               shaped
               clearable
               flat
               hide-details
             />
+            <v-checkbox
+              v-model="showMessageTemplate"
+              class="mb-4"
+              @click="showMessageTemplate != showMessageTemplate"
+              label="Show message template"
+              color="primary"
+              hide-details>
+            </v-checkbox>
             <v-card color="primary"
                     variant="tonal">
               <v-card-item class="mt-2">
