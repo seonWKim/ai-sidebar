@@ -5,6 +5,15 @@ import { ref } from "vue";
 const tab = ref(0);
 const tabs = ["Description", "Features", "Links"];
 const startUsing = "You can start by clicking the chrome extension icon";
+const box2Features = [
+  "Default Message Templates",
+  "Custom Message Templates",
+  "Show/Hide Message Template"
+];
+const box3Features = [
+  "Memorize/Forget Context",
+  "Configure Max Number of Context Memorization"
+];
 
 function toGithub() {
   window.open("https://github.com/seonwoo960000/ai-sidebar", "_blank");
@@ -56,7 +65,8 @@ function openSidePanel() {
       </v-col>
       <v-col cols="12"
              id="description">
-        <div class="description text-center">
+        <div class="description text-center"
+             data-aos="fade-left">
           <div class="description-1">
             Introducing Free AI Sidebar
           </div>
@@ -92,7 +102,7 @@ function openSidePanel() {
           </div>
         </div>
       </v-col>
-      <v-col cols="12">
+      <v-col cols="12" data-aos="zoom-in">
         <span class="theme-images">
         <v-img class="theme-image"
                src="@/assets/example-themes.png"
@@ -103,37 +113,56 @@ function openSidePanel() {
     <v-row class="box-2"
            id="features">
       <v-col class="theme-left-column"
+             data-aos="fade-right"
              cols="7">
         <v-img class="theme-image"
                src="@/assets/example-message-template.png"
                max-width="640" />
       </v-col>
       <v-col class="template-right-column"
+             data-aos="fade-left"
              cols="5">
         <div>
           <div class="template-title">
-            Configure your template
+            Configure Template
           </div>
           <div class="template-description">
             You can set your default message template so that you don't have to repeat the same message over and
             over again!!
+          </div>
+          <div class="feature-description"
+               v-for="(featureDescription, index) in box2Features"
+               :key="index">
+            <v-icon>mdi-check</v-icon>
+            <span class="feature-description">
+             {{ featureDescription }}
+            </span>
           </div>
         </div>
       </v-col>
     </v-row>
     <v-row class="box-3">
       <v-col class="memorization-left-column"
+             data-aos="fade-right"
              cols="5">
         <div style="max-width: 420px">
           <div class="memorization-title">
-            Remember the context
+            Remember Context
           </div>
           <div class="memorization-description">
             Remember context so that you can seamlessly continue your conversation with chatGPT.
           </div>
+          <div v-for="(featureDescription, index) in box3Features"
+               :key="index">
+            <v-icon>mdi-check</v-icon>
+            <span class="feature-description">
+             {{ featureDescription }}
+            </span>
+          </div>
         </div>
       </v-col>
       <v-col class="memorization-right-column"
+             data-aos="fade-left"
              cols="7">
         <v-img class="theme-image"
                src="@/assets/example-memorization.png"
@@ -141,6 +170,7 @@ function openSidePanel() {
       </v-col>
     </v-row>
     <v-row class="box-4"
+           data-aos="fade-up"
            id="links">
       <div class="mx-auto">
         <div class="footer-title">Links</div>
@@ -272,6 +302,7 @@ function openSidePanel() {
 .template-description {
   color: #555555;
   font-size: 16px;
+  margin-bottom: 16px;
 }
 
 .template-right-column {
@@ -297,6 +328,7 @@ function openSidePanel() {
 .memorization-description {
   color: #555555;
   font-size: 16px;
+  margin-bottom: 16px;
 }
 
 .footer-title {
@@ -310,5 +342,10 @@ function openSidePanel() {
   margin-bottom: 12px;
   color: #727272;
   font-size: 0.8rem;
+}
+
+.feature-description {
+  color: #555555;
+  margin-left: 4px;
 }
 </style>
