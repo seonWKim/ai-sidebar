@@ -6,13 +6,13 @@ const tab = ref(0);
 const tabs = ["Description", "Features", "Links"];
 const startUsing = "You can start by clicking the chrome extension icon";
 const box2Features = [
-  "Default Message Templates",
-  "Custom Message Templates",
-  "Show/Hide Message Template"
+  "Default message templates",
+  "Custom message templates",
+  "Show/Hide message templates"
 ];
 const box3Features = [
-  "Memorize/Forget Context",
-  "Configure Max Number of Context Memorization"
+  "Memorize/Forget context",
+  "Configure max number of previous contexts to memorize"
 ];
 
 function toGithub() {
@@ -130,13 +130,15 @@ function openSidePanel() {
             You can set your default message template so that you don't have to repeat the same message over and
             over again!!
           </div>
-          <div class="feature-description"
-               v-for="(featureDescription, index) in box2Features"
-               :key="index">
-            <v-icon>mdi-check</v-icon>
-            <span class="feature-description">
+          <div v-for="(featureDescription, index) in box2Features"
+               :key="index"
+               class="d-flex">
+            <div>
+              <v-icon>mdi-check</v-icon>
+            </div>
+            <div class="feature-description">
              {{ featureDescription }}
-            </span>
+            </div>
           </div>
         </div>
       </v-col>
@@ -153,11 +155,14 @@ function openSidePanel() {
             Remember context so that you can seamlessly continue your conversation with chatGPT.
           </div>
           <div v-for="(featureDescription, index) in box3Features"
-               :key="index">
-            <v-icon>mdi-check</v-icon>
-            <span class="feature-description">
-             {{ featureDescription }}
-            </span>
+               :key="index"
+               class="d-flex">
+            <div>
+              <v-icon>mdi-check</v-icon>
+            </div>
+            <div class="feature-description">
+              {{ featureDescription }}
+            </div>
           </div>
         </div>
       </v-col>
