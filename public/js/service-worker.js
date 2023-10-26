@@ -28,15 +28,6 @@ chrome.runtime.onMessage.addListener((message, sender) => {
   })();
 });
 
-chrome.commands.onCommand.addListener((command) => {
-  if (command === "open_sidepanel") {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      const currentTab = tabs[0];
-      chrome.sidePanel.open({ windowId: currentTab.windowId });
-    });
-  }
-});
-
 chrome.action.onClicked.addListener(async (tab) => {
   const tabId = tab.id;
   await chrome.sidePanel.open({ tabId });
