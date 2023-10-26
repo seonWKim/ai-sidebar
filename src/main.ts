@@ -13,19 +13,16 @@ import { createApp } from "vue";
 import "@/styles/main.css";
 // Plugins
 import { registerPlugins } from "@/plugins";
-import { documentEventListener } from "@/common/event";
+import AOS from "aos";
+import "aos/dist/aos.css";
 
 const app = createApp(App);
-const landing = createApp(Landing)
+const landing = createApp(Landing);
 
-import AOS from 'aos';
-import 'aos/dist/aos.css';
 AOS.init();
 
 registerPlugins(app);
 registerPlugins(landing);
 
-documentEventListener.initializeEventListeners();
-
 app.mount("#app");
-landing.mount("#landing")
+landing.mount("#landing");

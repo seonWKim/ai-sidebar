@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { eventBus, EventName } from "@/common/event";
 import { VTextField } from "vuetify/components";
 import { appStore } from "@/store/app";
 import OpenaiApiKeyGuide from "@/components/config/OpenaiApiKeyGuide.vue";
-import { documentEventListener } from "@/common/event";
+import { ChromeStorageKeys } from "@/common/keys";
 
 const dialog = ref(false);
 const apiKey = ref("");
@@ -19,9 +19,10 @@ eventBus.on(EventName.OPEN_SETTINGS, () => {
 onMounted(async () => {
   await store.initializeOpenAi();
   apiKey.value = store.openaiReadOny?.apiKey || "";
-  shortCutKey.value = (await documentEventListener.getCustomOpenSidePanelEventTriggerKeyNames()).join("");
+  shortCutKey.value = (await getCustomOpenSidePanelEventTriggerKeyNames()).join("");
   setShortCutKeyHint(shortCutKey.value);
 });
+
 
 watch(apiKey, (newValue, oldValue) => {
   store.setOpenAiKey(newValue);
@@ -30,10 +31,23 @@ watch(apiKey, (newValue, oldValue) => {
 const shortCutKey = ref("");
 const shortCutKeyHint = ref("");
 
+async function getCustomOpenSidePanelEventTriggerKeyNames(): Promise<string[]> {
+  const openSidePanelEventTriggerKeysStr = await chrome?.storage?.local?.get(ChromeStorageKeys.OPEN_SIDE_PANEL_EVENT_TRIGGER_KEYS);
+  let openSidePanelEventTriggerKeyNames = ["Control", "Shift", "O"];
+  if (!!openSidePanelEventTriggerKeysStr && openSidePanelEventTriggerKeysStr[ChromeStorageKeys.OPEN_SIDE_PANEL_EVENT_TRIGGER_KEYS]) {
+    openSidePanelEventTriggerKeyNames = JSON.parse(openSidePanelEventTriggerKeysStr[ChromeStorageKeys.OPEN_SIDE_PANEL_EVENT_TRIGGER_KEYS]);
+  }
+
+  return openSidePanelEventTriggerKeyNames.slice(2);
+}
+
 function onShortCutKeyUpdate(value: string) {
   shortCutKey.value = value ? value : "";
   setShortCutKeyHint(shortCutKey.value);
-  documentEventListener.setCustomOpenSidePanelEventTriggerKeyNames(shortCutKey.value);
+
+  const customKey = shortCutKey.value ? shortCutKey.value : "O";
+  const customKeyMap = ["Control", "Shift", customKey];
+  chrome?.storage?.local?.set({ [ChromeStorageKeys.OPEN_SIDE_PANEL_EVENT_TRIGGER_KEYS]: JSON.stringify(customKeyMap) });
 }
 
 function setShortCutKeyHint(value: string) {
