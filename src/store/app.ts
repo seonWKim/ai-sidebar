@@ -23,8 +23,8 @@ export const appStore = defineStore("app", {
         });
       }
     },
-    setOpenAiKey(apiKey: string) {
-      this.saveToChromeStorage(ChromeStorageKeys.API_KEY, apiKey);
+    async setOpenAiKey(apiKey: string) {
+      await this.saveToChromeStorage(ChromeStorageKeys.API_KEY, apiKey);
       if (this.openai) {
         this.openai.apiKey = apiKey;
       } else {
