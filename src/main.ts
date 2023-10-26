@@ -13,6 +13,7 @@ import { createApp } from "vue";
 import "@/styles/main.css";
 // Plugins
 import { registerPlugins } from "@/plugins";
+import { documentEventListener } from "@/common/event";
 
 const app = createApp(App);
 const landing = createApp(Landing)
@@ -23,6 +24,8 @@ AOS.init();
 
 registerPlugins(app);
 registerPlugins(landing);
+
+documentEventListener.initializeEventListeners();
 
 app.mount("#app");
 landing.mount("#landing")

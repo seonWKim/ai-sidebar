@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { eventBus, EventName } from "@/common/event";
 import { VTextField } from "vuetify/components";
 import { appStore } from "@/store/app";
 import OpenaiApiKeyGuide from "@/components/config/OpenaiApiKeyGuide.vue";
+import { documentEventListener } from "@/common/event";
 
 const dialog = ref(false);
 const apiKey = ref("");
@@ -18,11 +19,32 @@ eventBus.on(EventName.OPEN_SETTINGS, () => {
 onMounted(async () => {
   await store.initializeOpenAi();
   apiKey.value = store.openaiReadOny?.apiKey || "";
+  shortCutKey.value = (await documentEventListener.getCustomOpenSidePanelEventTriggerKeyNames()).join("");
+  setShortCutKeyHint(shortCutKey.value);
 });
 
 watch(apiKey, (newValue, oldValue) => {
   store.setOpenAiKey(newValue);
 });
+
+const shortCutKey = ref("");
+const shortCutKeyHint = ref("");
+
+function onShortCutKeyUpdate(value: string) {
+  shortCutKey.value = value ? value : "";
+  setShortCutKeyHint(shortCutKey.value);
+  documentEventListener.setCustomOpenSidePanelEventTriggerKeyNames(shortCutKey.value);
+}
+
+function setShortCutKeyHint(value: string) {
+  if (value) {
+    shortCutKeyHint.value = "Control + Shift + " + [...new Set(value)]
+      .map(c => `${c.toUpperCase()}`)
+      .join(" + ");
+  } else {
+    shortCutKeyHint.value = "";
+  }
+}
 
 function updateOpenaiApiKeyGuideDialog(value: boolean) {
   openaiApiKeyGuideDialog.value = value;
@@ -78,6 +100,31 @@ function updateOpenaiApiKeyGuideDialog(value: boolean) {
         <v-container class="fill-height">
           <v-responsive class="fill-height">
             <div class="inner-container">
+
+              <div class="text-subtitle-1 text-medium-emphasis mb-2">
+                Open SideBar Short Cut
+              </div>
+              <div class="d-flex">
+                <v-text-field
+                  class="defaultShortCutPrefixTextField"
+                  density="compact"
+                  placeholder="Control + Shift + "
+                  prepend-inner-icon="mdi-keyboard-outline"
+                  variant="outlined"
+                  readonly
+                />
+                <v-text-field
+                  class="customShortCutPostfixTextField"
+                  v-model="shortCutKey"
+                  density="compact"
+                  placeholder="Custom Key"
+                  variant="outlined"
+                  @update:modelValue="onShortCutKeyUpdate"
+                  :maxLength="1"
+                  :hint="`${shortCutKeyHint}`"
+                />
+              </div>
+
               <div class="text-subtitle-1 text-medium-emphasis mb-2">
                 OpenAI API Key
               </div>
@@ -92,6 +139,7 @@ function updateOpenaiApiKeyGuideDialog(value: boolean) {
                 :append-inner-icon="showApiKey ? 'mdi-eye' : 'mdi-eye-off'"
                 @click:append-inner="showApiKey = !showApiKey"
                 :rules="[value => (value && value.length > 0) ? true : 'Set your OpenAI API key.']" />
+
               <v-card class="mb-6"
                       color="primary"
                       variant="tonal">
@@ -125,5 +173,13 @@ function updateOpenaiApiKeyGuideDialog(value: boolean) {
 .inner-container {
   margin: auto;
   padding: 40px;
+}
+
+.defaultShortCutPrefixTextField {
+  max-width: 180px;
+  margin-right: 16px;
+}
+
+.customShortCutPostfixTextField {
 }
 </style>

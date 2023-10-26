@@ -36,14 +36,5 @@
       "16": "static/image/favicon-16x16.png",
       "32": "static/image/favicon-32x32.png"
     }
-  },
-  "commands": {
-    "open_sidepanel": {
-      "suggested_key": {
-        "default": "Ctrl+Shift+O",
-        "mac": "Command+Shift+O"
-      },
-      "description": "Open or close the side panel"
-    }
   }
 }

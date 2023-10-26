@@ -1,12 +1,11 @@
 <script setup lang="ts">
 
 import { ref } from "vue";
+import { EventName, documentEventListener } from "@/common/event";
 
 const tab = ref(0);
 const tabs = ["Description", "Features", "Links"];
 const startUsing = "Press the Free Ai Sidebar icon on the top right corner of your browser."
-// const startUsing = "Press \"Command + Shift + O\" for Mac. " +
-//   "Press \"Ctrl + Shift + O\" for Windows.";
 
 function toGithub() {
   window.open("https://github.com/seonwoo960000/ai-sidebar", "_blank");
@@ -18,6 +17,10 @@ function toChromeStore() {
 
 function scrollTo(tab: string) {
   document.getElementById(tab.toLowerCase())?.scrollIntoView({ behavior: "smooth" })
+}
+
+function openSidePanel() {
+  documentEventListener.emitEvent(EventName.OPEN_SIDEPANEL)
 }
 </script>
 
@@ -73,6 +76,7 @@ function scrollTo(tab: string) {
                 <v-btn class="description-button-1 text-capitalize"
                        size="large"
                        v-bind="props"
+                       @click="openSidePanel"
                 >
                   Start Using
                 </v-btn>
