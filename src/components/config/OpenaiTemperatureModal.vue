@@ -107,6 +107,10 @@ watch(temperature, (newVal) => {
   font-size: 10px;
 }
 
+.temperature {
+  padding-top: 16px;
+}
+
 .temperature ::v-deep(.v-input--horizontal .v-input__append) {
   margin-inline-start: 4px !important;
 }
