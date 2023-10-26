@@ -19,7 +19,9 @@ import "aos/dist/aos.css";
 const app = createApp(App);
 const landing = createApp(Landing);
 
-AOS.init();
+AOS.init({
+  duration: 1000,
+});
 
 registerPlugins(app);
 registerPlugins(landing);
