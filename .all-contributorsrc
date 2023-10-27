@@ -1,7 +1,5 @@
 {
-  "files": [
-    "README.md"
-  ],
+  "files": ["README.md"],
   "imageSize": 100,
   "commit": false,
   "commitType": "docs",
@@ -12,37 +10,28 @@
       "name": "Kim Seon Woo",
       "avatar_url": "https://avatars.githubusercontent.com/u/69591622?v=4",
       "profile": "https://github.com/seonwoo960000",
-      "contributions": [
-        "code",
-        "doc"
-      ]
+      "contributions": ["code", "doc"]
     },
     {
       "login": "Rhythm-08",
       "name": "Rhythm Sharma",
       "avatar_url": "https://avatars.githubusercontent.com/u/64489317?v=4",
       "profile": "https://www.linkedin.com/in/rhythm-sharma-708a421a8/",
-      "contributions": [
-        "design"
-      ]
+      "contributions": ["design"]
     },
     {
       "login": "CainanConway",
       "name": "CainanConway",
       "avatar_url": "https://avatars.githubusercontent.com/u/37641258?v=4",
       "profile": "https://github.com/CainanConway",
-      "contributions": [
-        "doc"
-      ]
+      "contributions": ["doc"]
     },
     {
       "login": "aishwarya-mali",
       "name": "Aishwarya Mali",
       "avatar_url": "https://avatars.githubusercontent.com/u/43086476?v=4",
       "profile": "https://github.com/aishwarya-mali",
-      "contributions": [
-        "design"
-      ]
+      "contributions": ["design"]
     }
   ],
   "contributorsPerLine": 7,

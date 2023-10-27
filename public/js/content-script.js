@@ -1,6 +1,6 @@
 let pushedKeys = {};
-const OPEN_SIDE_PANEL_EVENT = "OpenSidePanel";
-const OPEN_SIDE_PANEL_EVENT_TRIGGER_KEYS = "free_sidebar_open_side_panel_event_trigger_keys";
+const OPEN_SIDE_PANEL_EVENT = 'OpenSidePanel';
+const OPEN_SIDE_PANEL_EVENT_TRIGGER_KEYS = 'free_sidebar_open_side_panel_event_trigger_keys';
 
 addOpenSidePanelEvent();
 addKeydownEvent();
@@ -10,9 +10,15 @@ addKeyupEvent();
  * When {@link OPEN_SIDE_PANEL_EVENT} is dispatched, open chrome side panel.
  */
 function addOpenSidePanelEvent() {
-  document.addEventListener(OPEN_SIDE_PANEL_EVENT, function(_) {
-    chrome?.runtime?.sendMessage({ type: "open_side_panel" });
-  }, false);
+  document.addEventListener(
+    OPEN_SIDE_PANEL_EVENT,
+    function (_) {
+      chrome?.runtime?.sendMessage({
+        type: 'open_side_panel',
+      });
+    },
+    false
+  );
 }
 
 /**
@@ -20,7 +26,7 @@ function addOpenSidePanelEvent() {
  * When Shift + Control + Custom Key Map is pushed, dispatch {@link OPEN_SIDE_PANEL_EVENT}.
  */
 function addKeydownEvent() {
-  document.addEventListener("keydown", async (event) => {
+  document.addEventListener('keydown', async (event) => {
     const name = event.key;
     const code = event.code;
     pushedKeys[code] = name;
@@ -28,7 +34,7 @@ function addKeydownEvent() {
     const pushedKeyValues = Object.values(pushedKeys).map((key) => key.toLowerCase());
 
     // short-circuiting
-    if (!pushedKeyValues.includes("control") || !pushedKeyValues.includes("shift")) {
+    if (!pushedKeyValues.includes('control') || !pushedKeyValues.includes('shift')) {
       return;
     }
 
@@ -43,7 +49,7 @@ function addKeydownEvent() {
  * Add keyup event to document.
  */
 function addKeyupEvent() {
-  document.addEventListener("keyup", (event) => {
+  document.addEventListener('keyup', (event) => {
     const code = event.code;
     delete pushedKeys[code];
   });
@@ -54,12 +60,16 @@ function addKeyupEvent() {
  */
 async function getCustomKeyMap() {
   const openSidePanelEventTriggerKeysStr = await chrome?.storage?.local?.get(
-    OPEN_SIDE_PANEL_EVENT_TRIGGER_KEYS);
-  let openSidePanelEventTriggerKeyNames = ["Control", "Shift", "O"];
-  if (!!openSidePanelEventTriggerKeysStr &&
-      openSidePanelEventTriggerKeysStr[OPEN_SIDE_PANEL_EVENT_TRIGGER_KEYS]) {
-    openSidePanelEventTriggerKeyNames =
-      JSON.parse(openSidePanelEventTriggerKeysStr[OPEN_SIDE_PANEL_EVENT_TRIGGER_KEYS]);
+    OPEN_SIDE_PANEL_EVENT_TRIGGER_KEYS
+  );
+  let openSidePanelEventTriggerKeyNames = ['Control', 'Shift', 'O'];
+  if (
+    !!openSidePanelEventTriggerKeysStr &&
+    openSidePanelEventTriggerKeysStr[OPEN_SIDE_PANEL_EVENT_TRIGGER_KEYS]
+  ) {
+    openSidePanelEventTriggerKeyNames = JSON.parse(
+      openSidePanelEventTriggerKeysStr[OPEN_SIDE_PANEL_EVENT_TRIGGER_KEYS]
+    );
   }
   return openSidePanelEventTriggerKeyNames;
 }

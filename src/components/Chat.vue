@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Ref, ref } from "vue";
-import { v4 as uuidv4 } from "uuid";
+import { Ref, ref } from 'vue';
+import { v4 as uuidv4 } from 'uuid';
 import {
   ListenerEvent,
   ListenerEventType,
@@ -8,34 +8,34 @@ import {
   OpenaiModel,
   OpenaiPrompt,
   OpenaiRole,
-  streamOpenAiResponse
-} from "@/service/openai";
-import { VBtn, VTextarea } from "vuetify/components";
-import type { Message } from "@/common/message";
-import { eventBus, EventName } from "@/common/event";
-import ChatMessage from "@/components/ChatMessage.vue";
-import OpenaiModelSelector from "@/components/config/OpenaiModelSelector.vue";
-import MessageTemplateModal from "@/components/config/MessageTemplateModal.vue";
-import OpenaiTemperatureModal from "@/components/config/OpenaiTemperatureModal.vue";
-import _ from "lodash";
-import OpenaiContextMemorizerModal from "@/components/config/OpenaiContextMemorizerModal.vue";
-import { messageTemplateInputPlaceholder } from "@/common/templates";
+  streamOpenAiResponse,
+} from '@/service/openai';
+import { VBtn, VTextarea } from 'vuetify/components';
+import type { Message } from '@/common/message';
+import { eventBus, EventName } from '@/common/event';
+import ChatMessage from '@/components/ChatMessage.vue';
+import OpenaiModelSelector from '@/components/config/OpenaiModelSelector.vue';
+import MessageTemplateModal from '@/components/config/MessageTemplateModal.vue';
+import OpenaiTemperatureModal from '@/components/config/OpenaiTemperatureModal.vue';
+import _ from 'lodash';
+import OpenaiContextMemorizerModal from '@/components/config/OpenaiContextMemorizerModal.vue';
+import { messageTemplateInputPlaceholder } from '@/common/templates';
 
-const messageTemplate = ref("");
+const messageTemplate = ref('');
 const showMessageTemplate = ref(false);
 const scrollTarget: Ref<any> = ref();
 const model = ref(null);
 
 const messages = ref<Message[]>([]);
-const newMessage = ref("");
+const newMessage = ref('');
 const isMessageBeingStreamed = ref(false);
-const selectedModel: Ref<OpenaiModel> = ref(OpenaiModel["gpt-3.5-turbo"]);
+const selectedModel: Ref<OpenaiModel> = ref(OpenaiModel['gpt-3.5-turbo']);
 const selectedTemperature: Ref<number> = ref(1.0);
 
 let messageContexts: OpenaiMessage[] = [];
 const summarizeContextOpenaiMessage = OpenaiMessage.of1(
-  "Summarize all the messages in a format as follows. The placeholder for previousContext is where you have to fill in." +
-  "'Previous context: {{previousContext}}\n",
+  'Summarize all the messages in a format as follows. The placeholder for previousContext is where you have to fill in.' +
+    "'Previous context: {{previousContext}}\n",
   OpenaiRole.user
 );
 const contextMaxNo: Ref<number> = ref(5);
@@ -45,10 +45,10 @@ function getReceived(): Ref<Message> {
   return ref<Message>({
     id: uuidv4(),
     role: OpenaiRole.system,
-    type: "received",
+    type: 'received',
     text: [],
     originalText: [],
-    canceled: false
+    canceled: false,
   });
 }
 
@@ -106,7 +106,7 @@ function updateOpenaiTemperature(temperature: number) {
  * @param event Keyboard event
  */
 async function sendMessage(event: any) {
-  if (event.key === "Enter") {
+  if (event.key === 'Enter') {
     // Prevent sendMessage function from being called when shift key is pressed with enter
     if (event.shiftKey) {
       return;
@@ -117,7 +117,7 @@ async function sendMessage(event: any) {
   }
 
   // Return if message to send is empty
-  if (newMessage.value.trim() === "") {
+  if (newMessage.value.trim() === '') {
     return;
   }
 
@@ -125,13 +125,13 @@ async function sendMessage(event: any) {
   const messageToSend: Message = {
     id: uuidv4(),
     role: OpenaiRole.user,
-    type: "sent",
+    type: 'sent',
     text: [constructMessage(messageTemplate.value, newMessage.value)],
     originalText: [newMessage.value],
-    canceled: false
+    canceled: false,
   };
   messages.value.push(messageToSend);
-  newMessage.value = "";
+  newMessage.value = '';
   const prompt = new OpenaiPrompt(
     await constructOpenaiMessages(),
     selectedModel.value,
@@ -159,14 +159,14 @@ async function sendMessage(event: any) {
     },
     () => {
       if (received.value.canceled) {
-        return new ListenerEvent(ListenerEventType.STOP_STREAM, "");
+        return new ListenerEvent(ListenerEventType.STOP_STREAM, '');
       }
 
       return null;
     },
     () => {
       if (rememberContext.value) {
-        addContext(OpenaiMessage.of1(received.value.text.join(""), OpenaiRole.system));
+        addContext(OpenaiMessage.of1(received.value.text.join(''), OpenaiRole.system));
       }
       // received = getReceived();
       isMessageBeingStreamed.value = false;
@@ -181,7 +181,7 @@ async function sendMessage(event: any) {
  */
 function stopStream() {
   const streamingMessage = messages.value[messages.value.length - 1];
-  if (streamingMessage.type === "received" && !streamingMessage.canceled) {
+  if (streamingMessage.type === 'received' && !streamingMessage.canceled) {
     streamingMessage.canceled = true;
   }
 }
@@ -191,7 +191,7 @@ function stopStream() {
  */
 function clearMessages() {
   messages.value = [];
-  newMessage.value = "";
+  newMessage.value = '';
   messageContexts = [];
 }
 
@@ -202,14 +202,14 @@ function clearMessages() {
  * @param message the original message which user typed in
  */
 function constructMessage(template: string, message: string): string {
-  if (!template || template.trim() === "") {
+  if (!template || template.trim() === '') {
     return message;
   }
 
   if (template.includes(messageTemplateInputPlaceholder)) {
     return template.replace(messageTemplateInputPlaceholder, message);
   } else {
-    return template + "\n" + message;
+    return template + '\n' + message;
   }
 }
 
@@ -226,7 +226,7 @@ async function constructOpenaiMessages(): Promise<OpenaiMessage[]> {
 
   const messageToBeSent = messages.value[messages.value.length - 1];
   if (!rememberContext.value) {
-    return [OpenaiMessage.of1(messageToBeSent.text.join(""), OpenaiRole.user)];
+    return [OpenaiMessage.of1(messageToBeSent.text.join(''), OpenaiRole.user)];
   }
 
   // Summarize the context if it is too long
@@ -238,16 +238,13 @@ async function constructOpenaiMessages(): Promise<OpenaiMessage[]> {
     );
 
     const summarizedContext: string[] = [];
-    await streamOpenAiResponse(
-      prompt,
-      (res) => {
-        summarizedContext.push(res);
-      }
-    );
-    messageContexts = [OpenaiMessage.of1(summarizedContext.join(""), OpenaiRole.system)];
+    await streamOpenAiResponse(prompt, (res) => {
+      summarizedContext.push(res);
+    });
+    messageContexts = [OpenaiMessage.of1(summarizedContext.join(''), OpenaiRole.system)];
   }
 
-  addContext(OpenaiMessage.of1(messageToBeSent.text.join(""), OpenaiRole.user));
+  addContext(OpenaiMessage.of1(messageToBeSent.text.join(''), OpenaiRole.user));
   return _.cloneDeep(messageContexts);
 }
 
@@ -262,37 +259,32 @@ function addContext(context: OpenaiMessage) {
 function onApiKeyError(err: string) {
   eventBus.emit(EventName.OPEN_SETTINGS, { err: err });
   eventBus.emit(EventName.OPEN_SNACKBAR, {
-    text: "API key is invalid",
-    color: "error"
+    text: 'API key is invalid',
+    color: 'error',
   });
 }
 
 function getPosition(message: Message) {
   return {
-    display: "flex",
-    "justify-content": message.type === "sent" ? "flex-end" : "flex-start"
+    display: 'flex',
+    'justify-content': message.type === 'sent' ? 'flex-end' : 'flex-start',
   };
 }
 
 function getMessageCardClass(type: string) {
   return {
-    "message-card": true,
-    "message-card-sent": type === "sent",
-    "message-card-received": type === "received"
+    'message-card': true,
+    'message-card-sent': type === 'sent',
+    'message-card-received': type === 'received',
   };
 }
-
 </script>
 
 <template>
   <div class="parent">
     <div class="chat-message-container">
       <div class="chat-messages">
-        <div
-          v-for="message in messages"
-          :key="message.id"
-          :style="getPosition(message)"
-        >
+        <div v-for="message in messages" :key="message.id" :style="getPosition(message)">
           <chat-message
             :message="message"
             :show-message-template="showMessageTemplate"
@@ -319,36 +311,40 @@ function getMessageCardClass(type: string) {
           variant="plain"
           color="error"
           class="font-weight-bold"
-          @click="clearMessages">
+          @click="clearMessages"
+        >
           Clear
         </v-btn>
       </div>
     </div>
     <div class="chat-textarea">
       <div class="selectbox-area">
-        <v-slide-group v-model="model"
-                       show-arrows>
+        <v-slide-group v-model="model" show-arrows>
           <v-slide-group-item>
             <message-template-modal
               custom-style="mr-2"
               @update-message-template="updateMessageTemplate"
-              @update-show-message-template="updateShowMessageTemplate" />
+              @update-show-message-template="updateShowMessageTemplate"
+            />
           </v-slide-group-item>
           <v-slide-group-item>
             <openai-context-memorizer-modal
               custom-style="mr-2"
-              @update-remember-context="updateRememberContext" />
+              @update-remember-context="updateRememberContext"
+            />
           </v-slide-group-item>
           <v-slide-group-item>
             <openai-model-selector
               :selected-model="selectedModel"
               custom-style="mr-2"
-              @update-openai-model="updateOpenaiModel" />
+              @update-openai-model="updateOpenaiModel"
+            />
           </v-slide-group-item>
           <v-slide-group-item>
             <openai-temperature-modal
               :selected-temperature="selectedTemperature"
-              @update-openai-temperature="updateOpenaiTemperature" />
+              @update-openai-temperature="updateOpenaiTemperature"
+            />
           </v-slide-group-item>
         </v-slide-group>
       </div>
@@ -386,7 +382,7 @@ function getMessageCardClass(type: string) {
 .chat-message-container {
   display: grid;
   grid-template-rows: 1fr 32px;
-  border-bottom: 2px solid #F0F1F5;
+  border-bottom: 2px solid #f0f1f5;
 
   overflow-y: auto;
 }
@@ -431,7 +427,5 @@ function getMessageCardClass(type: string) {
 }
 
 .main-textarea {
-
 }
-
 </style>

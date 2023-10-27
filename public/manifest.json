@@ -19,17 +19,11 @@
   },
   "content_scripts": [
     {
-      "js": [ "js/content-script.js" ],
-      "matches": [ "<all_urls>" ]
+      "js": ["js/content-script.js"],
+      "matches": ["<all_urls>"]
     }
   ],
-  "permissions": [
-    "activeTab",
-    "sidePanel",
-    "contextMenus",
-    "storage",
-    "unlimitedStorage"
-  ],
+  "permissions": ["activeTab", "sidePanel", "contextMenus", "storage", "unlimitedStorage"],
   "action": {
     "default_title": "Click to open side bar",
     "default_icon": {

@@ -1,34 +1,36 @@
 <script setup lang="ts">
-
-import { ref } from "vue";
+import { ref } from 'vue';
 
 const tab = ref(0);
-const tabs = ["Description", "Features", "Links"];
-const startUsing = "You can start by clicking the chrome extension icon";
+const tabs = ['Description', 'Features', 'Links'];
+const startUsing = 'You can start by clicking the chrome extension icon';
 const box2Features = [
-  "Default message templates",
-  "Custom message templates",
-  "Show/Hide message templates"
+  'Default message templates',
+  'Custom message templates',
+  'Show/Hide message templates',
 ];
 const box3Features = [
-  "Memorize/Forget context",
-  "Configure max number of previous contexts to memorize"
+  'Memorize/Forget context',
+  'Configure max number of previous contexts to memorize',
 ];
 
 function toGithub() {
-  window.open("https://github.com/seonwoo960000/ai-sidebar", "_blank");
+  window.open('https://github.com/seonwoo960000/ai-sidebar', '_blank');
 }
 
 function toChromeStore() {
-  window.open("https://chromewebstore.google.com/detail/free-ai-side-bar/bphjdepgpbodffelhponjdfpjdajghgc?hl=ko", "_blank");
+  window.open(
+    'https://chromewebstore.google.com/detail/free-ai-side-bar/bphjdepgpbodffelhponjdfpjdajghgc?hl=ko',
+    '_blank'
+  );
 }
 
 function scrollTo(tab: string) {
-  document.getElementById(tab.toLowerCase())?.scrollIntoView({ behavior: "smooth" });
+  document.getElementById(tab.toLowerCase())?.scrollIntoView({ behavior: 'smooth' });
 }
 
 function openSidePanel() {
-  chrome?.runtime?.sendMessage({ type: "open_side_panel" });
+  chrome?.runtime?.sendMessage({ type: 'open_side_panel' });
 }
 </script>
 
@@ -38,65 +40,49 @@ function openSidePanel() {
       <v-col cols="12">
         <v-card class="appbar" elevation="0">
           <div class="d-flex align-center pa-4 font-weight-bold">
-            <v-img src="@/assets/logo.png"
-                   alt="FREE AI Sidebar"
-                   width="25px"
-                   height="25px" />
+            <v-img src="@/assets/logo.png" alt="FREE AI Sidebar" width="25px" height="25px" />
             <span class="ml-4">FREE AI</span>
           </div>
-          <v-tabs v-model="tab"
-                  align-tabs="center"
-                  bg-color="transparent">
-            <v-tab v-for="tab in tabs"
-                   class="tab text-capitalize mx-2"
-                   hide-slider
-                   :key="tab"
-                   @click="scrollTo(tab)"
-                   :value="tab">
+          <v-tabs v-model="tab" align-tabs="center" bg-color="transparent">
+            <v-tab
+              v-for="tab in tabs"
+              class="tab text-capitalize mx-2"
+              hide-slider
+              :key="tab"
+              @click="scrollTo(tab)"
+              :value="tab"
+            >
               {{ tab }}
             </v-tab>
           </v-tabs>
           <div>
-            <v-btn disabled>
-              NO SIGN UP
-            </v-btn>
+            <v-btn disabled> NO SIGN UP </v-btn>
           </div>
         </v-card>
       </v-col>
-      <v-col cols="12"
-             id="description">
-        <div class="description text-center"
-             data-aos="fade-left">
-          <div class="description-1">
-            Introducing Free AI Sidebar
-          </div>
-          <div class="description-2">
-            AI Tools Made Free
-          </div>
+      <v-col cols="12" id="description">
+        <div class="description text-center" data-aos="fade-left">
+          <div class="description-1">Introducing Free AI Sidebar</div>
+          <div class="description-2">AI Tools Made Free</div>
           <div class="description-3">
             Free AI Sidebar is a free and open source AI tool <br />
             which is available for everyone to use. <br />
           </div>
           <div>
-            <v-tooltip :text="startUsing"
-                       max-width="300px"
-                       location="bottom">
+            <v-tooltip :text="startUsing" max-width="300px" location="bottom">
               <template v-slot:activator="{ props }">
-                <v-btn class="description-button-1 text-capitalize"
-                       size="large"
-                       v-bind="props"
-                       @click="openSidePanel"
+                <v-btn
+                  class="description-button-1 text-capitalize"
+                  size="large"
+                  v-bind="props"
+                  @click="openSidePanel"
                 >
                   Start Using
                 </v-btn>
               </template>
             </v-tooltip>
-            <v-btn class="description-button-2 text-capitalize"
-                   size="large"
-                   @click="toGithub">
-              <v-icon>
-                mdi-github
-              </v-icon>
+            <v-btn class="description-button-2 text-capitalize" size="large" @click="toGithub">
+              <v-icon> mdi-github </v-icon>
               Github
             </v-btn>
           </div>
@@ -104,59 +90,22 @@ function openSidePanel() {
       </v-col>
       <v-col cols="12" data-aos="zoom-in">
         <span class="theme-images">
-        <v-img class="theme-image"
-               src="@/assets/example-themes.png"
-               height="600" />
-      </span>
+          <v-img class="theme-image" src="@/assets/example-themes.png" height="600" />
+        </span>
       </v-col>
     </v-row>
-    <v-row class="box-2"
-           id="features">
-      <v-col class="theme-left-column"
-             data-aos="fade-right"
-             cols="7">
-        <v-img class="theme-image"
-               src="@/assets/example-message-template.png"
-               max-width="640" />
+    <v-row class="box-2" id="features">
+      <v-col class="theme-left-column" data-aos="fade-right" cols="7">
+        <v-img class="theme-image" src="@/assets/example-message-template.png" max-width="640" />
       </v-col>
-      <v-col class="template-right-column"
-             data-aos="fade-left"
-             cols="5">
+      <v-col class="template-right-column" data-aos="fade-left" cols="5">
         <div>
-          <div class="template-title">
-            Configure Template
-          </div>
+          <div class="template-title">Configure Template</div>
           <div class="template-description">
-            You can set your default message template so that you don't have to repeat the same message over and
-            over again!!
+            You can set your default message template so that you don't have to repeat the same
+            message over and over again!!
           </div>
-          <div v-for="(featureDescription, index) in box2Features"
-               :key="index"
-               class="d-flex">
-            <div>
-              <v-icon>mdi-check</v-icon>
-            </div>
-            <div class="feature-description">
-             {{ featureDescription }}
-            </div>
-          </div>
-        </div>
-      </v-col>
-    </v-row>
-    <v-row class="box-3">
-      <v-col class="memorization-left-column"
-             data-aos="fade-right"
-             cols="5">
-        <div style="max-width: 420px">
-          <div class="memorization-title">
-            Remember Context
-          </div>
-          <div class="memorization-description">
-            Remember context so that you can seamlessly continue your conversation with chatGPT.
-          </div>
-          <div v-for="(featureDescription, index) in box3Features"
-               :key="index"
-               class="d-flex">
+          <div v-for="(featureDescription, index) in box2Features" :key="index" class="d-flex">
             <div>
               <v-icon>mdi-check</v-icon>
             </div>
@@ -166,31 +115,37 @@ function openSidePanel() {
           </div>
         </div>
       </v-col>
-      <v-col class="memorization-right-column"
-             data-aos="fade-left"
-             cols="7">
-        <v-img class="theme-image"
-               src="@/assets/example-memorization.png"
-               max-width="640" />
+    </v-row>
+    <v-row class="box-3">
+      <v-col class="memorization-left-column" data-aos="fade-right" cols="5">
+        <div style="max-width: 420px">
+          <div class="memorization-title">Remember Context</div>
+          <div class="memorization-description">
+            Remember context so that you can seamlessly continue your conversation with chatGPT.
+          </div>
+          <div v-for="(featureDescription, index) in box3Features" :key="index" class="d-flex">
+            <div>
+              <v-icon>mdi-check</v-icon>
+            </div>
+            <div class="feature-description">
+              {{ featureDescription }}
+            </div>
+          </div>
+        </div>
+      </v-col>
+      <v-col class="memorization-right-column" data-aos="fade-left" cols="7">
+        <v-img class="theme-image" src="@/assets/example-memorization.png" max-width="640" />
       </v-col>
     </v-row>
-    <v-row class="box-4"
-           data-aos="fade-up"
-           id="links">
+    <v-row class="box-4" data-aos="fade-up" id="links">
       <div class="mx-auto">
         <div class="footer-title">Links</div>
-        <div class="footer-item"
-             @click="toGithub">
-          <v-icon>
-            mdi-github
-          </v-icon>
+        <div class="footer-item" @click="toGithub">
+          <v-icon> mdi-github </v-icon>
           Github
         </div>
-        <div class="footer-item"
-             @click="toChromeStore">
-          <v-icon>
-            mdi-google-chrome
-          </v-icon>
+        <div class="footer-item" @click="toChromeStore">
+          <v-icon> mdi-google-chrome </v-icon>
           Chrome Extension
         </div>
       </div>
@@ -208,21 +163,21 @@ function openSidePanel() {
   border-radius: 0.8rem;
   margin-bottom: 16px;
   padding: 24px 0 48px 0;
-  background-image: linear-gradient(to bottom right, #FBD7FF 10%, #FFDEC1 80%);
+  background-image: linear-gradient(to bottom right, #fbd7ff 10%, #ffdec1 80%);
 }
 
 .box-2 {
   border-radius: 0.8rem;
   margin-bottom: 16px;
   padding: 96px 0;
-  background-color: #F4F4F4;
+  background-color: #f4f4f4;
 }
 
 .box-3 {
   border-radius: 0.8rem;
   margin-bottom: 16px;
   padding: 96px 0;
-  background-image: linear-gradient(to bottom right, #FBD7FF 10%, #FFDEC1 80%);
+  background-image: linear-gradient(to bottom right, #fbd7ff 10%, #ffdec1 80%);
 }
 
 .box-4 {
@@ -280,7 +235,7 @@ function openSidePanel() {
   padding: 0 20px;
   margin: 0 12px;
   border-radius: 0.375rem;
-  background-color: rgba(0, 0, 0, 0.06);;
+  background-color: rgba(0, 0, 0, 0.06);
 }
 
 .theme-images {
@@ -312,7 +267,7 @@ function openSidePanel() {
 
 .template-right-column {
   max-width: 420px;
-  padding-right: 8px
+  padding-right: 8px;
 }
 
 .memorization-left-column {
@@ -337,7 +292,7 @@ function openSidePanel() {
 }
 
 .footer-title {
-  color: #FFFFFF;
+  color: #ffffff;
   font-weight: bold;
   margin-bottom: 16px;
 }

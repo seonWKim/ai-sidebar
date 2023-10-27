@@ -9,7 +9,8 @@
     "zip": "npm run build && bestzip dist.zip dist/",
     "test": "vitest --run",
     "preview": "vite preview",
-    "lint": "eslint . --fix --ignore-path .gitignore"
+    "lint": "eslint . --fix --ignore-path .gitignore",
+    "prettier": "prettier --write --cache ."
   },
   "dependencies": {
     "@mdi/font": "7.0.96",

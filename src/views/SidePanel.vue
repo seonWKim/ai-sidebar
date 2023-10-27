@@ -9,9 +9,9 @@
 </template>
 
 <script lang="ts" setup>
-import Chat from "@/components/Chat.vue";
-import Settings from "@/components/config/Settings.vue";
-import Themes from "@/components/config/Themes.vue";
+import Chat from '@/components/Chat.vue';
+import Settings from '@/components/config/Settings.vue';
+import Themes from '@/components/config/Themes.vue';
 </script>
 
 <style scoped>
@@ -21,5 +21,4 @@ import Themes from "@/components/config/Themes.vue";
   height: 100vh;
   overflow: hidden;
 }
-
 </style>
