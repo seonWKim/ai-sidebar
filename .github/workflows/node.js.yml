@@ -30,4 +30,4 @@ jobs:
       - name: Build
         run: npm run build --if-present
       - name: Run tests
-        run: npm test
+        run: npm pull-request

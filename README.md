@@ -40,36 +40,25 @@
 
 ## Build and Test Chrome Extension 👨‍💻
 
-### Mocking OpenAI API
-
-1. Set `VITE_MOCK_OPENAI_API` to `true` in `.env` file
-
-### Using OpenAI API
-
 ![instruction.png](images/instruction.png)
 
-1. [Login to OpenAI Account](https://platform.openai.com/login)
-2. [Visit OpenAI API Keys Page](https://platform.openai.com/account/api-keys)
-3. Create a new API key(Make sure
-4. Make sure the organization is set to 'Personal'
-5. Copy the API Key
-6. Run `npm i` to install the necessary dependencies
-7. Run `npm run build` to build source code into `./dist`
-8. Visit [chrome extensions page](chrome://extensions/)
-9. Enable developer mode
-10. Load unpacked extension(select `./dist` folder)
-11. Paste API Key in OpenAI API Key input box
+1. Run `npm i` to install the necessary dependencies
+2. Run `npm run build` to build source code into `./dist`
+3. Visit [chrome extensions page](chrome://extensions/)
+4. Enable developer mode
+5. Load unpacked extension(select `./dist` folder)
+6. Paste API Key in OpenAI API Key input box(Set `VITE_MOCK_OPENAI_API` to `true` in `.env` file to mock OpenAI API)
 
 ## Note
 
 - By providing a personal API key the user may subject to billing
-- For pricing, refer to [OpenAI's pricing policy](https://openai.com/pricing)
 - API key is a secret. <b>DO NOT</b> share it with others
 - Users should understand the [rate limits](https://platform.openai.com/account/rate-limits) that the API holds
 - This extension will only work within a chrome browser
 
 ## Contributions
 
+- Submit an issue for any features or bug
 - Submit a pull request with a clear title and description
 - [Commit message best practices](https://www.freecodecamp.org/news/how-to-write-better-git-commit-messages/)
 
