@@ -7,7 +7,7 @@
     "build": "vue-tsc --noEmit && vite build",
     "build-watch": "vue-tsc --noEmit && vite build --watch",
     "zip": "npm run build && bestzip dist.zip dist/",
-    "pull-request": "npm run prettier && npm run lint && npm run test",
+    "pull-request": "npm run lint && npm run test",
     "test": "vitest --run",
     "preview": "vite preview",
     "lint": "eslint . --fix --ignore-path .gitignore",
