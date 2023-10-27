@@ -52,7 +52,7 @@ export const documentEventListener = {
     document.dispatchEvent(new Event(name));
   },
   addOpenSidePanelListener() {
-    document.addEventListener(EventName.OPEN_SIDEPANEL, function(e) {
+    document.addEventListener(EventName.OPEN_SIDEPANEL, function(_) {
       chrome?.runtime?.sendMessage({ type: "open_side_panel" });
     }, false);
   },

@@ -10,8 +10,8 @@ export const appStore = defineStore("app", {
   }),
   getters: {
     openaiReadOny: (state) => state.openai,
-    mockOpenai: (state) => import.meta.env.VITE_MOCK_OPENAI_API === "true",
-    mockOpenaiApiResponseInterval: (state) => import.meta.env.VITE_MOCK_OPENAI_API_RESPONSE_INTERVAL_MILLIS || 50
+    mockOpenai: (_) => import.meta.env.VITE_MOCK_OPENAI_API === "true",
+    mockOpenaiApiResponseInterval: (_) => import.meta.env.VITE_MOCK_OPENAI_API_RESPONSE_INTERVAL_MILLIS || 50
   },
   actions: {
     async initializeOpenAi() {

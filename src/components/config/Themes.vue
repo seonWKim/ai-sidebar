@@ -1,11 +1,9 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted } from "vue";
 import { appStore } from "@/store/app";
 import { useTheme } from "vuetify";
 import { ChromeStorageKeys } from "@/common/keys";
 
-const dialog = ref(false);
-const apiKey = ref("");
 const store = appStore();
 const theme = useTheme();
 

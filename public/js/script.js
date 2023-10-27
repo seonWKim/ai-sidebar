@@ -1,15 +1,15 @@
-// top level await is available in ES modules loaded from script tags
-const [tab] = await chrome.tabs.query({
+chrome.tabs.query({
   active: true,
   lastFocusedWindow: true
-});
-
-const tabId = tab.id;
-const button = document.getElementById('openSidePanel');
-button.addEventListener('click', async () => {
-  await chrome.sidePanel.open({tabId});
-  await chrome.sidePanel.setOptions({
-    tabId,
-    path: 'index.html',
+}).then(tabs => {
+  const tabId = tabs[0].id;
+  const button = document.getElementById('openSidePanel');
+  button.addEventListener('click', async () => {
+    await chrome.sidePanel.open({tabId});
+    await chrome.sidePanel.setOptions({
+      tabId,
+      path: 'index.html',
+    });
   });
-});
+})
+

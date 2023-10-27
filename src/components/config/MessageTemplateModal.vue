@@ -7,7 +7,7 @@ import { ChromeStorageKeys } from "@/common/keys";
 import { messageTemplateInputPlaceholder, defaultTemplates } from "@/common/templates";
 import MessageTemplateAddModal from "@/components/config/MessageTemplateAddModal.vue";
 
-const props = defineProps({
+defineProps({
   customStyle: {
     type: String,
     default: null

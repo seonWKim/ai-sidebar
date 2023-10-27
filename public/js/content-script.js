@@ -10,7 +10,7 @@ addKeyupEvent();
  * When {@link OPEN_SIDE_PANEL_EVENT} is dispatched, open chrome side panel.
  */
 function addOpenSidePanelEvent() {
-  document.addEventListener(OPEN_SIDE_PANEL_EVENT, function(e) {
+  document.addEventListener(OPEN_SIDE_PANEL_EVENT, function(_) {
     chrome?.runtime?.sendMessage({ type: "open_side_panel" });
   }, false);
 }

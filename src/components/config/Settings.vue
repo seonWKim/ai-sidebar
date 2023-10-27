@@ -24,7 +24,7 @@ onMounted(async () => {
 });
 
 
-watch(apiKey, (newValue, oldValue) => {
+watch(apiKey, (newValue, _) => {
   store.setOpenAiKey(newValue);
 });
 

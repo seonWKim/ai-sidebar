@@ -40,7 +40,7 @@ const wholeMessage = ref(props.message?.text?.join("") || "");
 /**
  * Watch streaming response and concatenate the strings. Only received messages are applicable
  */
-watch(props.message, (newValue, oldValue) => {
+watch(props.message, (newValue, _) => {
   if (props.message?.type !== "received") {
     return;
   }
