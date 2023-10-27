@@ -1,5 +1,5 @@
-import { v4 as uuidv4 } from "uuid";
-import { OpenaiRole } from "@/service/openai";
+import { v4 as uuidv4 } from 'uuid';
+import { OpenaiRole } from '@/service/openai';
 
 /**
  * @param id - unique id for the message
@@ -12,7 +12,7 @@ import { OpenaiRole } from "@/service/openai";
 export interface Message {
   id: ReturnType<typeof uuidv4>;
   role: OpenaiRole;
-  type: "sent" | "received";
+  type: 'sent' | 'received';
   text: string[];
   originalText: string[];
   canceled: boolean;

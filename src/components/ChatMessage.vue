@@ -1,29 +1,29 @@
 <script setup lang="ts">
-import type { Message } from "@/common/message";
-import { defineComponent, onMounted, ref, watch } from "vue";
-import Markdown from "vue3-markdown-it";
-import MarkdownItHighlightjs from "markdown-it-highlightjs";
+import type { Message } from '@/common/message';
+import { defineComponent, onMounted, ref, watch } from 'vue';
+import Markdown from 'vue3-markdown-it';
+import MarkdownItHighlightjs from 'markdown-it-highlightjs';
 
 const props = defineProps({
   message: {
     type: Object as () => Message,
-    required: true
+    required: true,
   },
   showMessageTemplate: {
     type: Boolean,
     required: false,
-    default: false
-  }
+    default: false,
+  },
 });
 
 defineComponent({
   components: {
-    Markdown
-  }
+    Markdown,
+  },
 });
 
 onMounted(() => {
-  if (props.message?.type !== "sent") {
+  if (props.message?.type !== 'sent') {
     return;
   }
 
@@ -35,18 +35,18 @@ onMounted(() => {
 });
 
 let lastSeenIdx = 0;
-const wholeMessage = ref(props.message?.text?.join("") || "");
+const wholeMessage = ref(props.message?.text?.join('') || '');
 
 /**
  * Watch streaming response and concatenate the strings. Only received messages are applicable
  */
-watch(props.message, (newValue, oldValue) => {
-  if (props.message?.type !== "received") {
+watch(props.message, (newValue, _) => {
+  if (props.message?.type !== 'received') {
     return;
   }
 
   const newLastIdx = newValue?.text.length || 0;
-  const newText = newValue?.text?.slice(lastSeenIdx, newLastIdx + 1)?.join("") || "";
+  const newText = newValue?.text?.slice(lastSeenIdx, newLastIdx + 1)?.join('') || '';
   lastSeenIdx = newLastIdx;
   wholeMessage.value += newText;
 });
@@ -56,21 +56,17 @@ const plugins = [
     plugin: MarkdownItHighlightjs,
     options: {
       css: {
-        source: import("highlight.js/styles/atom-one-light.css")
-      }
-    }
-  }
+        source: import('highlight.js/styles/atom-one-light.css'),
+      },
+    },
+  },
 ];
-
 </script>
 
 <template>
   <v-card>
     <v-card-text class="px-4 py-0">
-      <markdown :source="wholeMessage"
-                class="markdown"
-                :breaks="true"
-                :plugins="plugins" />
+      <markdown :source="wholeMessage" class="markdown" :breaks="true" :plugins="plugins" />
     </v-card-text>
   </v-card>
 </template>

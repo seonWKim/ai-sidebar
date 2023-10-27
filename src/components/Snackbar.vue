@@ -1,20 +1,17 @@
 <script setup lang="ts">
-
-import { ref } from "vue";
-import { eventBus, EventName } from "@/common/event";
+import { ref } from 'vue';
+import { eventBus, EventName } from '@/common/event';
 
 const snackbar = ref(false);
-const text = ref("");
-const color = ref("primary");
+const text = ref('');
+const color = ref('primary');
 
-eventBus.on(EventName.OPEN_SNACKBAR, message => {
-    text.value = message?.text || "";
-    color.value = message?.color || "primary";
+eventBus.on(EventName.OPEN_SNACKBAR, (message) => {
+  text.value = message?.text || '';
+  color.value = message?.color || 'primary';
 
-    snackbar.value = true;
-  }
-);
-
+  snackbar.value = true;
+});
 </script>
 
 <template>
@@ -25,6 +22,4 @@ eventBus.on(EventName.OPEN_SNACKBAR, message => {
   </div>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>
