@@ -27,11 +27,15 @@ function addOpenSidePanelEvent() {
  */
 function addKeydownEvent() {
   document.addEventListener('keydown', async (event) => {
-    const name = event.key;
     const code = event.code;
-    pushedKeys[code] = name;
+    if (!code) {
+      return;
+    }
 
-    const pushedKeyValues = Object.values(pushedKeys).map((key) => key.toLowerCase());
+    const key = event.key ? event.key.toLowerCase() : '';
+    pushedKeys[code] = key;
+
+    const pushedKeyValues = Object.values(pushedKeys);
 
     // short-circuiting
     if (!pushedKeyValues.includes('control') || !pushedKeyValues.includes('shift')) {
@@ -51,6 +55,10 @@ function addKeydownEvent() {
 function addKeyupEvent() {
   document.addEventListener('keyup', (event) => {
     const code = event.code;
+    if (!code) {
+      return;
+    }
+
     delete pushedKeys[code];
   });
 }
