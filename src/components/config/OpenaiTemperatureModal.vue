@@ -36,7 +36,7 @@ watch(temperature, (newVal) => {
 <template>
   <v-btn
     size="x-small"
-    prepend-icon="mdi-account-outline"
+    prepend-icon="mdi-thermometer-low"
     rounded
     variant="outlined"
     color="primary"
