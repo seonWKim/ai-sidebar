@@ -20,7 +20,10 @@ import OpenaiTemperatureModal from '@/components/config/OpenaiTemperatureModal.v
 import _ from 'lodash';
 import OpenaiContextMemorizerModal from '@/components/config/OpenaiContextMemorizerModal.vue';
 import { messageTemplateInputPlaceholder } from '@/common/templates';
+import { ChatType, ChatTypes } from '@/common/chat-type';
+import ChatTypeSelector from '@/components/config/ChatTypeSelector.vue';
 
+const selectedChatType = ref<ChatType>(ChatTypes.TEXT);
 const messageTemplate = ref('');
 const showMessageTemplate = ref(false);
 const scrollTarget: Ref<any> = ref();
@@ -50,6 +53,14 @@ function getReceived(): Ref<Message> {
     originalText: [],
     canceled: false,
   });
+}
+
+/**
+ * Update the {@link selectedChatType} which is used for determining the type of chat.
+ * @param chatType Text, Image ... etc
+ */
+function updateChatType(chatType: ChatType) {
+  selectedChatType.value = chatType;
 }
 
 /**
@@ -321,26 +332,29 @@ function getMessageCardClass(type: string) {
       <div class="selectbox-area">
         <v-slide-group v-model="model" show-arrows>
           <v-slide-group-item>
+            <chat-type-selector custom-style="mr-2" @update-chat-type="updateChatType" />
+          </v-slide-group-item>
+          <v-slide-group-item v-if="selectedChatType.messageTemplate">
             <message-template-modal
               custom-style="mr-2"
               @update-message-template="updateMessageTemplate"
               @update-show-message-template="updateShowMessageTemplate"
             />
           </v-slide-group-item>
-          <v-slide-group-item>
+          <v-slide-group-item v-if="selectedChatType.rememberContext">
             <openai-context-memorizer-modal
               custom-style="mr-2"
               @update-remember-context="updateRememberContext"
             />
           </v-slide-group-item>
-          <v-slide-group-item>
+          <v-slide-group-item v-if="selectedChatType.openaiModel">
             <openai-model-selector
               :selected-model="selectedModel"
               custom-style="mr-2"
               @update-openai-model="updateOpenaiModel"
             />
           </v-slide-group-item>
-          <v-slide-group-item>
+          <v-slide-group-item v-if="selectedChatType.temperature">
             <openai-temperature-modal
               :selected-temperature="selectedTemperature"
               @update-openai-temperature="updateOpenaiTemperature"
