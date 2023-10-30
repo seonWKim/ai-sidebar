@@ -29,7 +29,7 @@ export class OpenaiPrompt {
   constructor(
     messages: OpenaiMessage[],
     model: OpenaiModel = OpenaiModel['gpt-3.5-turbo'],
-    temperature: number = 1
+    temperature: number = 1,
   ) {
     this.messages = messages;
     this.model = model;
@@ -101,71 +101,73 @@ export enum ListenerEventType {
 }
 
 const streamOpenAiResponse = appStore().mockOpenai
-  ? async function (
-      prompt: OpenaiPrompt,
-      consumer: (message: string) => void,
-      beforeStreamListener: () => ListenerEvent | null = () => null,
-      middleOfStreamListener: () => ListenerEvent | null = () => null,
-      endOfStreamListener: () => ListenerEvent | null = () => null,
-      onError: (error: any) => void = () => {}
-    ): Promise<void> {
-      try {
-        beforeStreamListener();
+  ? async function(
+    prompt: OpenaiPrompt,
+    consumer: (message: string) => void,
+    beforeStreamListener: () => ListenerEvent | null = () => null,
+    middleOfStreamListener: () => ListenerEvent | null = () => null,
+    endOfStreamListener: () => ListenerEvent | null = () => null,
+    onError: (error: any) => void = () => {
+    },
+  ): Promise<void> {
+    try {
+      beforeStreamListener();
 
-        for (const part of MOCK_RESPONSE_STREAM) {
-          const event = middleOfStreamListener();
-          if (event?.type == ListenerEventType.STOP_STREAM) {
-            break;
-          }
-
-          await new Promise((resolve, _) => setTimeout(resolve, mockOpenaiApiResponseInterval));
-          consumer(part + ' ');
+      for (const part of MOCK_RESPONSE_STREAM) {
+        const event = middleOfStreamListener();
+        if (event?.type == ListenerEventType.STOP_STREAM) {
+          break;
         }
 
-        endOfStreamListener();
-      } catch (e) {
-        onError(e);
+        await new Promise((resolve, _) => setTimeout(resolve, mockOpenaiApiResponseInterval));
+        consumer(part + ' ');
       }
+
+      endOfStreamListener();
+    } catch (e) {
+      onError(e);
     }
-  : async function (
-      prompt: OpenaiPrompt,
-      consumer: (message: string) => void,
-      beforeStreamListener: () => ListenerEvent | null = () => null,
-      middleOfStreamListener: () => ListenerEvent | null = () => null,
-      endOfStreamListener: () => ListenerEvent | null = () => null,
-      onError: (error: any) => void = () => {}
-    ): Promise<void> {
-      try {
-        if (!appStore().openai) {
-          throw new Error('OpenAI is not initialized');
-        }
-
-        const stream = await appStore().openai!.chat.completions.create({
-          messages: prompt.messages.map((message) => ({
-            role: message.role,
-            content: message.content,
-          })),
-          model: prompt.model,
-          temperature: prompt.temperature,
-          stream: true,
-        });
-
-        beforeStreamListener();
-
-        for await (const part of stream) {
-          const event = middleOfStreamListener();
-          if (event?.type == ListenerEventType.STOP_STREAM) {
-            stream.controller.abort();
-            break;
-          }
-
-          consumer(part.choices[0]?.delta?.content || '');
-        }
-
-        endOfStreamListener();
-      } catch (e) {
-        onError(e);
+  }
+  : async function(
+    prompt: OpenaiPrompt,
+    consumer: (message: string) => void,
+    beforeStreamListener: () => ListenerEvent | null = () => null,
+    middleOfStreamListener: () => ListenerEvent | null = () => null,
+    endOfStreamListener: () => ListenerEvent | null = () => null,
+    onError: (error: any) => void = () => {
+    },
+  ): Promise<void> {
+    try {
+      if (!appStore().openai) {
+        throw new Error('OpenAI is not initialized');
       }
-    };
+
+      const stream = await appStore().openai!.chat.completions.create({
+        messages: prompt.messages.map((message) => ({
+          role: message.role,
+          content: message.content,
+        })),
+        model: prompt.model,
+        temperature: prompt.temperature,
+        stream: true,
+      });
+
+      beforeStreamListener();
+
+      for await (const part of stream) {
+        const event = middleOfStreamListener();
+        if (event?.type == ListenerEventType.STOP_STREAM) {
+          stream.controller.abort();
+          break;
+        }
+
+        consumer(part.choices[0]?.delta?.content || '');
+      }
+
+      endOfStreamListener();
+    } catch (e) {
+      onError(e);
+    }
+  };
 
 export { streamOpenAiResponse };

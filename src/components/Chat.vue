@@ -1,5 +1,5 @@
-<script setup lang="ts">
-import { Ref, ref } from 'vue';
+<script setup lang='ts'>
+import { Ref, ref, toRaw } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 import {
   ListenerEvent,
@@ -23,6 +23,19 @@ import { messageTemplateInputPlaceholder } from '@/common/templates';
 import { ChatType, ChatTypes } from '@/common/chat-type';
 import ChatTypeSelector from '@/components/config/ChatTypeSelector.vue';
 
+class ChatTypeInformation {
+  placeholder: string;
+}
+
+const chatTypeInformationMap: Record<ChatType, ChatTypeInformation> = {
+  [ChatTypes.TEXT]: {
+    placeholder: 'Write a command ...',
+  },
+  [ChatTypes.IMAGE]: {
+    placeholder: 'Generate an image that...',
+  },
+};
+
 const selectedChatType = ref<ChatType>(ChatTypes.TEXT);
 const messageTemplate = ref('');
 const showMessageTemplate = ref(false);
@@ -38,8 +51,8 @@ const selectedTemperature: Ref<number> = ref(1.0);
 let messageContexts: OpenaiMessage[] = [];
 const summarizeContextOpenaiMessage = OpenaiMessage.of1(
   'Summarize all the messages in a format as follows. The placeholder for previousContext is where you have to fill in.' +
-    "'Previous context: {{previousContext}}\n",
-  OpenaiRole.user
+  '\'Previous context: {{previousContext}}\n',
+  OpenaiRole.user,
 );
 const contextMaxNo: Ref<number> = ref(5);
 const rememberContext: Ref<boolean> = ref(false);
@@ -107,18 +120,11 @@ function updateOpenaiTemperature(temperature: number) {
 }
 
 /**
- * Send message to OpenAI API and stream the response. The way it works is as follows:
- * <pre>
- *   1. Check whether the keyboard event is "pressing enter key" without "pressing shift key". If not, return.
- *   2. Push the user typed message into {@link messages} array. This array of messages are shown in the UI.
- *   3. Construct the prompt by using {@link constructMessage} function to send to OpenAI API.
- *   4. Stream the response from OpenAI API by using {@link streamOpenAiResponse} function.
- * </pre>
- * @param event Keyboard event
+ * Send message to OpenAI API.
  */
-async function sendMessage(event: any) {
+async function sendMessage(event: KeyboardEvent) {
   if (event.key === 'Enter') {
-    // Prevent sendMessage function from being called when shift key is pressed with enter
+    // Prevent current function from being called when shift key is pressed with enter
     if (event.shiftKey) {
       return;
     }
@@ -137,16 +143,35 @@ async function sendMessage(event: any) {
     id: uuidv4(),
     role: OpenaiRole.user,
     type: 'sent',
-    text: [constructMessage(messageTemplate.value, newMessage.value)],
+    text: [applyMessageTemplate(newMessage.value)],
     originalText: [newMessage.value],
     canceled: false,
   };
   messages.value.push(messageToSend);
   newMessage.value = '';
+
+  switch (toRaw(selectedChatType.value)) {
+    case ChatTypes.TEXT:
+      await sendChatMessage();
+      break;
+    case ChatTypes.IMAGE:
+      await sendGenerateImageMessage();
+      break;
+  }
+}
+
+/**
+ * Send message to OpenAI API and stream the response.
+ * This function may reformat the message by using {@link messageTemplate}.
+ * This function may add previous context by using {@link constructMessageWithPreviousContext}
+ * if {@link rememberContext} is true.
+ * @param event Keyboard event
+ */
+async function sendChatMessage() {
   const prompt = new OpenaiPrompt(
-    await constructOpenaiMessages(),
+    await constructMessageWithPreviousContext(),
     selectedModel.value,
-    selectedTemperature.value
+    selectedTemperature.value,
   );
 
   // Send message and receive stream response
@@ -183,8 +208,12 @@ async function sendMessage(event: any) {
       isMessageBeingStreamed.value = false;
       return null;
     },
-    onApiKeyError
+    onApiKeyError,
   );
+}
+
+async function sendGenerateImageMessage() {
+  console.log('generate image');
 }
 
 /**
@@ -207,20 +236,19 @@ function clearMessages() {
 }
 
 /**
- * Construct message to be sent to OpenAI API by combining the message template and the message if configured.
+ * Construct message to be sent to OpenAI API by combining the {@link messageTemplate} and the message if configured.
  * When message template is not configured, the original message is used without any modification.
- * @param template message template to be used to format the original message
  * @param message the original message which user typed in
  */
-function constructMessage(template: string, message: string): string {
-  if (!template || template.trim() === '') {
+function applyMessageTemplate(message: string): string {
+  if (!messageTemplate.value || messageTemplate.value.trim() === '') {
     return message;
   }
 
-  if (template.includes(messageTemplateInputPlaceholder)) {
-    return template.replace(messageTemplateInputPlaceholder, message);
+  if (messageTemplate.value.includes(messageTemplateInputPlaceholder)) {
+    return messageTemplate.value.replace(messageTemplateInputPlaceholder, message);
   } else {
-    return template + '\n' + message;
+    return messageTemplate.value + '\n' + message;
   }
 }
 
@@ -230,7 +258,7 @@ function constructMessage(template: string, message: string): string {
  * If the size of the previous context is too large, it will be summarized first.
  * @returns {Promise<OpenaiMessage[]>} messages to be sent to OpenAI API
  */
-async function constructOpenaiMessages(): Promise<OpenaiMessage[]> {
+async function constructMessageWithPreviousContext(): Promise<OpenaiMessage[]> {
   if (messages.value.length == 0) {
     return [];
   }
@@ -245,7 +273,7 @@ async function constructOpenaiMessages(): Promise<OpenaiMessage[]> {
     const prompt = new OpenaiPrompt(
       [...messageContexts, summarizeContextOpenaiMessage],
       selectedModel.value,
-      selectedTemperature.value
+      selectedTemperature.value,
     );
 
     const summarizedContext: string[] = [];
@@ -292,90 +320,89 @@ function getMessageCardClass(type: string) {
 </script>
 
 <template>
-  <div class="parent">
-    <div class="chat-message-container">
-      <div class="chat-messages">
-        <div v-for="message in messages" :key="message.id" :style="getPosition(message)">
+  <div class='parent'>
+    <div class='chat-message-container'>
+      <div class='chat-messages'>
+        <div v-for='message in messages' :key='message.id' :style='getPosition(message)'>
           <chat-message
-            :message="message"
-            :show-message-template="showMessageTemplate"
-            color="messages"
-            :class="getMessageCardClass(message.type)"
+            :message='message'
+            :show-message-template='showMessageTemplate'
+            color='messages'
+            :class='getMessageCardClass(message.type)'
           />
         </div>
       </div>
-      <div ref="scrollTarget" />
-      <div class="chat-message-buttons">
+      <div ref='scrollTarget' />
+      <div class='chat-message-buttons'>
         <v-btn
-          v-if="isMessageBeingStreamed"
-          size="small"
-          variant="plain"
-          color="error"
-          class="font-weight-bold"
-          @click="stopStream"
+          v-if='isMessageBeingStreamed'
+          size='small'
+          variant='plain'
+          color='error'
+          class='font-weight-bold'
+          @click='stopStream'
         >
           Stop
         </v-btn>
         <v-btn
-          v-if="!isMessageBeingStreamed && messages.length > 0"
-          size="small"
-          variant="plain"
-          color="error"
-          class="font-weight-bold"
-          @click="clearMessages"
+          v-if='!isMessageBeingStreamed && messages.length > 0'
+          size='small'
+          variant='plain'
+          color='error'
+          class='font-weight-bold'
+          @click='clearMessages'
         >
           Clear
         </v-btn>
       </div>
     </div>
-    <div class="chat-textarea">
-      <div class="selectbox-area">
-        <v-slide-group v-model="model" show-arrows>
+    <div class='chat-textarea'>
+      <div class='selectbox-area'>
+        <v-slide-group v-model='model' show-arrows>
           <v-slide-group-item>
-            <chat-type-selector custom-style="mr-2" @update-chat-type="updateChatType" />
+            <chat-type-selector custom-style='mr-2' @update-chat-type='updateChatType' />
           </v-slide-group-item>
-          <v-slide-group-item v-if="selectedChatType.messageTemplate">
+          <v-slide-group-item v-if='selectedChatType.messageTemplate'>
             <message-template-modal
-              custom-style="mr-2"
-              @update-message-template="updateMessageTemplate"
-              @update-show-message-template="updateShowMessageTemplate"
+              custom-style='mr-2'
+              @update-message-template='updateMessageTemplate'
+              @update-show-message-template='updateShowMessageTemplate'
             />
           </v-slide-group-item>
-          <v-slide-group-item v-if="selectedChatType.rememberContext">
+          <v-slide-group-item v-if='selectedChatType.rememberContext'>
             <openai-context-memorizer-modal
-              custom-style="mr-2"
-              @update-remember-context="updateRememberContext"
+              custom-style='mr-2'
+              @update-remember-context='updateRememberContext'
             />
           </v-slide-group-item>
-          <v-slide-group-item v-if="selectedChatType.openaiModel">
+          <v-slide-group-item v-if='selectedChatType.openaiModel'>
             <openai-model-selector
-              :selected-model="selectedModel"
-              custom-style="mr-2"
-              @update-openai-model="updateOpenaiModel"
+              :selected-model='selectedModel'
+              custom-style='mr-2'
+              @update-openai-model='updateOpenaiModel'
             />
           </v-slide-group-item>
-          <v-slide-group-item v-if="selectedChatType.temperature">
+          <v-slide-group-item v-if='selectedChatType.temperature'>
             <openai-temperature-modal
-              :selected-temperature="selectedTemperature"
-              @update-openai-temperature="updateOpenaiTemperature"
+              :selected-temperature='selectedTemperature'
+              @update-openai-temperature='updateOpenaiTemperature'
             />
           </v-slide-group-item>
         </v-slide-group>
       </div>
       <v-textarea
-        v-model="newMessage"
-        class="main-textarea"
-        label="Write a message"
-        placeholder="Write an application that uses AI to..."
-        @keydown.enter="sendMessage"
-        append-inner-icon="mdi-send"
-        :on-click:append-inner="sendMessage"
-        variant="outlined"
+        v-model='newMessage'
+        label='Send a message'
+        :placeholder='chatTypeInformationMap[selectedChatType].placeholder'
+        @keydown.enter='sendMessage'
+        append-inner-icon='mdi-send'
+        :on-click:append-inner='sendMessage'
+        variant='outlined'
         shaped
         clearable
         flat
         hide-details
-        :disabled="isMessageBeingStreamed"
+        :disabled='isMessageBeingStreamed'
       />
     </div>
   </div>
@@ -396,7 +423,7 @@ function getMessageCardClass(type: string) {
 .chat-message-container {
   display: grid;
   grid-template-rows: 1fr 32px;
-  border-bottom: 2px solid #f0f1f5;
+  border-bottom: 2px solid #F0F1F5;
 
   overflow-y: auto;
 }
@@ -440,6 +467,4 @@ function getMessageCardClass(type: string) {
   border-radius: 0 10px 10px 10px;
 }
 
-.main-textarea {
-}
 </style>
