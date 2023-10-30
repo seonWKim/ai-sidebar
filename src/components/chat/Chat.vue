@@ -362,7 +362,6 @@ function getMessageCardClass(type: string) {
           <chat-message
             :message="message"
             :show-message-template="showMessageTemplate"
-            color="messages"
             :class="getMessageCardClass(message.action)"
           />
         </div>
