@@ -3,7 +3,7 @@ import { onMounted, ref, watch } from 'vue';
 import { eventBus, EventName } from '@/common/event';
 import { VTextField } from 'vuetify/components';
 import { appStore } from '@/store/app';
-import OpenaiApiKeyGuide from '@/components/config/OpenaiApiKeyGuide.vue';
+import OpenaiApiKeyGuide from '@/components/chat/config/OpenaiApiKeyGuide.vue';
 import { ChromeStorageKeys } from '@/common/keys';
 
 const dialog = ref(false);

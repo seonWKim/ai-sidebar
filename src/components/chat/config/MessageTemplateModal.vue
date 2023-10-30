@@ -4,7 +4,7 @@ import { VTextarea } from 'vuetify/components';
 import { appStore } from '@/store/app';
 import { ChromeStorageKeys } from '@/common/keys';
 import { messageTemplateInputPlaceholder, defaultTemplates } from '@/common/templates';
-import MessageTemplateAddModal from '@/components/config/MessageTemplateAddModal.vue';
+import MessageTemplateAddModal from '@/components/chat/config/MessageTemplateAddModal.vue';
 
 defineProps({
   customStyle: {

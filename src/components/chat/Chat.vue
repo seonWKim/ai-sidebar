@@ -16,15 +16,15 @@ import {
 import { VBtn, VTextarea } from 'vuetify/components';
 import type { Message } from '@/common/message';
 import { eventBus, EventName } from '@/common/event';
-import ChatMessage from '@/components/ChatMessage.vue';
-import OpenaiModelSelector from '@/components/config/OpenaiModelSelector.vue';
-import MessageTemplateModal from '@/components/config/MessageTemplateModal.vue';
-import OpenaiTemperatureModal from '@/components/config/OpenaiTemperatureModal.vue';
+import ChatMessage from '@/components/chat/message/ChatMessage.vue';
+import OpenaiModelSelector from '@/components/chat/config/OpenaiModelSelector.vue';
+import MessageTemplateModal from '@/components/chat/config/MessageTemplateModal.vue';
+import OpenaiTemperatureModal from '@/components/chat/config/OpenaiTemperatureModal.vue';
 import _ from 'lodash';
-import OpenaiContextMemorizerModal from '@/components/config/OpenaiContextMemorizerModal.vue';
+import OpenaiContextMemorizerModal from '@/components/chat/config/OpenaiContextMemorizerModal.vue';
 import { messageTemplateInputPlaceholder } from '@/common/templates';
 import { ChatType, ChatTypes } from '@/common/chat-type';
-import ChatTypeSelector from '@/components/config/ChatTypeSelector.vue';
+import ChatTypeSelector from '@/components/chat/config/ChatTypeSelector.vue';
 
 class ChatTypeInformation {
   placeholder: string;
