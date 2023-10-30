@@ -68,17 +68,18 @@ export const documentEventListener = {
       async (event) => {
         const name = event.key;
         const code = event.code;
+        if (!code) {
+          return;
+        }
+
         this.pushedKeys[code] = name;
 
         const pushedKeyValues = Object.values(this.pushedKeys).map((key) => key.toLowerCase());
         if (
           (await this.getCustomKeyMap()).every((key) => pushedKeyValues.includes(key.toLowerCase()))
         ) {
-          console.log(pushedKeyValues);
           this.pushedKeys = {};
           await this.emitEvent(EventName.OPEN_SIDEPANEL);
-        } else {
-          console.log(`failed: ${pushedKeyValues}, should use: ${await this.getCustomKeyMap()}}`);
         }
       },
       false
@@ -87,6 +88,10 @@ export const documentEventListener = {
   addKeyupEventListener() {
     document.addEventListener('keyup', (event) => {
       const code = event.code;
+      if (!code) {
+        return;
+      }
+
       delete this.pushedKeys[code];
     });
   },
