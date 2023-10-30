@@ -70,7 +70,7 @@ class OpenaiChatPrompt {
   constructor(
     messages: OpenaiChatMessage[],
     model: OpenaiModel = OpenaiModel['gpt-3.5-turbo'],
-    temperature: number = 1
+    temperature: number = 1,
   ) {
     this.messages = messages;
     this.model = model;
@@ -101,17 +101,28 @@ class OpenaiChatMessage {
   }
 }
 
+enum OpenaiImageFormat {
+  URL = 'url',
+  BASE_64_JSON = 'b64_json'
+}
+
+enum OpenaiImageSize {
+  SMALL = '256x256',
+  MEDIUM = '512x512',
+  LARGE = '1024x1024',
+}
+
 class OpenaiImageGenerationPrompt {
   content: string;
   numberOfImages: number;
-  response_format: 'url' | 'b64_json';
-  size: '256x256' | '512x512' | '1024x1024';
+  response_format: OpenaiImageFormat;
+  size: OpenaiImageSize;
 
   constructor(
     prompt: string,
     numberOfImages: number = 1,
-    response_format: 'url' | 'b64_json' = 'url',
-    size: '256x256' | '512x512' | '1024x1024' = '512x512'
+    response_format: OpenaiImageFormat = OpenaiImageFormat.URL,
+    size: OpenaiImageSize = OpenaiImageSize.SMALL
   ) {
     this.content = prompt;
     this.numberOfImages = numberOfImages;
@@ -121,83 +132,85 @@ class OpenaiImageGenerationPrompt {
 }
 
 const getOpenaiChatResponse = MOCK_OPENAI
-  ? async function (
-      prompt: OpenaiChatPrompt,
-      consumer: (message: string) => void,
-      beforeStreamListener: () => ListenerEvent | null = () => null,
-      middleOfStreamListener: () => ListenerEvent | null = () => null,
-      endOfStreamListener: () => ListenerEvent | null = () => null,
-      onError: (error: any) => void = () => {}
-    ): Promise<void> {
-      try {
-        beforeStreamListener();
-
-        for (const part of MOCK_RESPONSE_STREAM) {
-          const event = middleOfStreamListener();
-          if (event?.type == ListenerEventType.STOP_STREAM) {
-            break;
-          }
-
-          await new Promise((resolve, _) => setTimeout(resolve, MOCK_OPENAI_API_RESPONSE_INTERVAL));
-          consumer(part + ' ');
+  ? async function(
+    prompt: OpenaiChatPrompt,
+    consumer: (message: string) => void,
+    beforeStreamListener: () => ListenerEvent | null = () => null,
+    middleOfStreamListener: () => ListenerEvent | null = () => null,
+    endOfStreamListener: () => ListenerEvent | null = () => null,
+    onError: (error: any) => void = () => {
+    },
+  ): Promise<void> {
+    beforeStreamListener();
+    try {
+      for (const part of MOCK_RESPONSE_STREAM) {
+        const event = middleOfStreamListener();
+        if (event?.type == ListenerEventType.STOP_STREAM) {
+          break;
         }
 
-        endOfStreamListener();
-      } catch (e) {
-        onError(e);
+        await new Promise((resolve, _) => setTimeout(resolve, MOCK_OPENAI_API_RESPONSE_INTERVAL));
+        consumer(part + ' ');
       }
+
+    } catch (e) {
+      onError(e);
+    } finally {
+      endOfStreamListener();
     }
-  : async function (
-      prompt: OpenaiChatPrompt,
-      consumer: (message: string) => void,
-      beforeStreamListener: () => ListenerEvent | null = () => null,
-      middleOfStreamListener: () => ListenerEvent | null = () => null,
-      endOfStreamListener: () => ListenerEvent | null = () => null,
-      onError: (error: any) => void = () => {}
-    ): Promise<void> {
-      try {
-        if (!appStore().openai) {
-          throw new Error('OpenAI is not initialized');
-        }
-
-        const stream = await appStore().openai!.chat.completions.create({
-          messages: prompt.messages.map((message) => ({
-            role: message.role,
-            content: message.content,
-          })),
-          model: prompt.model,
-          temperature: prompt.temperature,
-          stream: true,
-        });
-
-        beforeStreamListener();
-
-        for await (const part of stream) {
-          const event = middleOfStreamListener();
-          if (event?.type == ListenerEventType.STOP_STREAM) {
-            stream.controller.abort();
-            break;
-          }
-
-          consumer(part.choices[0]?.delta?.content || '');
-        }
-
-        endOfStreamListener();
-      } catch (e) {
-        onError(e);
+  }
+  : async function(
+    prompt: OpenaiChatPrompt,
+    consumer: (message: string) => void,
+    beforeStreamListener: () => ListenerEvent | null = () => null,
+    middleOfStreamListener: () => ListenerEvent | null = () => null,
+    endOfStreamListener: () => ListenerEvent | null = () => null,
+    onError: (error: any) => void = () => {
+    },
+  ): Promise<void> {
+    beforeStreamListener();
+    try {
+      if (!appStore().openai) {
+        throw new Error('OpenAI is not initialized');
       }
-    };
 
-const getOpenaiImageGenerationResponse = async function (
+      const stream = await appStore().openai!.chat.completions.create({
+        messages: prompt.messages.map((message) => ({
+          role: message.role,
+          content: message.content,
+        })),
+        model: prompt.model,
+        temperature: prompt.temperature,
+        stream: true,
+      });
+
+
+      for await (const part of stream) {
+        const event = middleOfStreamListener();
+        if (event?.type == ListenerEventType.STOP_STREAM) {
+          stream.controller.abort();
+          break;
+        }
+
+        consumer(part.choices[0]?.delta?.content || '');
+      }
+    } catch (e) {
+      onError(e);
+    } finally {
+      endOfStreamListener();
+    }
+  };
+
+const getOpenaiImageGenerationResponse = async function(
   prompt: OpenaiImageGenerationPrompt,
   consumer: (message: string[]) => void,
   beforeRequestListener: () => ListenerEvent | null = () => null,
   endOfRequestListener: () => ListenerEvent | null = () => null,
-  onError: (error: any) => void = () => {}
+  onError: (error: any) => void = () => {
+  },
 ): Promise<void> {
+  beforeRequestListener();
   try {
-    beforeRequestListener();
-
     const imageResponse = await appStore().openai!.images.generate({
       prompt: prompt.content,
       n: prompt.numberOfImages,
@@ -205,11 +218,11 @@ const getOpenaiImageGenerationResponse = async function (
       size: prompt.size,
     });
 
-    endOfRequestListener();
-
     consumer(imageResponse.data.filter((img) => !!img?.url).map((img) => img.url!));
   } catch (e) {
     onError(e);
+  } finally {
+    endOfRequestListener();
   }
 };
 
@@ -219,6 +232,8 @@ export {
   OpenaiImageGenerationPrompt,
   OpenaiRole,
   OpenaiModel,
+  OpenaiImageFormat,
+  OpenaiImageSize,
   ListenerEvent,
   ListenerEventType,
   getOpenaiChatResponse,
