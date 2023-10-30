@@ -23,7 +23,11 @@ import OpenaiTemperatureModal from '@/components/chat/config/OpenaiTemperatureMo
 import _ from 'lodash';
 import OpenaiContextMemorizerModal from '@/components/chat/config/OpenaiContextMemorizerModal.vue';
 import { messageTemplateInputPlaceholder } from '@/common/templates';
-import { ChatType, ChatTypes } from '@/common/chat-type';
+import {
+  ChatType,
+  ChatTypeConfigButtonAvailability as availability,
+  ConfigurationButtons as buttons,
+} from '@/common/chat-type';
 import ChatTypeSelector from '@/components/chat/config/ChatTypeSelector.vue';
 
 class ChatTypeInformation {
@@ -34,12 +38,12 @@ class ChatTypeInformation {
   }
 }
 
-const chatTypeInformationMap: Record<string, ChatTypeInformation> = {
-  [ChatTypes.TEXT.name]: new ChatTypeInformation('Write a command ...'),
-  [ChatTypes.IMAGE.name]: new ChatTypeInformation('Generate an image that...'),
+const chatTypeInformationMap: Record<ChatType, ChatTypeInformation> = {
+  [ChatType.TEXT]: new ChatTypeInformation('Write a command ...'),
+  [ChatType.IMAGE]: new ChatTypeInformation('Generate an image that...'),
 };
 
-const selectedChatType = ref<ChatType>(ChatTypes.TEXT);
+const selectedChatType = ref<ChatType>(ChatType.TEXT);
 const messageTemplate = ref('');
 const showMessageTemplate = ref(false);
 const scrollTarget: Ref<any> = ref();
@@ -158,10 +162,10 @@ async function sendMessage(event: any) {
   newMessage.value = '';
 
   switch (toRaw(selectedChatType.value)) {
-    case ChatTypes.TEXT:
+    case ChatType.TEXT:
       await sendChatMessage();
       break;
-    case ChatTypes.IMAGE:
+    case ChatType.IMAGE:
       await sendGenerateImageMessage();
       break;
   }
@@ -375,7 +379,7 @@ function getMessageCardClass(type: string) {
           color="error"
           class="font-weight-bold"
           @click="stopStream"
-          :disabled="selectedChatType !== ChatTypes.TEXT"
+          :disabled="selectedChatType !== ChatType.TEXT"
         >
           Stop
         </v-btn>
@@ -397,27 +401,27 @@ function getMessageCardClass(type: string) {
           <v-slide-group-item>
             <chat-type-selector custom-style="mr-2" @update-chat-type="updateChatType" />
           </v-slide-group-item>
-          <v-slide-group-item v-if="selectedChatType.messageTemplate">
+          <v-slide-group-item v-if="availability[selectedChatType].has(buttons.MESSAGE_TEMPLATE)">
             <message-template-modal
               custom-style="mr-2"
               @update-message-template="updateMessageTemplate"
               @update-show-message-template="updateShowMessageTemplate"
             />
           </v-slide-group-item>
-          <v-slide-group-item v-if="selectedChatType.rememberContext">
+          <v-slide-group-item v-if="availability[selectedChatType].has(buttons.REMEMBER_CONTEXT)">
             <openai-context-memorizer-modal
               custom-style="mr-2"
               @update-remember-context="updateRememberContext"
             />
           </v-slide-group-item>
-          <v-slide-group-item v-if="selectedChatType.openaiModel">
+          <v-slide-group-item v-if="availability[selectedChatType].has(buttons.OPENAI_MODEL)">
             <openai-model-selector
               :selected-model="selectedModel"
               custom-style="mr-2"
               @update-openai-model="updateOpenaiModel"
             />
           </v-slide-group-item>
-          <v-slide-group-item v-if="selectedChatType.temperature">
+          <v-slide-group-item v-if="availability[selectedChatType].has(buttons.TEMPERATURE)">
             <openai-temperature-modal
               :selected-temperature="selectedTemperature"
               @update-openai-temperature="updateOpenaiTemperature"
@@ -428,7 +432,7 @@ function getMessageCardClass(type: string) {
       <v-textarea
         v-model="newMessage"
         label="Send a message"
-        :placeholder="chatTypeInformationMap[selectedChatType.name].placeholder"
+        :placeholder="chatTypeInformationMap[selectedChatType].placeholder"
         @keydown.enter="sendMessage"
         append-inner-icon="mdi-send"
         :on-click:append-inner="sendMessage"

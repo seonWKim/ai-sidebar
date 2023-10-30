@@ -2,7 +2,7 @@
 import type { Message } from '@/common/message';
 import { onMounted, ref, watch } from 'vue';
 import MarkdownItHighlightjs from 'markdown-it-highlightjs';
-import { ChatTypes } from '@/common/chat-type';
+import { ChatType } from '@/common/chat-type';
 import ChatMessageText from '@/components/chat/message/ChatMessageText.vue';
 import ChatMessageImage from '@/components/chat/message/ChatMessageImage.vue';
 
@@ -62,13 +62,13 @@ const plugins = [
 <template>
   <div>
     <chat-message-text
-      v-if="message.type.name === ChatTypes.TEXT.name"
+      v-if="message.type === ChatType.TEXT"
       color="messages"
       :joined-message="concatenatedMessage"
       :plugins="plugins"
     />
     <chat-message-image
-      v-if="message.type.name === ChatTypes.IMAGE.name"
+      v-if="message.type === ChatType.IMAGE"
       :message="message"
       color="messages"
       :concatenated-message="concatenatedMessage"

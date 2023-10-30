@@ -1,37 +1,36 @@
 /**
- * Stores information of specific chat type.
+ * All the chat types in the system
  */
-class ChatType {
-  constructor(
-    name: string,
-    icon: string,
-    messageTemplate: boolean,
-    rememberContext: boolean,
-    openaiModel: boolean,
-    temperature: boolean
-  ) {
-    this.name = name;
-    this.icon = icon;
-    this.messageTemplate = messageTemplate;
-    this.rememberContext = rememberContext;
-    this.openaiModel = openaiModel;
-    this.temperature = temperature;
-  }
-
-  name: string;
-  icon: string;
-  messageTemplate: boolean;
-  rememberContext: boolean;
-  openaiModel: boolean;
-  temperature: boolean;
+enum ChatType {
+  TEXT = 'Text',
+  IMAGE = 'Image',
 }
 
 /**
- * Stores all chat types in the system.
+ * All the configuration buttons in the system
  */
-const ChatTypes = {
-  TEXT: new ChatType('Text', 'mdi-format-text', true, true, true, true),
-  IMAGE: new ChatType('Image', 'mdi-image-outline', false, false, false, false),
+enum ConfigurationButtons {
+  MESSAGE_TEMPLATE = 'messageTemplate',
+  REMEMBER_CONTEXT = 'rememberContext',
+  OPENAI_MODEL = 'openaiModel',
+  TEMPERATURE = 'temperature',
+  IMAGE_CONFIG = 'imageConfig',
+}
+
+/**
+ * Which {@link ConfigurationButtons} is available for which {@link ChatType}
+ */
+const ChatTypeConfigButtonAvailability: Record<ChatType, Set<ConfigurationButtons>> = {
+  [ChatType.TEXT]: new Set([
+    ConfigurationButtons.MESSAGE_TEMPLATE,
+    ConfigurationButtons.REMEMBER_CONTEXT,
+    ConfigurationButtons.OPENAI_MODEL,
+    ConfigurationButtons.TEMPERATURE,
+  ]),
+  [ChatType.IMAGE]: new Set([
+    ConfigurationButtons.MESSAGE_TEMPLATE,
+    ConfigurationButtons.IMAGE_CONFIG,
+  ]),
 };
 
-export { ChatType, ChatTypes };
+export { ChatType, ConfigurationButtons, ChatTypeConfigButtonAvailability };

@@ -1,22 +1,26 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { ChatType, ChatTypes } from '@/common/chat-type';
+import { onMounted, ref } from 'vue';
+import { ChatType } from '@/common/chat-type';
 
-const props = defineProps({
-  selectedChatType: {
-    type: ChatType,
-    default: ChatTypes.TEXT,
-  },
+defineProps({
   customStyle: {
     type: String,
     default: null,
   },
 });
 
+onMounted(() => {
+  selectModel(selectedChatType.value);
+});
+
 const emits = defineEmits(['updateChatType']);
 
-const chatTypes: ChatType[] = Object.values(ChatTypes);
-const selectedChatType = ref<ChatType>(props.selectedChatType!);
+const chatTypes: ChatType[] = [ChatType.TEXT, ChatType.IMAGE];
+const selectedChatType = ref<ChatType>(ChatType.TEXT);
+const icon = {
+  [ChatType.TEXT]: 'mdi-format-text',
+  [ChatType.IMAGE]: 'mdi-image-outline',
+};
 
 /**
  * Select a role from the list of {@link OpenaiModel} values.
@@ -34,19 +38,23 @@ function selectModel(chatTypeStr: ChatType) {
     <template v-slot:activator="{ props }">
       <v-btn
         size="x-small"
-        :prepend-icon="selectedChatType.icon"
+        :prepend-icon="icon[selectedChatType]"
         rounded
         variant="outlined"
         color="primary"
         :class="customStyle"
         v-bind="props"
       >
-        {{ selectedChatType.name }}
+        {{ selectedChatType }}
       </v-btn>
     </template>
     <v-list>
-      <v-list-item v-for="(model, index) in chatTypes" :key="index" @click="selectModel(model)">
-        <v-list-item-title>{{ model.name }}</v-list-item-title>
+      <v-list-item
+        v-for="(chatType, index) in chatTypes"
+        :key="index"
+        @click="selectModel(chatType)"
+      >
+        <v-list-item-title>{{ chatType }}</v-list-item-title>
       </v-list-item>
     </v-list>
   </v-menu>
