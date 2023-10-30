@@ -1,4 +1,4 @@
-<script setup lang='ts'>
+<script setup lang="ts">
 import type { Message } from '@/common/message';
 import { defineComponent, onMounted, ref, watch } from 'vue';
 import Markdown from 'vue3-markdown-it';
@@ -14,6 +14,16 @@ const props = defineProps({
     type: Boolean,
     required: false,
     default: false,
+  },
+  options: {
+    type: Object as () => Record<string, string>,
+    required: false,
+    default: () => {
+      return {
+        imageWidth: '256px',
+        imageHeight: '256px',
+      };
+    },
   },
 });
 
@@ -52,7 +62,7 @@ watch(props.message, (newValue, _) => {
   wholeMessage.value += newText;
 });
 
-const imageLoaded: ref<Record<number, boolean>> = ref({});
+const imageLoaded = ref<Record<number, boolean>>({});
 const plugins = [
   {
     plugin: MarkdownItHighlightjs,
@@ -64,55 +74,51 @@ const plugins = [
   },
 ];
 
-function download(url: string) {
-  fetch(url)
-    .then(response => response.blob())
-    .then(blob => {
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = `freeaisidebar_${new Date().getTime()}.png`;
-      link.click();
-    });
+function download(base64: string) {
+  const el = document.createElement('a');
+  el.href = getUrl(base64);
+  el.download = `freeaisidebar_${new Date().getTime()}.png`;
+  el.click();
+}
+
+function getUrl(base64: string) {
+  return `data:image/jpeg;base64,${base64}`;
 }
 </script>
 
 <template>
   <v-card>
-    <v-card-text class='px-4 py-0'>
-      <div v-if='message.action === "received" && message.type.name === ChatTypes.IMAGE.name'
-           class='received-images'>
-        <div v-for='(url, idx) in message.text'
-             :key='idx'>
-          {{ url }}
-          <v-img :src='url'
-                 class='received-image'
-                 min-width='250px'
-                 min-height='250px'
-                 @load='imageLoaded[idx] = true'>
-            <div v-if='imageLoaded[idx]'
-                 class='text-right'>
-              <v-btn class='download-button'
-                     @click='download(url)'
-                     size='small'
-                     color='primary'
-                     icon='mdi-download' />
+    <v-card-text class="px-4 py-0">
+      <div
+        v-if="message.action === 'received' && message.type.name === ChatTypes.IMAGE.name"
+        class="received-images"
+      >
+        <div v-for="(base64, idx) in message.text" :key="idx">
+          <v-img
+            :src="getUrl(base64)"
+            class="received-image"
+            :width="props.options.imageWidth!"
+            :height="props.options.imageHeight!"
+            @load="imageLoaded[idx] = true"
+          >
+            <div v-if="imageLoaded[idx]" class="text-right">
+              <v-btn
+                class="download-button"
+                @click="download(base64)"
+                size="small"
+                color="primary"
+                icon="mdi-download"
+              />
             </div>
             <template v-slot:placeholder>
-              <div class='d-flex align-center justify-center fill-height'>
-                <v-progress-circular
-                  color='grey-lighten-4'
-                  indeterminate
-                ></v-progress-circular>
+              <div class="d-flex align-center justify-center fill-height">
+                <v-progress-circular color="grey-lighten-4" indeterminate></v-progress-circular>
               </div>
             </template>
           </v-img>
         </div>
       </div>
-      <markdown v-else
-                :source='wholeMessage'
-                class='markdown'
-                :breaks='true'
-                :plugins='plugins' />
+      <markdown v-else :source="wholeMessage" class="markdown" :breaks="true" :plugins="plugins" />
     </v-card-text>
   </v-card>
 </template>

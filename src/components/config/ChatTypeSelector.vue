@@ -16,7 +16,7 @@ const props = defineProps({
 const emits = defineEmits(['updateChatType']);
 
 const chatTypes: ChatType[] = Object.values(ChatTypes);
-const selectedChatType: ref<ChatType> = ref(props.selectedChatType);
+const selectedChatType = ref<ChatType>(props.selectedChatType!);
 
 /**
  * Select a role from the list of {@link OpenaiModel} values.

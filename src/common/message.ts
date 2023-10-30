@@ -13,7 +13,7 @@ import { ChatType } from '@/common/chat-type';
 export interface Message {
   id: ReturnType<typeof uuidv4>;
   role: OpenaiRole;
-  type: ChatType,
+  type: ChatType;
   action: 'sent' | 'received';
   text: string[];
   originalText: string[];
