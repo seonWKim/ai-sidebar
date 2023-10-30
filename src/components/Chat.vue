@@ -2,13 +2,15 @@
 import { Ref, ref, toRaw } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 import {
+  getOpenaiChatResponse,
+  getOpenaiImageGenerationResponse,
   ListenerEvent,
   ListenerEventType,
   OpenaiChatMessage,
-  OpenaiModel,
   OpenaiChatPrompt,
+  OpenaiImageGenerationPrompt,
+  OpenaiModel,
   OpenaiRole,
-  streamOpenAiChatResponse,
 } from '@/service/openai';
 import { VBtn, VTextarea } from 'vuetify/components';
 import type { Message } from '@/common/message';
@@ -177,7 +179,7 @@ async function sendChatMessage() {
   // Send message and receive stream response
   let isMessagePushed = false;
   const received = getReceived();
-  await streamOpenAiChatResponse(
+  await getOpenaiChatResponse(
     prompt,
     (res) => {
       if (!isMessagePushed) {
@@ -204,7 +206,6 @@ async function sendChatMessage() {
       if (rememberContext.value) {
         addContext(OpenaiChatMessage.of1(received.value.text.join(''), OpenaiRole.system));
       }
-      // received = getReceived();
       isMessageBeingStreamed.value = false;
       return null;
     },
@@ -212,7 +213,31 @@ async function sendChatMessage() {
   );
 }
 
-async function sendGenerateImageMessage() {}
+async function sendGenerateImageMessage() {
+  if (messages.value.length === 0) {
+    return;
+  }
+
+  const prompt = messages.value[messages.value.length - 1];
+  const received = getReceived();
+
+  await getOpenaiImageGenerationResponse(
+    new OpenaiImageGenerationPrompt(prompt.text[0], 1, 'url', '256x256'),
+    (imgUrls) => {
+      received.value.text.push(imgUrls.join(', '));
+      messages.value.push(received.value);
+    },
+    () => {
+      isMessageBeingStreamed.value = true;
+      return null;
+    },
+    () => {
+      isMessageBeingStreamed.value = false;
+      return null;
+    },
+    onApiKeyError
+  );
+}
 
 /**
  * Stop streaming response.
@@ -262,6 +287,7 @@ async function constructMessageWithPreviousContext(): Promise<OpenaiChatMessage[
   }
 
   const messageToBeSent = messages.value[messages.value.length - 1];
+
   if (!rememberContext.value) {
     return [OpenaiChatMessage.of1(messageToBeSent.text.join(''), OpenaiRole.user)];
   }
@@ -275,7 +301,7 @@ async function constructMessageWithPreviousContext(): Promise<OpenaiChatMessage[
     );
 
     const summarizedContext: string[] = [];
-    await streamOpenAiChatResponse(prompt, (res) => {
+    await getOpenaiChatResponse(prompt, (res) => {
       summarizedContext.push(res);
     });
     messageContexts = [OpenaiChatMessage.of1(summarizedContext.join(''), OpenaiRole.system)];

@@ -44,7 +44,7 @@ enum ListenerEventType {
 }
 
 /**
- * Event that might happen during {@link streamOpenAiChatResponse} function call.
+ * Event that might happen during {@link getOpenaiChatResponse} function call.
  */
 class ListenerEvent {
   type: ListenerEventType;
@@ -101,7 +101,26 @@ class OpenaiChatMessage {
   }
 }
 
-const streamOpenAiChatResponse = MOCK_OPENAI
+class OpenaiImageGenerationPrompt {
+  content: string;
+  numberOfImages: number;
+  response_format: 'url' | 'b64_json';
+  size: '256x256' | '512x512' | '1024x1024';
+
+  constructor(
+    prompt: string,
+    numberOfImages: number = 1,
+    response_format: 'url' | 'b64_json' = 'url',
+    size: '256x256' | '512x512' | '1024x1024' = '512x512'
+  ) {
+    this.content = prompt;
+    this.numberOfImages = numberOfImages;
+    this.response_format = response_format;
+    this.size = size;
+  }
+}
+
+const getOpenaiChatResponse = MOCK_OPENAI
   ? async function (
       prompt: OpenaiChatPrompt,
       consumer: (message: string) => void,
@@ -169,12 +188,39 @@ const streamOpenAiChatResponse = MOCK_OPENAI
       }
     };
 
+const getOpenaiImageGenerationResponse = async function (
+  prompt: OpenaiImageGenerationPrompt,
+  consumer: (message: string[]) => void,
+  beforeRequestListener: () => ListenerEvent | null = () => null,
+  endOfRequestListener: () => ListenerEvent | null = () => null,
+  onError: (error: any) => void = () => {}
+): Promise<void> {
+  try {
+    beforeRequestListener();
+
+    const imageResponse = await appStore().openai!.images.generate({
+      prompt: prompt.content,
+      n: prompt.numberOfImages,
+      response_format: prompt.response_format,
+      size: prompt.size,
+    });
+
+    endOfRequestListener();
+
+    consumer(imageResponse.data.filter((img) => !!img?.url).map((img) => img.url!));
+  } catch (e) {
+    onError(e);
+  }
+};
+
 export {
   OpenaiChatPrompt,
   OpenaiChatMessage,
+  OpenaiImageGenerationPrompt,
   OpenaiRole,
   OpenaiModel,
   ListenerEvent,
   ListenerEventType,
-  streamOpenAiChatResponse,
+  getOpenaiChatResponse,
+  getOpenaiImageGenerationResponse,
 };
