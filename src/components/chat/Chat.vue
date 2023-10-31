@@ -29,6 +29,7 @@ import {
   ConfigurationButtons as buttons,
 } from '@/common/chat-type';
 import ChatTypeSelector from '@/components/chat/config/ChatTypeSelector.vue';
+import OpenaiImageConfigurationModal from '@/components/chat/config/OpenaiImageConfigurationModal.vue';
 
 class ChatTypeInformation {
   placeholder: string;
@@ -54,8 +55,8 @@ const newMessage = ref('');
 const isMessageBeingStreamed = ref(false);
 const selectedModel: Ref<OpenaiModel> = ref(OpenaiModel['gpt-3.5-turbo']);
 const selectedTemperature: Ref<number> = ref(1.0);
-const selectedNumberOfImages = ref(3);
-const selectedImageSize = ref(OpenaiImageSize.SMALL);
+const selectedImageCount = ref<number>(1);
+const selectedImageSize = ref<OpenaiImageSize>(OpenaiImageSize.SMALL);
 
 let messageContexts: OpenaiChatMessage[] = [];
 const summarizeContextOpenaiMessage = OpenaiChatMessage.of1(
@@ -127,6 +128,22 @@ function updateRememberContext(shouldRememberContext: boolean) {
  */
 function updateOpenaiTemperature(temperature: number) {
   selectedTemperature.value = temperature;
+}
+
+/**
+ * Update the {@link selectedImageCount} which determines the number of images to generate.
+ * @param imageCount
+ */
+function updateImageCount(imageCount: number) {
+  selectedImageCount.value = imageCount;
+}
+
+/**
+ * Update the {@link selectedImageSize} which determines the size of the image to generate.
+ * @param imageSize
+ */
+function updateImageSize(imageSize: OpenaiImageSize) {
+  selectedImageSize.value = imageSize;
 }
 
 /**
@@ -233,7 +250,7 @@ async function sendGenerateImageMessage() {
   await getOpenaiImageGenerationResponse(
     new OpenaiImageGenerationPrompt(
       prompt.text[0],
-      selectedNumberOfImages.value,
+      selectedImageCount.value,
       selectedImageSize.value
     ),
     (imgUrls) => {
@@ -248,6 +265,7 @@ async function sendGenerateImageMessage() {
     },
     () => {
       isMessageBeingStreamed.value = false;
+      scrollTarget.value.scrollIntoView();
       return null;
     },
     onApiKeyError
@@ -335,6 +353,7 @@ function addContext(context: OpenaiChatMessage) {
 }
 
 function onApiKeyError(err: string) {
+  console.log(err);
   eventBus.emit(EventName.OPEN_SETTINGS, { err: err });
   eventBus.emit(EventName.OPEN_SNACKBAR, {
     text: 'API key is invalid',
@@ -362,12 +381,14 @@ function getMessageCardClass(type: string) {
   <div class="parent">
     <div class="chat-message-container">
       <div class="chat-messages">
-        <div v-for="message in messages" :key="message.id" :style="getPosition(message)">
-          <chat-message
-            :message="message"
-            :show-message-template="showMessageTemplate"
-            :class="getMessageCardClass(message.action)"
-          />
+        <div v-for="message in messages" :key="message.id">
+          <div :style="getPosition(message)">
+            <chat-message
+              :message="message"
+              :show-message-template="showMessageTemplate"
+              :class="getMessageCardClass(message.action)"
+            />
+          </div>
         </div>
       </div>
       <div ref="scrollTarget" />
@@ -425,6 +446,13 @@ function getMessageCardClass(type: string) {
             <openai-temperature-modal
               :selected-temperature="selectedTemperature"
               @update-openai-temperature="updateOpenaiTemperature"
+            />
+          </v-slide-group-item>
+          <v-slide-group-item v-if="availability[selectedChatType].has(buttons.IMAGE_CONFIG)">
+            <openai-image-configuration-modal
+              custom-style="mr-2"
+              @update-image-count="updateImageCount"
+              @update-image-size="updateImageSize"
             />
           </v-slide-group-item>
         </v-slide-group>
@@ -491,6 +519,10 @@ function getMessageCardClass(type: string) {
   display: flex;
   align-items: center;
   width: 100%;
+}
+
+.entire-row {
+  flex: 0 0 100%; /* Let it fill the entire space horizontally */
 }
 
 .message-card {
