@@ -240,8 +240,8 @@ async function sendGenerateImageMessage() {
       received.value.text = imgUrls;
     },
     () => {
-      // Fill "received" with specified number of images(to show progress circular while loading images)
-      received.value.text = new Array(selectedNumberOfImages.value).fill('');
+      // to show progress circular while loading images
+      received.value.text = [''];
       messages.value.push(received.value);
       isMessageBeingStreamed.value = true;
       return null;

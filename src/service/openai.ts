@@ -1,20 +1,8 @@
 import { appStore } from '@/store/app';
+import { MOCK_RESPONSE_STREAM, MOCK_RESPONSE_IMAGE } from '@/common/mocks';
 
 const MOCK_OPENAI_API_RESPONSE_INTERVAL: number = appStore().mockOpenaiApiResponseInterval;
 const MOCK_OPENAI: boolean = appStore().mockOpenai;
-const MOCK_RESPONSE_STREAM: string[] = (
-  'Lorem ipsum dolor sit amet consectetur adipisicing elit. ' +
-  'Maxime mollitia, molestiae quas vel sint commodi repudiandae consequuntur voluptatum laborum numquam ' +
-  'blanditiis harum quisquam eius sed odit fugiat iusto fuga praesentium optio, eaque rerum! Provident ' +
-  'laudantium molestias eos sapiente officiis modi at sunt excepturi expedita sint? Sed quibusdam recusandae.\n ' +
-  '```java\n' +
-  'public class HelloWorld {\n' +
-  '    public static void main(String[] args) {\n' +
-  '        System.out.println("Hello, world!");\n' +
-  '    }\n' +
-  '}\n' +
-  '```'
-).split(' ');
 
 /**
  * OpenAI Role - The role of the author of this message.
@@ -197,30 +185,47 @@ const getOpenaiChatResponse = MOCK_OPENAI
       }
     };
 
-const getOpenaiImageGenerationResponse = async function (
-  prompt: OpenaiImageGenerationPrompt,
-  consumer: (message: string[]) => void,
-  beforeRequestListener: () => ListenerEvent | null = () => null,
-  endOfRequestListener: () => ListenerEvent | null = () => null,
-  onError: (error: any) => void = () => {}
-): Promise<void> {
-  beforeRequestListener();
-  try {
-    const imageResponse = await appStore().openai!.images.generate({
-      prompt: prompt.content,
-      n: prompt.numberOfImages,
-      response_format: prompt.response_format,
-      size: prompt.size,
-    });
+const getOpenaiImageGenerationResponse = MOCK_OPENAI
+  ? async function (
+      prompt: OpenaiImageGenerationPrompt,
+      consumer: (message: string[]) => void,
+      beforeRequestListener: () => ListenerEvent | null = () => null,
+      endOfRequestListener: () => ListenerEvent | null = () => null,
+      onError: (error: any) => void = () => {}
+    ) {
+      beforeRequestListener();
+      try {
+        consumer(MOCK_RESPONSE_IMAGE);
+      } catch (e) {
+        onError(e);
+      } finally {
+        endOfRequestListener();
+      }
+    }
+  : async function (
+      prompt: OpenaiImageGenerationPrompt,
+      consumer: (message: string[]) => void,
+      beforeRequestListener: () => ListenerEvent | null = () => null,
+      endOfRequestListener: () => ListenerEvent | null = () => null,
+      onError: (error: any) => void = () => {}
+    ): Promise<void> {
+      beforeRequestListener();
+      try {
+        const imageResponse = await appStore().openai!.images.generate({
+          prompt: prompt.content,
+          n: prompt.numberOfImages,
+          response_format: prompt.response_format,
+          size: prompt.size,
+        });
 
-    const key = prompt.response_format;
-    consumer(imageResponse.data.filter((img) => img[key]).map((img) => img[key]!));
-  } catch (e) {
-    onError(e);
-  } finally {
-    endOfRequestListener();
-  }
-};
+        const key = prompt.response_format;
+        consumer(imageResponse.data.filter((img) => img[key]).map((img) => img[key]!));
+      } catch (e) {
+        onError(e);
+      } finally {
+        endOfRequestListener();
+      }
+    };
 
 export {
   OpenaiChatPrompt,
