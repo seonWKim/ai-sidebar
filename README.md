@@ -20,7 +20,7 @@
 
 ## Features
 
-![main.png](public/static/main.gif)
+![main.png](main.png)
 
 - Ask questions using chatGPT in chrome sidebar
   - Message Template

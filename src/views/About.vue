@@ -156,7 +156,6 @@ function openSidePanel() {
 <style scoped>
 .background {
   font-family: sans-serif;
-  padding: 16px 32px 16px 32px;
 }
 
 .box-1 {

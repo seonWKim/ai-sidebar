@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import type { Message } from '@/common/message';
-import { defineComponent, onMounted, ref, watch } from 'vue';
-import Markdown from 'vue3-markdown-it';
+import { onMounted, ref, watch } from 'vue';
 import MarkdownItHighlightjs from 'markdown-it-highlightjs';
+import { ChatType } from '@/common/chat-type';
+import ChatMessageText from '@/components/chat/message/ChatMessageText.vue';
+import ChatMessageImage from '@/components/chat/message/ChatMessageImage.vue';
 
 const props = defineProps({
   message: {
@@ -16,39 +18,33 @@ const props = defineProps({
   },
 });
 
-defineComponent({
-  components: {
-    Markdown,
-  },
-});
-
 onMounted(() => {
-  if (props.message?.type !== 'sent') {
+  if (props.message?.action !== 'sent') {
     return;
   }
 
   if (props.showMessageTemplate) {
-    wholeMessage.value = props.message.text[0];
+    concatenatedMessage.value = props.message.text[0];
   } else {
-    wholeMessage.value = props.message.originalText[0];
+    concatenatedMessage.value = props.message.originalText[0];
   }
 });
 
 let lastSeenIdx = 0;
-const wholeMessage = ref(props.message?.text?.join('') || '');
+const concatenatedMessage = ref(props.message?.text?.join('') || '');
 
 /**
  * Watch streaming response and concatenate the strings. Only received messages are applicable
  */
 watch(props.message, (newValue, _) => {
-  if (props.message?.type !== 'received') {
+  if (props.message?.action !== 'received') {
     return;
   }
 
   const newLastIdx = newValue?.text.length || 0;
   const newText = newValue?.text?.slice(lastSeenIdx, newLastIdx + 1)?.join('') || '';
   lastSeenIdx = newLastIdx;
-  wholeMessage.value += newText;
+  concatenatedMessage.value += newText;
 });
 
 const plugins = [
@@ -64,31 +60,21 @@ const plugins = [
 </script>
 
 <template>
-  <v-card>
-    <v-card-text class="px-4 py-0">
-      <markdown :source="wholeMessage" class="markdown" :breaks="true" :plugins="plugins" />
-    </v-card-text>
-  </v-card>
+  <div>
+    <chat-message-text
+      v-if="message.type === ChatType.TEXT"
+      color="messages"
+      :joined-message="concatenatedMessage"
+      :plugins="plugins"
+    />
+    <chat-message-image
+      v-if="message.type === ChatType.IMAGE"
+      :message="message"
+      color="messages"
+      :concatenated-message="concatenatedMessage"
+      :plugins="plugins"
+    />
+  </div>
 </template>
 
-<style scoped>
-.markdown {
-  padding: 0 8px;
-}
-
-.markdown ::v-deep(code) {
-  white-space: pre-wrap !important;
-}
-
-.markdown ::v-deep(pre) {
-  margin: 12px 0;
-}
-
-.markdown ::v-deep(p) {
-  margin: 12px 0;
-}
-
-.markdown ::v-deep(code) {
-  border-radius: 8px;
-}
-</style>
+<style scoped></style>

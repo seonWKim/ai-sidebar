@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { OpenaiRole } from '@/service/openai';
+import { ChatType } from '@/common/chat-type';
 
 /**
  * @param id - unique id for the message
@@ -12,7 +13,8 @@ import { OpenaiRole } from '@/service/openai';
 export interface Message {
   id: ReturnType<typeof uuidv4>;
   role: OpenaiRole;
-  type: 'sent' | 'received';
+  type: ChatType;
+  action: 'sent' | 'received';
   text: string[];
   originalText: string[];
   canceled: boolean;
