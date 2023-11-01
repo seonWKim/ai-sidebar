@@ -56,7 +56,7 @@ function updateImageSize(selectedImageSize: OpenaiImageSize) {
     class="cy-openai-image-configuration-modal-button"
     @click="dialog = !dialog"
   >
-    Settings
+    SETTINGS
     <v-dialog class="dialog" v-model="dialog" :scrim="false">
       <v-card>
         <v-toolbar dark color="primary">

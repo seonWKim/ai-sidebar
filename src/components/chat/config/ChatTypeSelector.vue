@@ -46,6 +46,7 @@ function selectModel(chatTypeStr: ChatType) {
         v-for="(chatType, index) in chatTypes"
         :key="index"
         @click="selectModel(chatType)"
+        :class='`cy-chat-type-selector-${chatType}`'
       >
         <v-list-item-title>{{ chatType }}</v-list-item-title>
       </v-list-item>
