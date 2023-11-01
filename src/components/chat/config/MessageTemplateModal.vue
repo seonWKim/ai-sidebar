@@ -55,7 +55,7 @@ function onCustomTemplateChange(value: number) {
     rounded
     variant="outlined"
     color="primary"
-    class='cy-message-template-modal-button'
+    class="cy-message-template-modal-button"
     @click="dialog = !dialog"
   >
     TEMPLATE

@@ -35,7 +35,7 @@ function selectModel(chatTypeStr: ChatType) {
         rounded
         variant="outlined"
         color="primary"
-        class='cy-chat-type-selector-button'
+        class="cy-chat-type-selector-button"
         v-bind="props"
       >
         {{ selectedChatType.toUpperCase() }}
@@ -46,7 +46,7 @@ function selectModel(chatTypeStr: ChatType) {
         v-for="(chatType, index) in chatTypes"
         :key="index"
         @click="selectModel(chatType)"
-        :class='`cy-chat-type-selector-${chatType}`'
+        :class="`cy-chat-type-selector-${chatType}`"
       >
         <v-list-item-title>{{ chatType }}</v-list-item-title>
       </v-list-item>
@@ -55,9 +55,7 @@ function selectModel(chatTypeStr: ChatType) {
 </template>
 
 <style scoped>
-
 .cy-chat-type-selector-button {
   margin-right: 8px;
 }
-
 </style>

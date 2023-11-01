@@ -42,7 +42,6 @@ watch(contextMaxNo, (newVal) => {
     variant="outlined"
     color="primary"
     class="cy-openai-context-memorizer-modal-button"
-    v-bind="props"
     @click="dialog = !dialog"
   >
     {{ rememberContext ? 'MEMORIZING...' : 'FORGETTING...' }}

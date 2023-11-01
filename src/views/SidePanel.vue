@@ -1,9 +1,9 @@
 <template>
   <div class="sidepanel-layout">
-    <chat class='cy-chat'/>
+    <chat class="cy-chat" />
     <div class="h-100 bg-settings">
-      <settings class='cy-settings'/>
-      <themes class='cy-themes'/>
+      <settings class="cy-settings" />
+      <themes class="cy-themes" />
     </div>
   </div>
 </template>

@@ -36,7 +36,7 @@ watch(temperature, (newVal) => {
     rounded
     variant="outlined"
     color="primary"
-    class='cy-openai-temperature-modal-button'
+    class="cy-openai-temperature-modal-button"
     v-bind="props"
     @click="dialog = !dialog"
   >
