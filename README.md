@@ -60,6 +60,7 @@
 
 - Submit an issue for any features or bug
 - Submit a pull request with a clear title and description
+- Run `npm run pull-request-check` before submitting a pull request
 - [Commit message best practices](https://www.freecodecamp.org/news/how-to-write-better-git-commit-messages/)
 
 ## Contributors

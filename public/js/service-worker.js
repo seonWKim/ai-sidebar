@@ -1,15 +1,25 @@
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: 'openSidePanel',
-    title: 'Open Side Panel',
+    title: 'Open Side Bar',
+    contexts: ['all'],
+  });
+  chrome.contextMenus.create({
+    id: 'openFullPage',
+    title: 'Open Full Page',
     contexts: ['all'],
   });
   chrome.tabs.create({ url: 'landing.html' });
 });
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-  if (info.menuItemId === 'openSidePanel') {
-    chrome.sidePanel.open({ windowId: tab.windowId });
+  switch (info.menuItemId) {
+    case 'openSidePanel':
+      chrome.sidePanel.open({ windowId: tab.windowId });
+      break;
+    case 'openFullPage':
+      chrome.tabs.create({ url: 'index.html' });
+      break;
   }
 });
 
