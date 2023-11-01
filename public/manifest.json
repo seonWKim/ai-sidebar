@@ -25,7 +25,7 @@
   ],
   "permissions": ["activeTab", "sidePanel", "contextMenus", "storage", "unlimitedStorage"],
   "action": {
-    "default_title": "Click to open side bar",
+    "default_title": "Click to use Free AI Side Bar",
     "default_icon": {
       "16": "static/image/favicon-16x16.png",
       "32": "static/image/favicon-32x32.png"

@@ -1,7 +1,7 @@
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: 'openSidePanel',
-    title: 'Open Side Panel',
+    title: 'Open Side Bar',
     contexts: ['all'],
   });
   chrome.contextMenus.create({
