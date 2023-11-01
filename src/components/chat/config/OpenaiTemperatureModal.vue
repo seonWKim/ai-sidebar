@@ -4,10 +4,6 @@ import { ChromeStorageKeys } from '@/common/keys';
 import { appStore } from '@/store/app';
 
 const props = defineProps({
-  customStyle: {
-    type: String,
-    default: null,
-  },
   selectedTemperature: {
     type: Number,
     required: true,
@@ -40,11 +36,11 @@ watch(temperature, (newVal) => {
     rounded
     variant="outlined"
     color="primary"
-    :class="customStyle"
+    class='cy-openai-temperature-modal-button'
     v-bind="props"
     @click="dialog = !dialog"
   >
-    Temperature
+    TEMPERATURE
     <v-dialog class="dialog" v-model="dialog" :scrim="false">
       <v-card>
         <v-toolbar dark color="primary">
@@ -96,6 +92,9 @@ watch(temperature, (newVal) => {
 </template>
 
 <style scoped>
+.cy-openai-temperature-modal-button {
+}
+
 .slider {
   font-size: 10px;
 }

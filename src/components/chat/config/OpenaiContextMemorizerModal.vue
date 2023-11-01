@@ -3,13 +3,6 @@ import { onMounted, ref, watch } from 'vue';
 import { appStore } from '@/store/app';
 import { ChromeStorageKeys } from '@/common/keys';
 
-const props = defineProps({
-  customStyle: {
-    type: String,
-    default: null,
-  },
-});
-
 onMounted(async () => {
   rememberContext.value =
     (await store.getFromChromeStorage(ChromeStorageKeys.REMEMBER_CONTEXT)) === 'true';
@@ -48,7 +41,7 @@ watch(contextMaxNo, (newVal) => {
     rounded
     variant="outlined"
     color="primary"
-    :class="customStyle"
+    class="cy-openai-context-memorizer-modal-button"
     v-bind="props"
     @click="dialog = !dialog"
   >
@@ -96,7 +89,7 @@ watch(contextMaxNo, (newVal) => {
             </v-card-item>
             <v-card-text class="text-medium-emphasis text-caption">
               If "Memorize Previous Contexts" is set, previous messages are also sent to OpenAI API
-              witht the current message. You can configure how many previous messages should be sent
+              with the current message. You can configure how many previous messages should be sent
               by using the slider.
             </v-card-text>
           </v-card>
@@ -107,6 +100,10 @@ watch(contextMaxNo, (newVal) => {
 </template>
 
 <style scoped>
+.cy-openai-context-memorizer-modal-button {
+  margin-right: 8px;
+}
+
 .dialog {
   width: 80%;
 }

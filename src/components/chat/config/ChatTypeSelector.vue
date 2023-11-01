@@ -2,13 +2,6 @@
 import { onMounted, ref } from 'vue';
 import { ChatType } from '@/common/chat-type';
 
-defineProps({
-  customStyle: {
-    type: String,
-    default: null,
-  },
-});
-
 onMounted(() => {
   selectModel(selectedChatType.value);
 });
@@ -42,10 +35,10 @@ function selectModel(chatTypeStr: ChatType) {
         rounded
         variant="outlined"
         color="primary"
-        :class="customStyle"
+        class='cy-chat-type-selector-button'
         v-bind="props"
       >
-        {{ selectedChatType }}
+        {{ selectedChatType.toUpperCase() }}
       </v-btn>
     </template>
     <v-list>
@@ -60,4 +53,10 @@ function selectModel(chatTypeStr: ChatType) {
   </v-menu>
 </template>
 
-<style scoped></style>
+<style scoped>
+
+.cy-chat-type-selector-button {
+  margin-right: 8px;
+}
+
+</style>

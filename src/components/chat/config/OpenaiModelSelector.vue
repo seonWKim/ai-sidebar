@@ -7,16 +7,12 @@ const props = defineProps({
     type: String,
     default: OpenaiModel['gpt-3.5-turbo'],
   },
-  customStyle: {
-    type: String,
-    default: null,
-  },
 });
 
 const emits = defineEmits(['updateOpenaiModel']);
 
 const models = ref(Object.values(OpenaiModel));
-const selectedModel = ref(props.selectedModel);
+const selectedModel = ref<String>(props.selectedModel!);
 
 /**
  * Select a role from the list of {@link OpenaiModel} values.
@@ -40,10 +36,10 @@ function selectModel(modelStr: string) {
         rounded
         variant="outlined"
         color="primary"
-        :class="customStyle"
+        class="cy-openai-model-selector-button"
         v-bind="props"
       >
-        {{ selectedModel }}
+        {{ selectedModel.toUpperCase() }}
       </v-btn>
     </template>
     <v-list>
@@ -54,4 +50,8 @@ function selectModel(modelStr: string) {
   </v-menu>
 </template>
 
-<style scoped></style>
+<style scoped>
+.cy-openai-model-selector-button {
+  margin-right: 8px;
+}
+</style>
