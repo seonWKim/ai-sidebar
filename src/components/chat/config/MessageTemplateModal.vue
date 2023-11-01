@@ -6,13 +6,6 @@ import { ChromeStorageKeys } from '@/common/keys';
 import { messageTemplateInputPlaceholder, defaultTemplates } from '@/common/templates';
 import MessageTemplateAddModal from '@/components/chat/config/MessageTemplateAddModal.vue';
 
-defineProps({
-  customStyle: {
-    type: String,
-    default: null,
-  },
-});
-
 onMounted(async () => {
   template.value = await store.getFromChromeStorage(ChromeStorageKeys.MESSAGE_TEMPLATE);
   showMessageTemplate.value =
@@ -62,10 +55,10 @@ function onCustomTemplateChange(value: number) {
     rounded
     variant="outlined"
     color="primary"
-    :class="customStyle"
+    class="cy-message-template-modal-button"
     @click="dialog = !dialog"
   >
-    Template
+    TEMPLATE
     <v-dialog class="dialog" v-model="dialog" :scrim="false">
       <v-card>
         <v-toolbar color="primary">
@@ -138,6 +131,10 @@ function onCustomTemplateChange(value: number) {
 </template>
 
 <style scoped>
+.cy-message-template-modal-button {
+  margin-right: 8px;
+}
+
 .dialog {
   width: 80%;
 }

@@ -420,25 +420,20 @@ function getMessageCardClass(type: string) {
       <div class="selectbox-area">
         <v-slide-group v-model="model" show-arrows>
           <v-slide-group-item>
-            <chat-type-selector custom-style="mr-2" @update-chat-type="updateChatType" />
+            <chat-type-selector @update-chat-type="updateChatType" />
           </v-slide-group-item>
           <v-slide-group-item v-if="availability[selectedChatType].has(buttons.MESSAGE_TEMPLATE)">
             <message-template-modal
-              custom-style="mr-2"
               @update-message-template="updateMessageTemplate"
               @update-show-message-template="updateShowMessageTemplate"
             />
           </v-slide-group-item>
           <v-slide-group-item v-if="availability[selectedChatType].has(buttons.REMEMBER_CONTEXT)">
-            <openai-context-memorizer-modal
-              custom-style="mr-2"
-              @update-remember-context="updateRememberContext"
-            />
+            <openai-context-memorizer-modal @update-remember-context="updateRememberContext" />
           </v-slide-group-item>
           <v-slide-group-item v-if="availability[selectedChatType].has(buttons.OPENAI_MODEL)">
             <openai-model-selector
               :selected-model="selectedModel"
-              custom-style="mr-2"
               @update-openai-model="updateOpenaiModel"
             />
           </v-slide-group-item>

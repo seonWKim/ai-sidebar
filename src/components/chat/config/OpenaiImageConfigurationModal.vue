@@ -4,13 +4,6 @@ import { ChromeStorageKeys } from '@/common/keys';
 import { appStore } from '@/store/app';
 import { OpenaiImageSize } from '@/service/openai';
 
-const props = defineProps({
-  customStyle: {
-    type: String,
-    default: null,
-  },
-});
-
 onMounted(async () => {
   const imageCountStr: string = await store.getFromChromeStorage(
     ChromeStorageKeys.IMAGE_CONFIGURATION_COUNT
@@ -60,11 +53,10 @@ function updateImageSize(selectedImageSize: OpenaiImageSize) {
     rounded
     variant="outlined"
     color="primary"
-    :class="customStyle"
-    v-bind="props"
+    class="cy-openai-image-configuration-modal-button"
     @click="dialog = !dialog"
   >
-    Settings
+    SETTINGS
     <v-dialog class="dialog" v-model="dialog" :scrim="false">
       <v-card>
         <v-toolbar dark color="primary">
@@ -106,4 +98,8 @@ function updateImageSize(selectedImageSize: OpenaiImageSize) {
   </v-btn>
 </template>
 
-<style scoped></style>
+<style scoped>
+.cy-openai-image-configuration-modal-button {
+  margin-right: 8px;
+}
+</style>
