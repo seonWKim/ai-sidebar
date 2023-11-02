@@ -1,6 +1,7 @@
 let pushedKeys = {};
 const OPEN_SIDE_PANEL_EVENT = 'OpenSidePanel';
 const OPEN_SIDE_PANEL_EVENT_TRIGGER_KEYS = 'free_sidebar_open_side_panel_event_trigger_keys';
+const OPEN_SIDE_PANEL_EVENT_TRIGGER_ENABLED = 'free_sidebar_open_side_panel_event_trigger_enabled';
 
 addOpenSidePanelEvent();
 addKeydownEvent();
@@ -39,6 +40,13 @@ function addKeydownEvent() {
 
     // short-circuiting
     if (!pushedKeyValues.includes('control') || !pushedKeyValues.includes('shift')) {
+      return;
+    }
+
+    const eventEnabled = (
+      await chrome?.storage?.local?.get(OPEN_SIDE_PANEL_EVENT_TRIGGER_ENABLED)
+    )?.[OPEN_SIDE_PANEL_EVENT_TRIGGER_ENABLED];
+    if (eventEnabled !== 'true') {
       return;
     }
 

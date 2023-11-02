@@ -19,6 +19,7 @@ eventBus.on(EventName.OPEN_SETTINGS, () => {
 onMounted(async () => {
   await store.initializeOpenAi();
   apiKey.value = store.openaiReadOny?.apiKey || '';
+  shortCutEnabled.value = await getOpenSidePanelEventTriggerEnabled();
   shortCutKey.value = (await getCustomOpenSidePanelEventTriggerKeyNames()).join('');
   setShortCutKeyHint(shortCutKey.value);
 });
@@ -29,19 +30,22 @@ watch(apiKey, (newValue, _) => {
 
 const shortCutKey = ref('');
 const shortCutKeyHint = ref('');
+const shortCutEnabled = ref(true);
+
+async function getOpenSidePanelEventTriggerEnabled(): Promise<boolean> {
+  const enabled = await store.getFromChromeStorage(
+    ChromeStorageKeys.OPEN_SIDE_PANEL_EVENT_TRIGGER_ENABLED
+  );
+  return enabled ? enabled === 'true' : false;
+}
 
 async function getCustomOpenSidePanelEventTriggerKeyNames(): Promise<string[]> {
-  const openSidePanelEventTriggerKeysStr = await chrome?.storage?.local?.get(
+  const openSidePanelEventTriggerKeysStr = await store.getFromChromeStorage(
     ChromeStorageKeys.OPEN_SIDE_PANEL_EVENT_TRIGGER_KEYS
   );
   let openSidePanelEventTriggerKeyNames = ['Control', 'Shift', 'O'];
-  if (
-    !!openSidePanelEventTriggerKeysStr &&
-    openSidePanelEventTriggerKeysStr[ChromeStorageKeys.OPEN_SIDE_PANEL_EVENT_TRIGGER_KEYS]
-  ) {
-    openSidePanelEventTriggerKeyNames = JSON.parse(
-      openSidePanelEventTriggerKeysStr[ChromeStorageKeys.OPEN_SIDE_PANEL_EVENT_TRIGGER_KEYS]
-    );
+  if (openSidePanelEventTriggerKeysStr) {
+    openSidePanelEventTriggerKeyNames = JSON.parse(openSidePanelEventTriggerKeysStr);
   }
 
   return openSidePanelEventTriggerKeyNames.slice(2);
@@ -53,9 +57,17 @@ function onShortCutKeyUpdate(value: string) {
 
   const customKey = shortCutKey.value ? shortCutKey.value : 'O';
   const customKeyMap = ['Control', 'Shift', customKey];
-  chrome?.storage?.local?.set({
-    [ChromeStorageKeys.OPEN_SIDE_PANEL_EVENT_TRIGGER_KEYS]: JSON.stringify(customKeyMap),
-  });
+  store.saveToChromeStorage(
+    ChromeStorageKeys.OPEN_SIDE_PANEL_EVENT_TRIGGER_KEYS,
+    JSON.stringify(customKeyMap)
+  );
+}
+
+function onShortCutEnabledUpdate() {
+  store.saveToChromeStorage(
+    ChromeStorageKeys.OPEN_SIDE_PANEL_EVENT_TRIGGER_ENABLED,
+    shortCutEnabled.value.toString()
+  );
 }
 
 function setShortCutKeyHint(value: string) {
@@ -93,13 +105,24 @@ function updateOpenaiApiKeyGuideDialog(value: boolean) {
           <v-toolbar-title>Settings</v-toolbar-title>
           <v-spacer></v-spacer>
           <v-toolbar-items>
-            <v-btn size="small" variant="text" disabled> Auto Saved </v-btn>
+            <v-btn size="small" variant="text" disabled> Auto Saved</v-btn>
           </v-toolbar-items>
         </v-toolbar>
         <v-container class="fill-height">
           <v-responsive class="fill-height">
-            <div class="inner-container">
-              <div class="text-subtitle-1 text-medium-emphasis mb-2">Open SideBar Short Cut</div>
+            <v-form class="inner-container">
+              <div class="d-flex justify-space-between align-center">
+                <div class="text-subtitle-1 text-medium-emphasis mb-2">Open SideBar Short Cut</div>
+                <div>
+                  <v-switch
+                    v-model="shortCutEnabled"
+                    color="primary"
+                    hide-details
+                    @update:modelValue="onShortCutEnabledUpdate"
+                    :label="shortCutEnabled ? 'On' : 'Off'"
+                  />
+                </div>
+              </div>
               <div class="d-flex">
                 <v-text-field
                   class="defaultShortCutPrefixTextField"
@@ -130,6 +153,7 @@ function updateOpenaiApiKeyGuideDialog(value: boolean) {
                 v-model="apiKey"
                 :type="showApiKey ? 'text' : 'password'"
                 clearable
+                autocomplete="on"
                 :append-inner-icon="showApiKey ? 'mdi-eye' : 'mdi-eye-off'"
                 @click:append-inner="showApiKey = !showApiKey"
                 :rules="[
@@ -139,7 +163,7 @@ function updateOpenaiApiKeyGuideDialog(value: boolean) {
 
               <v-card class="mb-6" color="primary" variant="tonal">
                 <v-card-item class="mt-2">
-                  <template v-slot:subtitle> Note </template>
+                  <template v-slot:subtitle> Note</template>
                 </v-card-item>
                 <v-card-text class="text-medium-emphasis text-caption">
                   Click
@@ -149,7 +173,7 @@ function updateOpenaiApiKeyGuideDialog(value: boolean) {
                   for more information.
                 </v-card-text>
               </v-card>
-            </div>
+            </v-form>
           </v-responsive>
         </v-container>
       </v-card>
