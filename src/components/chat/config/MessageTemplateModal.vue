@@ -63,7 +63,7 @@ function onCustomTemplateChange(value: number) {
       <v-card>
         <v-toolbar color="primary">
           <v-btn icon dark @click="dialog = false">
-            <v-icon> mdi-close </v-icon>
+            <v-icon class="cy-message-template-modal-close-icon"> mdi-close </v-icon>
           </v-btn>
           <v-toolbar-title>Template</v-toolbar-title>
         </v-toolbar>
@@ -73,6 +73,7 @@ function onCustomTemplateChange(value: number) {
             <v-autocomplete
               v-model="selectedDefaultTemplate"
               :items="defaultTemplates"
+              class="cy-message-template-modal-default-template"
               clearable
               item-title="name"
               item-value="id"
@@ -95,7 +96,7 @@ function onCustomTemplateChange(value: number) {
               {{ selectedTemplateHint }}
             </div>
             <v-textarea
-              class="mb-4"
+              class="cy-message-template-modal-textarea"
               v-model="template"
               :placeholder="messageTemplatePlaceholder"
               variant="outlined"
@@ -106,16 +107,15 @@ function onCustomTemplateChange(value: number) {
 
             <v-checkbox
               v-model="showMessageTemplate"
-              class="mb-4"
+              class="cy-message-template-modal-show-checkbox"
               @click="showMessageTemplate != showMessageTemplate"
               label="Show message template"
               color="primary"
               hide-details
-            >
-            </v-checkbox>
+            />
             <v-card color="primary" variant="tonal">
               <v-card-item class="mt-2">
-                <template v-slot:subtitle> Note </template>
+                <template v-slot:subtitle> Note</template>
               </v-card-item>
               <v-card-text class="text-medium-emphasis text-caption">
                 <span>{{ messageTemplateInputPlaceholder }}</span>
@@ -133,6 +133,14 @@ function onCustomTemplateChange(value: number) {
 <style scoped>
 .cy-message-template-modal-button {
   margin-right: 8px;
+}
+
+.cy-message-template-modal-textarea {
+  margin-bottom: 16px;
+}
+
+.cy-message-template-modal-show-checkbox {
+  margin-bottom: 16px;
 }
 
 .dialog {
