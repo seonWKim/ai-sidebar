@@ -18,7 +18,8 @@ export default createVuetify({
     themes: {
       light: {
         colors: {
-          settings: '#F0F1F5',
+          settings: '#EEEEEE',
+          settings2: '#E0E0E0',
           messages: '#F0F1F5',
 
           background: '#FFFFFF',
@@ -69,6 +70,7 @@ export default createVuetify({
       dark: {
         colors: {
           settings: '#424242',
+          settings2: '#535353',
           messages: '#CCBFD6',
 
           background: '#121212',
