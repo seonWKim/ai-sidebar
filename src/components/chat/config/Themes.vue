@@ -21,9 +21,7 @@ function toggleTheme() {
 </script>
 
 <template>
-  <div class="text-center mx-4 mt-6">
-    <v-btn icon="mdi-theme-light-dark" size="16px" variant="flat" @click="toggleTheme" />
-  </div>
+  <v-icon @click="toggleTheme"> mdi-theme-light-dark </v-icon>
 </template>
 
 <style scoped></style>

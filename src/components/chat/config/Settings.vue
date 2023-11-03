@@ -85,100 +85,94 @@ function updateOpenaiApiKeyGuideDialog(value: boolean) {
 </script>
 
 <template>
-  <v-row>
-    <v-dialog v-model="dialog" fullscreen :scrim="false" transition="scroll-x-reverse-transition">
-      <template v-slot:activator="{ props }">
-        <div class="mx-auto mt-6">
-          <v-btn icon="mdi-cog" size="16px" v-bind="props" variant="flat" />
-        </div>
-      </template>
-      <openai-api-key-guide
-        hidden
-        :dialog="openaiApiKeyGuideDialog"
-        @update:dialog="updateOpenaiApiKeyGuideDialog"
-      />
-      <v-card>
-        <v-toolbar dark color="primary">
-          <v-btn icon dark @click="dialog = false">
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-          <v-toolbar-title>Settings</v-toolbar-title>
-          <v-spacer></v-spacer>
-          <v-toolbar-items>
-            <v-btn size="small" variant="text" disabled> Auto Saved</v-btn>
-          </v-toolbar-items>
-        </v-toolbar>
-        <v-container class="fill-height">
-          <v-responsive class="fill-height">
-            <v-form class="inner-container">
-              <div class="d-flex justify-space-between align-center">
-                <div class="text-subtitle-1 text-medium-emphasis mb-2">Open SideBar Short Cut</div>
-                <div>
-                  <v-switch
-                    v-model="shortCutEnabled"
-                    color="primary"
-                    hide-details
-                    @update:modelValue="onShortCutEnabledUpdate"
-                    :label="shortCutEnabled ? 'On' : 'Off'"
-                  />
-                </div>
-              </div>
-              <div class="d-flex">
-                <v-text-field
-                  class="defaultShortCutPrefixTextField"
-                  density="compact"
-                  placeholder="Control + Shift + "
-                  prepend-inner-icon="mdi-keyboard-outline"
-                  variant="outlined"
-                  readonly
-                />
-                <v-text-field
-                  class="customShortCutPostfixTextField"
-                  v-model="shortCutKey"
-                  density="compact"
-                  placeholder="Custom Key"
-                  variant="outlined"
-                  @update:modelValue="onShortCutKeyUpdate"
-                  :maxLength="1"
-                  :hint="`${shortCutKeyHint}`"
+  <v-dialog v-model="dialog" fullscreen :scrim="false" transition="scroll-x-reverse-transition">
+    <template v-slot:activator="{ props }">
+      <v-icon v-bind="props"> mdi-cog </v-icon>
+    </template>
+    <openai-api-key-guide
+      hidden
+      :dialog="openaiApiKeyGuideDialog"
+      @update:dialog="updateOpenaiApiKeyGuideDialog"
+    />
+    <v-card>
+      <v-toolbar dark color="primary">
+        <v-btn icon dark @click="dialog = false">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+        <v-toolbar-title>Settings</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-toolbar-items>
+          <v-btn size="small" variant="text" disabled> Auto Saved</v-btn>
+        </v-toolbar-items>
+      </v-toolbar>
+      <v-container class="fill-height">
+        <v-responsive class="fill-height">
+          <v-form class="inner-container">
+            <div class="d-flex justify-space-between align-center">
+              <div class="text-subtitle-1 text-medium-emphasis mb-2">Open SideBar Short Cut</div>
+              <div>
+                <v-switch
+                  v-model="shortCutEnabled"
+                  color="primary"
+                  hide-details
+                  @update:modelValue="onShortCutEnabledUpdate"
+                  :label="shortCutEnabled ? 'On' : 'Off'"
                 />
               </div>
-
-              <div class="text-subtitle-1 text-medium-emphasis mb-2">OpenAI API Key</div>
+            </div>
+            <div class="d-flex">
               <v-text-field
+                class="defaultShortCutPrefixTextField"
                 density="compact"
-                placeholder="API Key"
-                prepend-inner-icon="mdi-lock-outline"
+                placeholder="Control + Shift + "
+                prepend-inner-icon="mdi-keyboard-outline"
                 variant="outlined"
-                v-model="apiKey"
-                :type="showApiKey ? 'text' : 'password'"
-                clearable
-                autocomplete="on"
-                :append-inner-icon="showApiKey ? 'mdi-eye' : 'mdi-eye-off'"
-                @click:append-inner="showApiKey = !showApiKey"
-                :rules="[
-                  (value) => (value && value.length > 0 ? true : 'Set your OpenAI API key.'),
-                ]"
+                readonly
               />
+              <v-text-field
+                class="customShortCutPostfixTextField"
+                v-model="shortCutKey"
+                density="compact"
+                placeholder="Custom Key"
+                variant="outlined"
+                @update:modelValue="onShortCutKeyUpdate"
+                :maxLength="1"
+                :hint="`${shortCutKeyHint}`"
+              />
+            </div>
 
-              <v-card class="mb-6" color="primary" variant="tonal">
-                <v-card-item class="mt-2">
-                  <template v-slot:subtitle> Note</template>
-                </v-card-item>
-                <v-card-text class="text-medium-emphasis text-caption">
-                  Click
-                  <span class="text-primary guide" @click="openaiApiKeyGuideDialog = true">
-                    OpenAi API Key Guide
-                  </span>
-                  for more information.
-                </v-card-text>
-              </v-card>
-            </v-form>
-          </v-responsive>
-        </v-container>
-      </v-card>
-    </v-dialog>
-  </v-row>
+            <div class="text-subtitle-1 text-medium-emphasis mb-2">OpenAI API Key</div>
+            <v-text-field
+              density="compact"
+              placeholder="API Key"
+              prepend-inner-icon="mdi-lock-outline"
+              variant="outlined"
+              v-model="apiKey"
+              :type="showApiKey ? 'text' : 'password'"
+              clearable
+              autocomplete="on"
+              :append-inner-icon="showApiKey ? 'mdi-eye' : 'mdi-eye-off'"
+              @click:append-inner="showApiKey = !showApiKey"
+              :rules="[(value) => (value && value.length > 0 ? true : 'Set your OpenAI API key.')]"
+            />
+
+            <v-card class="mb-6" color="primary" variant="tonal">
+              <v-card-item class="mt-2">
+                <template v-slot:subtitle> Note</template>
+              </v-card-item>
+              <v-card-text class="text-medium-emphasis text-caption">
+                Click
+                <span class="text-primary guide" @click="openaiApiKeyGuideDialog = true">
+                  OpenAi API Key Guide
+                </span>
+                for more information.
+              </v-card-text>
+            </v-card>
+          </v-form>
+        </v-responsive>
+      </v-container>
+    </v-card>
+  </v-dialog>
 </template>
 
 <style scoped>
