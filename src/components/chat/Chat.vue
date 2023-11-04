@@ -353,7 +353,6 @@ function addContext(context: OpenaiChatMessage) {
 }
 
 function onApiKeyError(err: string) {
-  console.log(err);
   eventBus.emit(EventName.OPEN_SETTINGS, { err: err });
   eventBus.emit(EventName.OPEN_SNACKBAR, {
     text: 'API key is invalid',
@@ -382,14 +381,12 @@ function getMessageCardClass(type: string, index: number) {
   <div class="parent">
     <div class="chat-message-container">
       <div class="chat-messages">
-        <div v-for="(message, index) in messages" :key="message.id">
-          <div :style="getPosition(message)">
-            <chat-message
-              :message="message"
-              :show-message-template="showMessageTemplate"
-              :class="getMessageCardClass(message.action, index)"
-            />
-          </div>
+        <div v-for="(message, index) in messages" :key="message.id" :style="getPosition(message)">
+          <chat-message
+            :message="message"
+            :show-message-template="showMessageTemplate"
+            :class="getMessageCardClass(message.action, index)"
+          />
         </div>
       </div>
       <div ref="scrollTarget" />
@@ -418,47 +415,45 @@ function getMessageCardClass(type: string, index: number) {
       </div>
     </div>
     <div class="chat-textarea">
-      <div class="selectbox-area">
-        <v-slide-group v-model="model" show-arrows>
-          <v-slide-group-item>
-            <chat-type-selector class="cy-chat-type-selector" @update-chat-type="updateChatType" />
-          </v-slide-group-item>
-          <v-slide-group-item v-if="availability[selectedChatType].has(buttons.MESSAGE_TEMPLATE)">
-            <message-template-modal
-              class="cy-message-template-modal"
-              @update-message-template="updateMessageTemplate"
-              @update-show-message-template="updateShowMessageTemplate"
-            />
-          </v-slide-group-item>
-          <v-slide-group-item v-if="availability[selectedChatType].has(buttons.REMEMBER_CONTEXT)">
-            <openai-context-memorizer-modal
-              class="cy-openai-context-memorizer-modal"
-              @update-remember-context="updateRememberContext"
-            />
-          </v-slide-group-item>
-          <v-slide-group-item v-if="availability[selectedChatType].has(buttons.OPENAI_MODEL)">
-            <openai-model-selector
-              class="cy-openai-model-selector"
-              :selected-model="selectedModel"
-              @update-openai-model="updateOpenaiModel"
-            />
-          </v-slide-group-item>
-          <v-slide-group-item v-if="availability[selectedChatType].has(buttons.TEMPERATURE)">
-            <openai-temperature-modal
-              class="cy-openai-temperature-modal"
-              :selected-temperature="selectedTemperature"
-              @update-openai-temperature="updateOpenaiTemperature"
-            />
-          </v-slide-group-item>
-          <v-slide-group-item v-if="availability[selectedChatType].has(buttons.IMAGE_CONFIG)">
-            <openai-image-configuration-modal
-              class="cy-openai-image-configuration-modal"
-              @update-image-count="updateImageCount"
-              @update-image-size="updateImageSize"
-            />
-          </v-slide-group-item>
-        </v-slide-group>
-      </div>
+      <v-slide-group v-model="model" show-arrows class="selectbox-area">
+        <v-slide-group-item>
+          <chat-type-selector class="cy-chat-type-selector" @update-chat-type="updateChatType" />
+        </v-slide-group-item>
+        <v-slide-group-item v-if="availability[selectedChatType].has(buttons.MESSAGE_TEMPLATE)">
+          <message-template-modal
+            class="cy-message-template-modal"
+            @update-message-template="updateMessageTemplate"
+            @update-show-message-template="updateShowMessageTemplate"
+          />
+        </v-slide-group-item>
+        <v-slide-group-item v-if="availability[selectedChatType].has(buttons.REMEMBER_CONTEXT)">
+          <openai-context-memorizer-modal
+            class="cy-openai-context-memorizer-modal"
+            @update-remember-context="updateRememberContext"
+          />
+        </v-slide-group-item>
+        <v-slide-group-item v-if="availability[selectedChatType].has(buttons.OPENAI_MODEL)">
+          <openai-model-selector
+            class="cy-openai-model-selector"
+            :selected-model="selectedModel"
+            @update-openai-model="updateOpenaiModel"
+          />
+        </v-slide-group-item>
+        <v-slide-group-item v-if="availability[selectedChatType].has(buttons.TEMPERATURE)">
+          <openai-temperature-modal
+            class="cy-openai-temperature-modal"
+            :selected-temperature="selectedTemperature"
+            @update-openai-temperature="updateOpenaiTemperature"
+          />
+        </v-slide-group-item>
+        <v-slide-group-item v-if="availability[selectedChatType].has(buttons.IMAGE_CONFIG)">
+          <openai-image-configuration-modal
+            class="cy-openai-image-configuration-modal"
+            @update-image-count="updateImageCount"
+            @update-image-size="updateImageSize"
+          />
+        </v-slide-group-item>
+      </v-slide-group>
       <v-textarea
         v-model="newMessage"
         label="Send a message"
@@ -483,7 +478,7 @@ function getMessageCardClass(type: string, index: number) {
 .parent {
   display: grid;
   grid-template-rows: 1fr 210px;
-  grid-gap: 10px;
+  gap: 10px;
   height: 100%;
 
   overflow-y: auto;
@@ -515,17 +510,12 @@ function getMessageCardClass(type: string, index: number) {
   margin: 0 8px 0 8px;
   display: grid;
   grid-template-rows: 32px 1fr;
-  grid-gap: 10px;
+  gap: 10px;
 }
 
 .selectbox-area {
   display: flex;
   align-items: center;
-  width: 100%;
-}
-
-.entire-row {
-  flex: 0 0 100%; /* Let it fill the entire space horizontally */
 }
 
 .message-card {

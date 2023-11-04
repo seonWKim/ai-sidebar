@@ -95,6 +95,10 @@ watch(temperature, (newVal) => {
 .cy-openai-temperature-modal-button {
 }
 
+.dialog {
+  width: 80%;
+}
+
 .slider {
   font-size: 10px;
 }

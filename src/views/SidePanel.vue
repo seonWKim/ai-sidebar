@@ -61,11 +61,4 @@ function showOrHideSidePanel(value: boolean) {
   display: flex;
   align-items: center;
 }
-
-.sidepanel-layout {
-  display: grid;
-  grid-template-columns: 1fr 36px;
-  height: 100vh;
-  overflow: hidden;
-}
 </style>

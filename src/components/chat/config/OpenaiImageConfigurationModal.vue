@@ -102,4 +102,8 @@ function updateImageSize(selectedImageSize: OpenaiImageSize) {
 .cy-openai-image-configuration-modal-button {
   margin-right: 8px;
 }
+
+.dialog {
+  width: 80%;
+}
 </style>
