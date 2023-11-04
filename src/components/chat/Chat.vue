@@ -367,14 +367,6 @@ function getPosition(message: Message) {
   };
 }
 
-function getMessageCardClass(type: string, index: number) {
-  return {
-    'message-card': true,
-    'message-card-sent': type === 'sent',
-    'message-card-received': type === 'received',
-    [`cy-chat-chat-message-${type}-${index}`]: true,
-  };
-}
 </script>
 
 <template>
@@ -385,7 +377,8 @@ function getMessageCardClass(type: string, index: number) {
           <chat-message
             :message="message"
             :show-message-template="showMessageTemplate"
-            :class="getMessageCardClass(message.action, index)"
+            class="message-card"
+            :class="`cy-chat-chat-message-${message.type}-${index}`"
           />
         </div>
       </div>
@@ -523,11 +516,4 @@ function getMessageCardClass(type: string, index: number) {
   max-width: 70%;
 }
 
-.message-card-sent {
-  border-radius: 10px 0 10px 10px;
-}
-
-.message-card-received {
-  border-radius: 0 10px 10px 10px;
-}
 </style>
