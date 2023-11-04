@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Markdown from 'vue3-markdown-it';
 import { defineComponent } from 'vue';
+import {eventBus, EventName} from "@/common/event";
 
 defineComponent({
   components: {
@@ -8,7 +9,7 @@ defineComponent({
   },
 });
 
-defineProps({
+const props = defineProps({
   joinedMessage: {
     type: String,
     required: true,
@@ -22,11 +23,41 @@ defineProps({
     type: String,
     default: '10px',
   },
+  enableCopy: {
+    type: Boolean,
+    default: false,
+  },
 });
+
+function copyText() {
+  const textarea = document.createElement("textarea");
+  textarea.value = props.joinedMessage;
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand("copy");
+  document.body.removeChild(textarea);
+
+  eventBus.emit(EventName.OPEN_SNACKBAR, {
+    text: 'Copied',
+    color: 'primary',
+  });
+}
 </script>
 
 <template>
-  <v-card :style="{ 'border-radius': borderRadius }">
+  <div v-if="enableCopy" class="cy-copy-btn">
+    <v-tooltip text="copy" max-width="300px" location="top">
+      <template v-slot:activator="{ props }">
+        <v-btn icon="mdi-content-copy"
+               @click="copyText"
+               v-bind="props"
+               size="x-small"
+               flat
+               density="compact"/>
+      </template>
+    </v-tooltip>
+  </div>
+  <v-card :style="{ 'border-radius': borderRadius }" color="messages">
     <v-card-text class="card-text-style">
       <markdown :source="joinedMessage" class="markdown" :breaks="true" :plugins="plugins" />
     </v-card-text>
@@ -37,6 +68,12 @@ defineProps({
 .card-text-style {
   padding: 0 16px;
   background-color: transparent;
+}
+
+.cy-copy-btn {
+  padding: 8px;
+  display: flex;
+  justify-content: end;
 }
 
 .markdown {

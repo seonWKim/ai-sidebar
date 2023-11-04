@@ -378,7 +378,7 @@ function getPosition(message: Message) {
             :message="message"
             :show-message-template="showMessageTemplate"
             class="message-card"
-            :class="`cy-chat-chat-message-${type}-${index}`"
+            :class="`cy-chat-chat-message-${message.type}-${index}`"
           />
         </div>
       </div>

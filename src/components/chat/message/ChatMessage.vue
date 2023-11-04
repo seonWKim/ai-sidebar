@@ -65,15 +65,14 @@ const plugins = [
   <div>
     <chat-message-text
       v-if="message.type === ChatType.TEXT"
-      color="messages"
       :joined-message="concatenatedMessage"
       :plugins="plugins"
       :border-radius="message.action === 'sent' ? BORDER_RADIUS_SENT : BORDER_RADIUS_RECEIVED"
+      :enable-copy="message.action === 'received'"
     />
     <chat-message-image
       v-if="message.type === ChatType.IMAGE"
       :message="message"
-      color="messages"
       :concatenated-message="concatenatedMessage"
       :plugins="plugins"
       :border-radius="message.action === 'sent' ? BORDER_RADIUS_SENT : BORDER_RADIUS_RECEIVED"
