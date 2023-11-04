@@ -24,6 +24,10 @@ defineProps({
     type: Array,
     required: true,
   },
+  borderRadius: {
+    type: String,
+    default: '10px'
+  }
 });
 
 const imageLoaded = ref<Record<number, boolean>>({});
@@ -45,7 +49,7 @@ function getUrl(base64: string) {
 </script>
 
 <template>
-  <v-card>
+  <v-card :style="{ 'border-radius': borderRadius }">
     <v-card-text class="card-text-style">
       <div v-if="message.action === 'received'" class="received-images">
         <div v-for="(base64, idx) in message.text" :key="idx">

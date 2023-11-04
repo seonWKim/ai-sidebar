@@ -18,11 +18,15 @@ defineProps({
     type: Array,
     required: true,
   },
+  borderRadius: {
+    type: String,
+    default: '10px',
+  },
 });
 </script>
 
 <template>
-  <v-card>
+  <v-card :style="{ 'border-radius': borderRadius }">
     <v-card-text class="card-text-style">
       <markdown :source="joinedMessage" class="markdown" :breaks="true" :plugins="plugins" />
     </v-card-text>
