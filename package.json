@@ -13,7 +13,7 @@
     "lint": "eslint . --fix --ignore-path .gitignore",
     "prettier": "prettier --write --cache .",
     "cypress": "vite -m cypress & cypress run --headed && killall -9 node",
-    "cypress-gui": "vite -m cypree && npx cypress open"
+    "cypress-gui": "vite -m cypress & npx cypress open"
   },
   "dependencies": {
     "@mdi/font": "7.0.96",
@@ -41,6 +41,7 @@
     "@vitejs/plugin-vue": "^4.0.0",
     "@vue/eslint-config-typescript": "^11.0.0",
     "bestzip": "^2.2.1",
+    "cypress": "^13.4.0",
     "eslint": "^8.37.0",
     "eslint-plugin-vue": "^9.3.0",
     "prettier": "3.0.3",
