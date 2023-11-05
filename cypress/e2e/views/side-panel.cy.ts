@@ -2,8 +2,8 @@ describe('SiePanel.vue spec', () => {
   it('Check necessary components are visible', () => {
     cy.visit('http://localhost:3000');
     cy.get('.cy-chat').should('be.visible');
-    cy.get('.cy-settings').should('be.visible');
-    cy.get('.cy-themes').should('be.visible');
+    cy.get('.cy-settings').should('not.be.visible');
+    cy.get('.cy-themes').should('not.be.visible');
   });
 
   it('Check configuration buttons when "Text" is selected', () => {
