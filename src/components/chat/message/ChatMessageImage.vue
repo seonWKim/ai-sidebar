@@ -26,8 +26,8 @@ defineProps({
   },
   borderRadius: {
     type: String,
-    default: '10px'
-  }
+    default: '10px',
+  },
 });
 
 const imageLoaded = ref<Record<number, boolean>>({});
