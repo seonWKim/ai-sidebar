@@ -32,12 +32,12 @@ jobs:
       - name: Test
         run: npm test
       - name: Cypress
+        uses: cypress-io/github-action@v5
+        with:
+          wait-on: http://localhost:3000
+          start: npx vite build -m cypress
         run: |
-          echo "Running local server"
-          vite -m cypress
-          echo "Running cypress test"
-          cypress run --headed
-          echo "Killing local server process"
-          killall -9 node
+          - npx vite preview --port 3000
+          - npx cypress run --headed
       - name: Build
         run: npm run build --if-present
