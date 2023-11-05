@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Markdown from 'vue3-markdown-it';
 import { defineComponent } from 'vue';
-import {eventBus, EventName} from "@/common/event";
+import { eventBus, EventName } from '@/common/event';
 
 defineComponent({
   components: {
@@ -30,11 +30,11 @@ const props = defineProps({
 });
 
 function copyText() {
-  const textarea = document.createElement("textarea");
+  const textarea = document.createElement('textarea');
   textarea.value = props.joinedMessage;
   document.body.appendChild(textarea);
   textarea.select();
-  document.execCommand("copy");
+  document.execCommand('copy');
   document.body.removeChild(textarea);
 
   eventBus.emit(EventName.OPEN_SNACKBAR, {
@@ -48,12 +48,14 @@ function copyText() {
   <div v-if="enableCopy" class="cy-copy-btn">
     <v-tooltip text="copy" max-width="300px" location="top">
       <template v-slot:activator="{ props }">
-        <v-btn icon="mdi-content-copy"
-               @click="copyText"
-               v-bind="props"
-               size="x-small"
-               flat
-               density="compact"/>
+        <v-btn
+          icon="mdi-content-copy"
+          @click="copyText"
+          v-bind="props"
+          size="x-small"
+          flat
+          density="compact"
+        />
       </template>
     </v-tooltip>
   </div>

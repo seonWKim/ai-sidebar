@@ -366,7 +366,6 @@ function getPosition(message: Message) {
     'justify-content': message.action === 'sent' ? 'flex-end' : 'flex-start',
   };
 }
-
 </script>
 
 <template>
@@ -453,7 +452,6 @@ function getPosition(message: Message) {
         class="cy-chat-textarea"
         :placeholder="chatTypeInformationMap[selectedChatType].placeholder"
         @keydown.enter="sendMessage"
-        append-inner-icon="mdi-send"
         :on-click:append-inner="sendMessage"
         variant="outlined"
         shaped
@@ -516,4 +514,7 @@ function getPosition(message: Message) {
   max-width: 70%;
 }
 
+.cy-chat-textarea ::v-deep(.v-field) {
+  border-radius: 16px;
+}
 </style>
