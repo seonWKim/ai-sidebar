@@ -12,7 +12,7 @@
     "preview": "vite preview",
     "lint": "eslint . --fix --ignore-path .gitignore",
     "prettier": "prettier --write --cache .",
-    "cypress": "vite -m cypress & cypress run --headed && killall -9 node",
+    "cypress2": "vite -m cypress & cypress run --headed && killall -9 node",
     "cypress-gui": "vite -m cypress & npx cypress open"
   },
   "dependencies": {
