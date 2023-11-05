@@ -57,6 +57,7 @@ const selectedModel: Ref<OpenaiModel> = ref(OpenaiModel['gpt-3.5-turbo']);
 const selectedTemperature: Ref<number> = ref(1.0);
 const selectedImageCount = ref<number>(1);
 const selectedImageSize = ref<OpenaiImageSize>(OpenaiImageSize.SMALL);
+const showSlideGroupArrows = ref(false)
 
 let messageContexts: OpenaiChatMessage[] = [];
 const summarizeContextOpenaiMessage = OpenaiChatMessage.of1(
@@ -377,7 +378,7 @@ function getPosition(message: Message) {
             :message="message"
             :show-message-template="showMessageTemplate"
             class="message-card"
-            :class="`cy-chat-chat-message-${message.type}-${index}`"
+            :class="`cy-chat-chat-message-${message.action}-${index}`"
           />
         </div>
       </div>
@@ -407,7 +408,11 @@ function getPosition(message: Message) {
       </div>
     </div>
     <div class="chat-textarea">
-      <v-slide-group v-model="model" show-arrows class="selectbox-area">
+      <v-slide-group v-model="model"
+                     class="selectbox-area"
+      :show-arrows="showSlideGroupArrows"
+      @mouseenter="showSlideGroupArrows = true"
+      @mouseleave="showSlideGroupArrows = false">
         <v-slide-group-item>
           <chat-type-selector class="cy-chat-type-selector" @update-chat-type="updateChatType" />
         </v-slide-group-item>

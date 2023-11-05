@@ -31,5 +31,7 @@ jobs:
         run: npm run lint
       - name: Test
         run: npm test
+      - name: Cypress
+        run: npm run cypress
       - name: Build
         run: npm run build --if-present
