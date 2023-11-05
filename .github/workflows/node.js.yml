@@ -37,6 +37,7 @@ jobs:
           wait-on: http://localhost:3000
           start: npx vite build -m cypress
         run: |
+          - echo test
           - npx vite preview --port 3000
           - npx cypress run --headed
       - name: Build
