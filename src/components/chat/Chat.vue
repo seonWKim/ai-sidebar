@@ -60,12 +60,12 @@ const selectedImageSize = ref<OpenaiImageSize>(OpenaiImageSize.SMALL);
 
 let messageContexts: OpenaiChatMessage[] = [];
 const summarizeContextOpenaiMessage = OpenaiChatMessage.of1(
-  'Summarize all the messages in a format as follows. The placeholder for previousContext is where you have to fill in.' +
+  'Summarize all the messages in a format as follows. The placeholder for previousContext is where you have to fill in the summarized context.' +
     "'Previous context: {{previousContext}}\n",
   OpenaiRole.user
 );
 const contextMaxNo: Ref<number> = ref(5);
-const rememberContext: Ref<boolean> = ref(false);
+const rememberContext: Ref<boolean> = ref(true);
 
 function getDefaultReceived(): Ref<Message> {
   return ref<Message>({
@@ -120,6 +120,14 @@ function updateRememberContext(shouldRememberContext: boolean) {
     messageContexts = [];
   }
   rememberContext.value = shouldRememberContext;
+}
+
+/**
+ * Update the {@link contextMaxNo} which determines the maximum number of previous context to remember.
+ * @param maxNo Maximum number of previous context to remember
+ */
+function updateContextMaxNo(maxNo: number) {
+  contextMaxNo.value = maxNo;
 }
 
 /**
@@ -229,6 +237,7 @@ async function sendChatMessage() {
       return null;
     },
     () => {
+      console.log(`remembering context ${rememberContext.value}`);
       if (rememberContext.value) {
         addContext(OpenaiChatMessage.of1(received.value.text.join(''), OpenaiRole.system));
       }
@@ -422,6 +431,7 @@ function getPosition(message: Message) {
           <openai-context-memorizer-modal
             class="cy-openai-context-memorizer-modal"
             @update-remember-context="updateRememberContext"
+            @update-context-max-no="updateContextMaxNo"
           />
         </v-slide-group-item>
         <v-slide-group-item v-if="availability[selectedChatType].has(buttons.OPENAI_MODEL)">
