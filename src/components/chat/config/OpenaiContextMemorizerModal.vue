@@ -4,17 +4,22 @@ import { appStore } from '@/store/app';
 import { ChromeStorageKeys } from '@/common/keys';
 
 onMounted(async () => {
-  rememberContext.value =
-    (await store.getFromChromeStorage(ChromeStorageKeys.REMEMBER_CONTEXT)) === 'true';
+  const rememberContextValue = await store.getFromChromeStorage(ChromeStorageKeys.REMEMBER_CONTEXT);
+  if (rememberContextValue != null && rememberContextValue === 'false') {
+    rememberContext.value = false;
+  } else {
+    rememberContext.value = true;
+  }
+
   contextMaxNo.value =
     parseInt(await store.getFromChromeStorage(ChromeStorageKeys.CONTEXT_MAX_NO)) || 10;
 });
 
-const emits = defineEmits(['updateRememberContext']);
+const emits = defineEmits(['updateRememberContext', 'updateContextMaxNo']);
 const store = appStore();
 
 const dialog = ref(false);
-const rememberContext = ref(false);
+const rememberContext = ref(true);
 const contextMaxNo = ref(10);
 
 /**
@@ -27,10 +32,12 @@ function flip() {
 
 watch(rememberContext, (newVal) => {
   store.saveToChromeStorage(ChromeStorageKeys.REMEMBER_CONTEXT, newVal.toString());
+  emits('updateRememberContext', rememberContext.value);
 });
 
 watch(contextMaxNo, (newVal) => {
   store.saveToChromeStorage(ChromeStorageKeys.CONTEXT_MAX_NO, newVal.toString());
+  emits('updateContextMaxNo', contextMaxNo.value);
 });
 </script>
 
