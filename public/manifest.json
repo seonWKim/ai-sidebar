@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Free AI Side Bar",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "description": "Free AI Side Bar",
   "minimum_chrome_version": "116",
   "background": {
