@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "vite",
+    "dev": "vite -m dev",
     "build": "vue-tsc --noEmit && vite build",
     "build-watch": "vue-tsc --noEmit && vite build --watch",
     "zip": "npm run build && bestzip dist.zip dist/",

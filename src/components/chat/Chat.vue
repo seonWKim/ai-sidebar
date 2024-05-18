@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Ref, ref, toRaw } from 'vue';
+import { onMounted, onUnmounted, Ref, ref, toRaw } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 import {
   getOpenaiChatResponse,
@@ -15,6 +15,7 @@ import {
 } from '@/service/openai';
 import { VBtn, VTextarea } from 'vuetify/components';
 import type { Message } from '@/common/message';
+import { cancelMessageStreaming, completeMessage } from '@/common/message';
 import { eventBus, EventName } from '@/common/event';
 import ChatMessage from '@/components/chat/message/ChatMessage.vue';
 import OpenaiModelSelector from '@/components/chat/config/OpenaiModelSelector.vue';
@@ -44,10 +45,14 @@ const chatTypeInformationMap: Record<ChatType, ChatTypeInformation> = {
   [ChatType.IMAGE]: new ChatTypeInformation('Generate an image that...'),
 };
 
+const scrollableElement = ref<HTMLElement | null>(null);
+const programmaticallyScrolling = ref(false);
+const hasUserManuallyScrolled = ref(false);
+const scrollToDestination: Ref<any> = ref();
+
 const selectedChatType = ref<ChatType>(ChatType.TEXT);
 const messageTemplate = ref('');
 const showMessageTemplate = ref(false);
-const scrollTarget: Ref<any> = ref();
 const model = ref(null);
 
 const messages = ref<Message[]>([]);
@@ -67,7 +72,28 @@ const summarizeContextOpenaiMessage = OpenaiChatMessage.of1(
 const contextMaxNo: Ref<number> = ref(5);
 const rememberContext: Ref<boolean> = ref(true);
 
-function getDefaultReceived(): Ref<Message> {
+const lastScrollTop = ref(0);
+/**
+ * When user scrolls up manually, set {@link hasUserManuallyScrolled} to true.
+ * {@link hasUserManuallyScrolled} is used to determine whether to scroll automatically to the
+ * bottom of the chat when new message being received.
+ */
+onMounted(() => {
+  scrollableElement.value?.addEventListener('scroll', () => {
+    const st = scrollableElement.value?.scrollTop || 0;
+    if (st < lastScrollTop.value) {
+      hasUserManuallyScrolled.value = true;
+    }
+
+    lastScrollTop.value = st <= 0 ? 0 : st;
+  });
+});
+
+onUnmounted(() => {
+  scrollableElement.value?.removeEventListener('scroll', () => {});
+});
+
+const defaultMessageRef = (): Ref<Message> => {
   return ref<Message>({
     id: uuidv4(),
     role: OpenaiRole.system,
@@ -75,89 +101,92 @@ function getDefaultReceived(): Ref<Message> {
     action: 'received',
     text: [],
     originalText: [],
-    canceled: false,
+    meta: {
+      canceled: false,
+      completed: false,
+    },
   });
-}
+};
 
 /**
  * Update the {@link selectedChatType} which is used for determining the type of chat.
  * @param chatType Text, Image ... etc
  */
-function updateChatType(chatType: ChatType) {
+const updateChatType = (chatType: ChatType) => {
   selectedChatType.value = chatType;
-}
+};
 
 /**
  * Update the {@link messageTemplate} which is used for formatting the original message typed by the user.
  * @param template Message template
  */
-function updateMessageTemplate(template: string) {
+const updateMessageTemplate = (template: string) => {
   messageTemplate.value = template;
-}
+};
 
 /**
  * Update {@link showMessageTemplate} which is used to determine whether to show message formatted with message template.
  * @param showMessage Whether to show message formatted with message template
  */
-function updateShowMessageTemplate(showMessage: boolean) {
+const updateShowMessageTemplate = (showMessage: boolean) => {
   showMessageTemplate.value = showMessage;
-}
+};
 
 /**
  * Update the {@link selectedModel} to use.
  * @param model OpenAI model
  */
-function updateOpenaiModel(model: OpenaiModel) {
+const updateOpenaiModel = (model: OpenaiModel) => {
   selectedModel.value = model;
-}
+};
 
 /**
  * Update {@link rememberContext}
  * @param shouldRememberContext Whether to remember context or not
  */
-function updateRememberContext(shouldRememberContext: boolean) {
+const updateRememberContext = (shouldRememberContext: boolean) => {
   if (!shouldRememberContext) {
     messageContexts = [];
   }
   rememberContext.value = shouldRememberContext;
-}
+};
 
 /**
  * Update the {@link contextMaxNo} which determines the maximum number of previous context to remember.
  * @param maxNo Maximum number of previous context to remember
  */
-function updateContextMaxNo(maxNo: number) {
+const updateContextMaxNo = (maxNo: number) => {
   contextMaxNo.value = maxNo;
-}
+};
 
 /**
  * Update the {@link selectedTemperature} of OpenAI API.
  * @param temperature Temperature
  */
-function updateOpenaiTemperature(temperature: number) {
+const updateOpenaiTemperature = (temperature: number) => {
   selectedTemperature.value = temperature;
-}
+};
 
 /**
  * Update the {@link selectedImageCount} which determines the number of images to generate.
  * @param imageCount
  */
-function updateImageCount(imageCount: number) {
+const updateImageCount = (imageCount: number) => {
   selectedImageCount.value = imageCount;
-}
+};
 
 /**
  * Update the {@link selectedImageSize} which determines the size of the image to generate.
  * @param imageSize
  */
-function updateImageSize(imageSize: OpenaiImageSize) {
+const updateImageSize = (imageSize: OpenaiImageSize) => {
   selectedImageSize.value = imageSize;
-}
+};
 
 /**
  * Send message to OpenAI API.
  */
-async function sendMessage(event: any) {
+const sendMessage = async (event: any) => {
   if (event.key === 'Enter') {
     // Prevent current function from being called when shift key is pressed with enter
     if (event.shiftKey) {
@@ -181,7 +210,10 @@ async function sendMessage(event: any) {
     action: 'sent',
     text: [applyMessageTemplate(newMessage.value)],
     originalText: [newMessage.value],
-    canceled: false,
+    meta: {
+      canceled: false,
+      completed: true,
+    },
   };
   messages.value.push(messageToSend);
   newMessage.value = '';
@@ -194,16 +226,15 @@ async function sendMessage(event: any) {
       await sendGenerateImageMessage();
       break;
   }
-}
+};
 
 /**
  * Send message to OpenAI API and stream the response.
  * This function may reformat the message by using {@link messageTemplate}.
  * This function may add previous context by using {@link constructMessageWithPreviousContext}
  * if {@link rememberContext} is true.
- * @param event Keyboard event
  */
-async function sendChatMessage() {
+const sendChatMessage = async () => {
   const prompt = new OpenaiChatPrompt(
     await constructMessageWithPreviousContext(),
     selectedModel.value,
@@ -211,50 +242,56 @@ async function sendChatMessage() {
   );
 
   // Send message and receive stream response
-  let isMessagePushed = false;
-  const received = getDefaultReceived();
+  let initialized = false;
+  const receivedMessage = defaultMessageRef().value;
+
   await getOpenaiChatResponse(
     prompt,
     (res) => {
-      if (!isMessagePushed) {
+      if (!initialized) {
         // Show received message in the UI
-        messages.value.push(received.value);
-        isMessagePushed = true;
+        messages.value.push(receivedMessage);
+        initialized = true;
       }
 
-      received.value.text.push(res);
-      scrollTarget.value.scrollIntoView();
+      receivedMessage.text.push(res);
     },
     () => {
       isMessageBeingStreamed.value = true;
       return null;
     },
     () => {
-      if (received.value.canceled) {
+      if (receivedMessage.meta.canceled) {
         return new ListenerEvent(ListenerEventType.STOP_STREAM, '');
+      }
+
+      if (!hasUserManuallyScrolled.value) {
+        programmaticScroll();
       }
 
       return null;
     },
     () => {
-      console.log(`remembering context ${rememberContext.value}`);
+      completeMessage(receivedMessage);
       if (rememberContext.value) {
-        addContext(OpenaiChatMessage.of1(received.value.text.join(''), OpenaiRole.system));
+        addContext(OpenaiChatMessage.of1(receivedMessage.text.join(''), OpenaiRole.system));
       }
+
       isMessageBeingStreamed.value = false;
+      hasUserManuallyScrolled.value = false;
       return null;
     },
     onApiKeyError
   );
-}
+};
 
-async function sendGenerateImageMessage() {
+const sendGenerateImageMessage = async () => {
   if (messages.value.length === 0) {
     return;
   }
 
   const prompt = messages.value[messages.value.length - 1];
-  const received = getDefaultReceived();
+  const received = defaultMessageRef();
 
   await getOpenaiImageGenerationResponse(
     new OpenaiImageGenerationPrompt(
@@ -274,38 +311,54 @@ async function sendGenerateImageMessage() {
     },
     () => {
       isMessageBeingStreamed.value = false;
-      scrollTarget.value.scrollIntoView();
+      hasUserManuallyScrolled.value = false;
       return null;
     },
     onApiKeyError
   );
-}
+};
+
+const programmaticScroll = _.throttle(() => {
+  programmaticallyScrolling.value = true;
+  scrollToDestination.value.scrollIntoView({ behavior: 'smooth' });
+  setTimeout(() => {
+    programmaticallyScrolling.value = false;
+  }, 1000);
+}, 200);
 
 /**
  * Stop streaming response.
  */
-function stopStream() {
-  const streamingMessage = messages.value[messages.value.length - 1];
-  if (streamingMessage.action === 'received' && !streamingMessage.canceled) {
-    streamingMessage.canceled = true;
+const stopStream = () => {
+  const streamingMessage = lastMessage();
+  if (
+    streamingMessage.action === 'received' &&
+    !streamingMessage.meta.completed &&
+    !streamingMessage.meta.canceled
+  ) {
+    cancelMessageStreaming(streamingMessage);
   }
-}
+};
+
+const lastMessage = (): Message => {
+  return messages.value[messages.value.length - 1];
+};
 
 /**
  * Clear all messages and contexts.
  */
-function clearMessages() {
+const clearMessages = () => {
   messages.value = [];
   newMessage.value = '';
   messageContexts = [];
-}
+};
 
 /**
  * Construct message to be sent to OpenAI API by combining the {@link messageTemplate} and the message if configured.
  * When message template is not configured, the original message is used without any modification.
  * @param message the original message which user typed in
  */
-function applyMessageTemplate(message: string): string {
+const applyMessageTemplate = (message: string): string => {
   if (!messageTemplate.value || messageTemplate.value.trim() === '') {
     return message;
   }
@@ -315,7 +368,7 @@ function applyMessageTemplate(message: string): string {
   } else {
     return messageTemplate.value + '\n' + message;
   }
-}
+};
 
 /**
  * Construct messages to be sent to OpenAI API
@@ -323,7 +376,7 @@ function applyMessageTemplate(message: string): string {
  * If the size of the previous context is too large, it will be summarized first.
  * @returns {Promise<OpenaiChatMessage[]>} messages to be sent to OpenAI API
  */
-async function constructMessageWithPreviousContext(): Promise<OpenaiChatMessage[]> {
+const constructMessageWithPreviousContext = async (): Promise<OpenaiChatMessage[]> => {
   if (messages.value.length == 0) {
     return [];
   }
@@ -351,35 +404,35 @@ async function constructMessageWithPreviousContext(): Promise<OpenaiChatMessage[
 
   addContext(OpenaiChatMessage.of1(messageToBeSent.text.join(''), OpenaiRole.user));
   return _.cloneDeep(messageContexts);
-}
+};
 
 /**
  * Add context to {@link messageContexts}
  * @param context context to add
  */
-function addContext(context: OpenaiChatMessage) {
+const addContext = (context: OpenaiChatMessage) => {
   messageContexts.push(context);
-}
+};
 
-function onApiKeyError(err: string) {
+const onApiKeyError = (err: string) => {
   eventBus.emit(EventName.OPEN_SETTINGS, { err: err });
   eventBus.emit(EventName.OPEN_SNACKBAR, {
     text: 'API key is invalid',
     color: 'error',
   });
-}
+};
 
-function getPosition(message: Message) {
+const getPosition = (message: Message) => {
   return {
     display: 'flex',
     'justify-content': message.action === 'sent' ? 'flex-end' : 'flex-start',
   };
-}
+};
 </script>
 
 <template>
   <div class="parent">
-    <div class="chat-message-container">
+    <div ref="scrollableElement" class="chat-message-container">
       <div class="chat-messages">
         <div v-for="(message, index) in messages" :key="message.id" :style="getPosition(message)">
           <chat-message
@@ -390,7 +443,7 @@ function getPosition(message: Message) {
           />
         </div>
       </div>
-      <div ref="scrollTarget" />
+      <div ref="scrollToDestination" />
       <div class="chat-message-buttons">
         <v-btn
           v-if="isMessageBeingStreamed"
