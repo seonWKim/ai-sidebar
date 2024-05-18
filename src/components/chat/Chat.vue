@@ -1,5 +1,5 @@
 <script setup lang='ts'>
-import { Ref, ref, toRaw } from 'vue';
+import { onMounted, onUnmounted, Ref, ref, toRaw } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 import {
   getOpenaiChatResponse,
@@ -46,10 +46,13 @@ const chatTypeInformationMap: Record<ChatType, ChatTypeInformation> = {
 };
 
 const scrollableElement = ref<HTMLElement | null>(null);
+const programmaticallyScrolling = ref(false);
+const hasUserManuallyScrolled = ref(false);
+const scrollToDestination: Ref<any> = ref();
+
 const selectedChatType = ref<ChatType>(ChatType.TEXT);
 const messageTemplate = ref('');
 const showMessageTemplate = ref(false);
-const scrollToDestination: Ref<any> = ref();
 const model = ref(null);
 
 const messages = ref<Message[]>([]);
@@ -68,6 +71,28 @@ const summarizeContextOpenaiMessage = OpenaiChatMessage.of1(
 );
 const contextMaxNo: Ref<number> = ref(5);
 const rememberContext: Ref<boolean> = ref(true);
+
+const lastScrollTop = ref(0);
+/**
+ * When user scrolls up manually, set {@link hasUserManuallyScrolled} to true.
+ * {@link hasUserManuallyScrolled} is used to determine whether to scroll automatically to the
+ * bottom of the chat when new message being received.
+ */
+onMounted(() => {
+  scrollableElement.value?.addEventListener('scroll', () => {
+    const st = scrollableElement.value?.scrollTop || 0;
+    if (st < lastScrollTop.value) {
+      hasUserManuallyScrolled.value = true;
+    }
+
+    lastScrollTop.value = st <= 0 ? 0 : st;
+  });
+});
+
+onUnmounted(() => {
+  scrollableElement.value?.removeEventListener('scroll', () => {
+  });
+});
 
 const defaultMessageRef = (): Ref<Message> => {
   return ref<Message>({
@@ -241,7 +266,10 @@ const sendChatMessage = async () => {
         return new ListenerEvent(ListenerEventType.STOP_STREAM, '');
       }
 
-      programmaticScroll();
+      if (!hasUserManuallyScrolled.value) {
+        programmaticScroll();
+      }
+
       return null;
     },
     () => {
@@ -251,6 +279,7 @@ const sendChatMessage = async () => {
       }
 
       isMessageBeingStreamed.value = false;
+      hasUserManuallyScrolled.value = false;
       return null;
     },
     onApiKeyError,
@@ -283,6 +312,7 @@ const sendGenerateImageMessage = async () => {
     },
     () => {
       isMessageBeingStreamed.value = false;
+      hasUserManuallyScrolled.value = false;
       return null;
     },
     onApiKeyError,
@@ -290,8 +320,12 @@ const sendGenerateImageMessage = async () => {
 };
 
 const programmaticScroll = _.throttle(() => {
+  programmaticallyScrolling.value = true;
   scrollToDestination.value.scrollIntoView({ behavior: 'smooth' });
-}, 1000);
+  setTimeout(() => {
+    programmaticallyScrolling.value = false;
+  }, 1000);
+}, 200);
 
 /**
  * Stop streaming response.
