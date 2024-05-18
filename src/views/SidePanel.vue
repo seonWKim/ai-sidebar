@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import Chat from '@/components/chat/Chat.vue';
-import Settings from '@/components/chat/config/Settings.vue';
-import Themes from '@/components/chat/config/Themes.vue';
+import SidePanelSettings from '@/components/chat/config/SidePanelSettings.vue';
+import SidePanelThemes from '@/components/chat/config/SidePanelThemes.vue';
 import OpenOrClose from '@/components/chat/config/OpenOrClose.vue';
 import { ref } from 'vue';
 
@@ -29,10 +29,10 @@ function showOrHideSidePanel(value: boolean) {
     <div class="icons bg-settings">
       <div v-show="showSidePanel">
         <div class="cy-settings">
-          <settings />
+          <side-panel-settings />
         </div>
         <div class="cy-themes">
-          <themes />
+          <side-panel-themes />
         </div>
       </div>
     </div>
