@@ -1,4 +1,3 @@
-import { OpenaiChatMessage } from '@/service/openai';
 import { completeMessage, Message } from '@/common/message';
 
 /**
@@ -9,10 +8,14 @@ class HookedMessages {
   onPushCompleted: (messages: Message[]) => void;
   onCleared: () => void;
 
-  constructor(onPushed: (messages: Message[]) => void, onCleared: () => void) {
+  constructor(onPushCompleted: (messages: Message[]) => void, onCleared: () => void) {
     this.messages = [];
-    this.onPushCompleted = onPushed;
+    this.onPushCompleted = onPushCompleted;
     this.onCleared = onCleared;
+  }
+
+  public initializeMessages(messages: Message[]) {
+    this.messages = messages;
   }
 
   public pushMessage(message: Message) {

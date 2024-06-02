@@ -1,4 +1,4 @@
-<script setup lang='ts'>
+<script setup lang="ts">
 import { onMounted, onUnmounted, reactive, Ref, ref, toRaw } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -15,7 +15,7 @@ import {
 } from '@/service/openai';
 import { VBtn, VTextarea } from 'vuetify/components';
 import type { Message } from '@/common/message';
-import { cancelMessageStreaming, completeMessage } from '@/common/message';
+import { cancelMessageStreaming } from '@/common/message';
 import { eventBus, EventName } from '@/common/event';
 import ChatMessage from '@/components/chat/message/ChatMessage.vue';
 import OpenaiModelSelector from '@/components/chat/config/OpenaiModelSelector.vue';
@@ -32,6 +32,9 @@ import {
 import ChatTypeSelector from '@/components/chat/config/ChatTypeSelector.vue';
 import OpenaiImageConfigurationModal from '@/components/chat/config/OpenaiImageConfigurationModal.vue';
 import { HookedMessages } from '@/service/messages';
+import { ChromeStorageKeys } from '@/common/keys';
+import { appStore } from '@/store/app';
+const store = appStore();
 
 class ChatTypeInformation {
   placeholder: string;
@@ -56,14 +59,17 @@ const messageTemplate = ref('');
 const showMessageTemplate = ref(false);
 const model = ref(null);
 
-const hookedMessages = reactive(new HookedMessages(
-  (messages: Message[]) => {
-    console.log(`Messages pushed: ${messages}`);
-  },
-  () => {
-    console.log('Messages cleared');
-  },
-));
+const hookedMessages = reactive(
+  new HookedMessages(
+    (messages: Message[]) => {
+      store.saveToChromeStorage(ChromeStorageKeys.STORED_MESSAGES, JSON.stringify(messages));
+      const lastMessage = messages.length > 0 ? messages[messages.length - 1] : '';
+    },
+    () => {
+      store.saveToChromeStorage(ChromeStorageKeys.STORED_MESSAGES, JSON.stringify([]));
+    }
+  )
+);
 const newMessage = ref('');
 const isMessageBeingStreamed = ref(false);
 const selectedModel: Ref<OpenaiModel> = ref(OpenaiModel['gpt-3.5-turbo']);
@@ -74,8 +80,8 @@ const selectedImageSize = ref<OpenaiImageSize>(OpenaiImageSize.SMALL);
 let messageContexts: OpenaiChatMessage[] = [];
 const summarizeContextOpenaiMessage = OpenaiChatMessage.of(
   'Summarize all the messages in a format as follows. The placeholder for previousContext is where you have to fill in the summarized context.' +
-  '\'Previous context: {{previousContext}}\n',
-  OpenaiRole.user,
+    "'Previous context: {{previousContext}}\n",
+  OpenaiRole.user
 );
 const contextMaxNo: Ref<number> = ref(5);
 const rememberContext: Ref<boolean> = ref(true);
@@ -86,7 +92,13 @@ const lastScrollTop = ref(0);
  * {@link hasUserManuallyScrolled} is used to determine whether to scroll automatically to the
  * bottom of the chat when new message being received.
  */
-onMounted(() => {
+onMounted(async () => {
+  const previousMessages = await store.getFromChromeStorage(ChromeStorageKeys.STORED_MESSAGES);
+  if (previousMessages) {
+    const previousMessagesArray: Message[] = JSON.parse(previousMessages);
+    hookedMessages.initializeMessages(previousMessagesArray);
+  }
+
   scrollableElement.value?.addEventListener('scroll', () => {
     const st = scrollableElement.value?.scrollTop || 0;
     if (st < lastScrollTop.value) {
@@ -98,8 +110,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  scrollableElement.value?.removeEventListener('scroll', () => {
-  });
+  scrollableElement.value?.removeEventListener('scroll', () => {});
 });
 
 const defaultMessageRef = (): Ref<Message> => {
@@ -247,7 +258,7 @@ const sendChatMessage = async () => {
   const prompt = new OpenaiChatPrompt(
     await constructMessageWithPreviousContext(),
     selectedModel.value,
-    selectedTemperature.value,
+    selectedTemperature.value
   );
 
   // Send message and receive stream response
@@ -283,14 +294,16 @@ const sendChatMessage = async () => {
     () => {
       hookedMessages.pushMessageCompleted();
       if (rememberContext.value && hookedMessages.hasMessages()) {
-        addContext(OpenaiChatMessage.of(hookedMessages.lastMessage()!!.text.join(''), OpenaiRole.system));
+        addContext(
+          OpenaiChatMessage.of(hookedMessages.lastMessage()!!.text.join(''), OpenaiRole.system)
+        );
       }
 
       isMessageBeingStreamed.value = false;
       hasUserManuallyScrolled.value = false;
       return null;
     },
-    onApiKeyError,
+    onApiKeyError
   );
 };
 
@@ -307,7 +320,7 @@ const sendGenerateImageMessage = async () => {
     new OpenaiImageGenerationPrompt(
       prompt.text[0],
       selectedImageCount.value,
-      selectedImageSize.value,
+      selectedImageSize.value
     ),
     (imgUrls) => {
       received.value.text = imgUrls;
@@ -323,7 +336,7 @@ const sendGenerateImageMessage = async () => {
       hasUserManuallyScrolled.value = false;
       return null;
     },
-    onApiKeyError,
+    onApiKeyError
   );
 };
 
@@ -399,7 +412,7 @@ const constructMessageWithPreviousContext = async (): Promise<OpenaiChatMessage[
     const prompt = new OpenaiChatPrompt(
       [...messageContexts, summarizeContextOpenaiMessage],
       selectedModel.value,
-      selectedTemperature.value,
+      selectedTemperature.value
     );
 
     const summarizedContext: string[] = [];
@@ -438,101 +451,101 @@ const getPosition = (message: Message) => {
 </script>
 
 <template>
-  <div class='parent'>
-    <div ref='scrollableElement' class='chat-message-container'>
-      <div class='chat-messages'>
+  <div class="parent">
+    <div ref="scrollableElement" class="chat-message-container">
+      <div class="chat-messages">
         <div
-          v-for='(message, index) in hookedMessages.messages'
-          :key='message.id'
-          :style='getPosition(message)'
+          v-for="(message, index) in hookedMessages.messages"
+          :key="message.id"
+          :style="getPosition(message)"
         >
           <chat-message
-            :message='message'
-            :show-message-template='showMessageTemplate'
-            class='message-card'
-            :class='`cy-chat-chat-message-${message.action}-${index}`'
+            :message="message"
+            :show-message-template="showMessageTemplate"
+            class="message-card"
+            :class="`cy-chat-chat-message-${message.action}-${index}`"
           />
         </div>
       </div>
-      <div ref='scrollToDestination' />
-      <div class='chat-message-buttons'>
+      <div ref="scrollToDestination" />
+      <div class="chat-message-buttons">
         <v-btn
-          v-if='isMessageBeingStreamed'
-          size='small'
-          variant='plain'
-          color='error'
-          class='font-weight-bold'
-          @click='stopStream'
-          :disabled='selectedChatType !== ChatType.TEXT'
+          v-if="isMessageBeingStreamed"
+          size="small"
+          variant="plain"
+          color="error"
+          class="font-weight-bold"
+          @click="stopStream"
+          :disabled="selectedChatType !== ChatType.TEXT"
         >
           Stop
         </v-btn>
         <v-btn
-          v-if='!isMessageBeingStreamed && hookedMessages.hasMessages()'
-          size='small'
-          variant='plain'
-          color='error'
-          class='font-weight-bold'
-          @click='clearMessages'
+          v-if="!isMessageBeingStreamed && hookedMessages.hasMessages()"
+          size="small"
+          variant="plain"
+          color="error"
+          class="font-weight-bold"
+          @click="clearMessages"
         >
           Clear
         </v-btn>
       </div>
     </div>
-    <div class='chat-textarea'>
-      <v-slide-group v-model='model' class='selectbox-area' show-arrows>
+    <div class="chat-textarea">
+      <v-slide-group v-model="model" class="selectbox-area" show-arrows>
         <v-slide-group-item>
-          <chat-type-selector class='cy-chat-type-selector' @update-chat-type='updateChatType' />
+          <chat-type-selector class="cy-chat-type-selector" @update-chat-type="updateChatType" />
         </v-slide-group-item>
-        <v-slide-group-item v-if='availability[selectedChatType].has(buttons.MESSAGE_TEMPLATE)'>
+        <v-slide-group-item v-if="availability[selectedChatType].has(buttons.MESSAGE_TEMPLATE)">
           <message-template-modal
-            class='cy-message-template-modal'
-            @update-message-template='updateMessageTemplate'
-            @update-show-message-template='updateShowMessageTemplate'
+            class="cy-message-template-modal"
+            @update-message-template="updateMessageTemplate"
+            @update-show-message-template="updateShowMessageTemplate"
           />
         </v-slide-group-item>
-        <v-slide-group-item v-if='availability[selectedChatType].has(buttons.REMEMBER_CONTEXT)'>
+        <v-slide-group-item v-if="availability[selectedChatType].has(buttons.REMEMBER_CONTEXT)">
           <openai-context-memorizer-modal
-            class='cy-openai-context-memorizer-modal'
-            @update-remember-context='updateRememberContext'
-            @update-context-max-no='updateContextMaxNo'
+            class="cy-openai-context-memorizer-modal"
+            @update-remember-context="updateRememberContext"
+            @update-context-max-no="updateContextMaxNo"
           />
         </v-slide-group-item>
-        <v-slide-group-item v-if='availability[selectedChatType].has(buttons.OPENAI_MODEL)'>
+        <v-slide-group-item v-if="availability[selectedChatType].has(buttons.OPENAI_MODEL)">
           <openai-model-selector
-            class='cy-openai-model-selector'
-            :selected-model='selectedModel'
-            @update-openai-model='updateOpenaiModel'
+            class="cy-openai-model-selector"
+            :selected-model="selectedModel"
+            @update-openai-model="updateOpenaiModel"
           />
         </v-slide-group-item>
-        <v-slide-group-item v-if='availability[selectedChatType].has(buttons.TEMPERATURE)'>
+        <v-slide-group-item v-if="availability[selectedChatType].has(buttons.TEMPERATURE)">
           <openai-temperature-modal
-            class='cy-openai-temperature-modal'
-            :selected-temperature='selectedTemperature'
-            @update-openai-temperature='updateOpenaiTemperature'
+            class="cy-openai-temperature-modal"
+            :selected-temperature="selectedTemperature"
+            @update-openai-temperature="updateOpenaiTemperature"
           />
         </v-slide-group-item>
-        <v-slide-group-item v-if='availability[selectedChatType].has(buttons.IMAGE_CONFIG)'>
+        <v-slide-group-item v-if="availability[selectedChatType].has(buttons.IMAGE_CONFIG)">
           <openai-image-configuration-modal
-            class='cy-openai-image-configuration-modal'
-            @update-image-count='updateImageCount'
-            @update-image-size='updateImageSize'
+            class="cy-openai-image-configuration-modal"
+            @update-image-count="updateImageCount"
+            @update-image-size="updateImageSize"
           />
         </v-slide-group-item>
       </v-slide-group>
       <v-textarea
-        v-model='newMessage'
-        label='Send a message'
-        class='cy-chat-textarea'
-        :placeholder='chatTypeInformationMap[selectedChatType].placeholder'
-        @keydown.enter='sendMessage'
-        :on-click:append-inner='sendMessage'
-        variant='outlined'
+        v-model="newMessage"
+        label="Send a message"
+        class="cy-chat-textarea"
+        :placeholder="chatTypeInformationMap[selectedChatType].placeholder"
+        @keydown.enter="sendMessage"
+        :on-click:append-inner="sendMessage"
+        variant="outlined"
         shaped
         clearable
         flat
         hide-details
-        :disabled='isMessageBeingStreamed'
+        :disabled="isMessageBeingStreamed"
       />
     </div>
   </div>
@@ -553,7 +566,7 @@ const getPosition = (message: Message) => {
 .chat-message-container {
   display: grid;
   grid-template-rows: 1fr 32px;
-  border-bottom: 2px solid #F0F1F5;
+  border-bottom: 2px solid #f0f1f5;
 
   overflow-y: auto;
 }
