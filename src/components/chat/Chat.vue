@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, Ref, ref, toRaw } from 'vue';
+import { onMounted, onUnmounted, reactive, Ref, ref, toRaw } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 import {
   getOpenaiChatResponse,
@@ -15,7 +15,7 @@ import {
 } from '@/service/openai';
 import { VBtn, VTextarea } from 'vuetify/components';
 import type { Message } from '@/common/message';
-import { cancelMessageStreaming, completeMessage } from '@/common/message';
+import { cancelMessageStreaming } from '@/common/message';
 import { eventBus, EventName } from '@/common/event';
 import ChatMessage from '@/components/chat/message/ChatMessage.vue';
 import OpenaiModelSelector from '@/components/chat/config/OpenaiModelSelector.vue';
@@ -31,6 +31,10 @@ import {
 } from '@/common/chat-type';
 import ChatTypeSelector from '@/components/chat/config/ChatTypeSelector.vue';
 import OpenaiImageConfigurationModal from '@/components/chat/config/OpenaiImageConfigurationModal.vue';
+import { HookedMessages } from '@/service/messages';
+import { ChromeStorageKeys } from '@/common/keys';
+import { appStore } from '@/store/app';
+const store = appStore();
 
 class ChatTypeInformation {
   placeholder: string;
@@ -55,7 +59,16 @@ const messageTemplate = ref('');
 const showMessageTemplate = ref(false);
 const model = ref(null);
 
-const messages = ref<Message[]>([]);
+const hookedMessages = reactive(
+  new HookedMessages(
+    (messages: Message[]) => {
+      store.saveToChromeStorage(ChromeStorageKeys.STORED_MESSAGES, JSON.stringify(messages));
+    },
+    () => {
+      store.saveToChromeStorage(ChromeStorageKeys.STORED_MESSAGES, JSON.stringify([]));
+    }
+  )
+);
 const newMessage = ref('');
 const isMessageBeingStreamed = ref(false);
 const selectedModel: Ref<OpenaiModel> = ref(OpenaiModel['gpt-3.5-turbo']);
@@ -64,7 +77,7 @@ const selectedImageCount = ref<number>(1);
 const selectedImageSize = ref<OpenaiImageSize>(OpenaiImageSize.SMALL);
 
 let messageContexts: OpenaiChatMessage[] = [];
-const summarizeContextOpenaiMessage = OpenaiChatMessage.of1(
+const summarizeContextOpenaiMessage = OpenaiChatMessage.of(
   'Summarize all the messages in a format as follows. The placeholder for previousContext is where you have to fill in the summarized context.' +
     "'Previous context: {{previousContext}}\n",
   OpenaiRole.user
@@ -78,7 +91,13 @@ const lastScrollTop = ref(0);
  * {@link hasUserManuallyScrolled} is used to determine whether to scroll automatically to the
  * bottom of the chat when new message being received.
  */
-onMounted(() => {
+onMounted(async () => {
+  const previousMessages = await store.getFromChromeStorage(ChromeStorageKeys.STORED_MESSAGES);
+  if (previousMessages) {
+    const previousMessagesArray: Message[] = JSON.parse(previousMessages);
+    hookedMessages.initializeMessages(previousMessagesArray);
+  }
+
   scrollableElement.value?.addEventListener('scroll', () => {
     const st = scrollableElement.value?.scrollTop || 0;
     if (st < lastScrollTop.value) {
@@ -215,7 +234,7 @@ const sendMessage = async (event: any) => {
       completed: true,
     },
   };
-  messages.value.push(messageToSend);
+  hookedMessages.pushMessage(messageToSend);
   newMessage.value = '';
 
   switch (toRaw(selectedChatType.value)) {
@@ -250,18 +269,18 @@ const sendChatMessage = async () => {
     (res) => {
       if (!initialized) {
         // Show received message in the UI
-        messages.value.push(receivedMessage);
+        hookedMessages.pushMessage(receivedMessage);
         initialized = true;
       }
 
-      receivedMessage.text.push(res);
+      hookedMessages.pushMessageText(res);
     },
     () => {
       isMessageBeingStreamed.value = true;
       return null;
     },
     () => {
-      if (receivedMessage.meta.canceled) {
+      if (hookedMessages.isCanceled()) {
         return new ListenerEvent(ListenerEventType.STOP_STREAM, '');
       }
 
@@ -272,9 +291,11 @@ const sendChatMessage = async () => {
       return null;
     },
     () => {
-      completeMessage(receivedMessage);
-      if (rememberContext.value) {
-        addContext(OpenaiChatMessage.of1(receivedMessage.text.join(''), OpenaiRole.system));
+      hookedMessages.pushMessageCompleted();
+      if (rememberContext.value && hookedMessages.hasMessages()) {
+        addContext(
+          OpenaiChatMessage.of(hookedMessages.lastMessage()!!.text.join(''), OpenaiRole.system)
+        );
       }
 
       isMessageBeingStreamed.value = false;
@@ -286,11 +307,12 @@ const sendChatMessage = async () => {
 };
 
 const sendGenerateImageMessage = async () => {
-  if (messages.value.length === 0) {
+  if (!hookedMessages.hasMessages()) {
     return;
   }
 
-  const prompt = messages.value[messages.value.length - 1];
+  // We can assure that lastMessage exists
+  const prompt = hookedMessages.lastMessage()!!;
   const received = defaultMessageRef();
 
   await getOpenaiImageGenerationResponse(
@@ -303,9 +325,8 @@ const sendGenerateImageMessage = async () => {
       received.value.text = imgUrls;
     },
     () => {
-      // to show progress circular while loading images
       received.value.text = [''];
-      messages.value.push(received.value);
+      hookedMessages.pushMessage(received.value);
       isMessageBeingStreamed.value = true;
       return null;
     },
@@ -330,8 +351,9 @@ const programmaticScroll = _.throttle(() => {
  * Stop streaming response.
  */
 const stopStream = () => {
-  const streamingMessage = lastMessage();
+  const streamingMessage = hookedMessages.lastMessage();
   if (
+    streamingMessage != null &&
     streamingMessage.action === 'received' &&
     !streamingMessage.meta.completed &&
     !streamingMessage.meta.canceled
@@ -340,15 +362,11 @@ const stopStream = () => {
   }
 };
 
-const lastMessage = (): Message => {
-  return messages.value[messages.value.length - 1];
-};
-
 /**
  * Clear all messages and contexts.
  */
 const clearMessages = () => {
-  messages.value = [];
+  hookedMessages.clearMessages();
   newMessage.value = '';
   messageContexts = [];
 };
@@ -377,14 +395,15 @@ const applyMessageTemplate = (message: string): string => {
  * @returns {Promise<OpenaiChatMessage[]>} messages to be sent to OpenAI API
  */
 const constructMessageWithPreviousContext = async (): Promise<OpenaiChatMessage[]> => {
-  if (messages.value.length == 0) {
+  if (!hookedMessages.hasMessages()) {
     return [];
   }
 
-  const messageToBeSent = messages.value[messages.value.length - 1];
+  // We can assure that lastMessage exists
+  const messageToBeSent = hookedMessages.lastMessage()!!;
 
   if (!rememberContext.value) {
-    return [OpenaiChatMessage.of1(messageToBeSent.text.join(''), OpenaiRole.user)];
+    return [OpenaiChatMessage.of(messageToBeSent.text.join(''), OpenaiRole.user)];
   }
 
   // Summarize the context if it is too long
@@ -399,10 +418,10 @@ const constructMessageWithPreviousContext = async (): Promise<OpenaiChatMessage[
     await getOpenaiChatResponse(prompt, (res) => {
       summarizedContext.push(res);
     });
-    messageContexts = [OpenaiChatMessage.of1(summarizedContext.join(''), OpenaiRole.system)];
+    messageContexts = [OpenaiChatMessage.of(summarizedContext.join(''), OpenaiRole.system)];
   }
 
-  addContext(OpenaiChatMessage.of1(messageToBeSent.text.join(''), OpenaiRole.user));
+  addContext(OpenaiChatMessage.of(messageToBeSent.text.join(''), OpenaiRole.user));
   return _.cloneDeep(messageContexts);
 };
 
@@ -434,7 +453,11 @@ const getPosition = (message: Message) => {
   <div class="parent">
     <div ref="scrollableElement" class="chat-message-container">
       <div class="chat-messages">
-        <div v-for="(message, index) in messages" :key="message.id" :style="getPosition(message)">
+        <div
+          v-for="(message, index) in hookedMessages.messages"
+          :key="message.id"
+          :style="getPosition(message)"
+        >
           <chat-message
             :message="message"
             :show-message-template="showMessageTemplate"
@@ -457,7 +480,7 @@ const getPosition = (message: Message) => {
           Stop
         </v-btn>
         <v-btn
-          v-if="!isMessageBeingStreamed && messages.length > 0"
+          v-if="!isMessageBeingStreamed && hookedMessages.hasMessages()"
           size="small"
           variant="plain"
           color="error"

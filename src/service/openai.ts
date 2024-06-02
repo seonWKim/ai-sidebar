@@ -80,11 +80,7 @@ class OpenaiChatMessage {
     this.role = role;
   }
 
-  static of0(content: string): OpenaiChatMessage {
-    return new OpenaiChatMessage(content, OpenaiRole.user);
-  }
-
-  static of1(content: string, role: OpenaiRole) {
+  static of(content: string, role: OpenaiRole) {
     return new OpenaiChatMessage(content, role);
   }
 }
