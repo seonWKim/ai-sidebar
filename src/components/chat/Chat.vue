@@ -63,7 +63,6 @@ const hookedMessages = reactive(
   new HookedMessages(
     (messages: Message[]) => {
       store.saveToChromeStorage(ChromeStorageKeys.STORED_MESSAGES, JSON.stringify(messages));
-      const lastMessage = messages.length > 0 ? messages[messages.length - 1] : '';
     },
     () => {
       store.saveToChromeStorage(ChromeStorageKeys.STORED_MESSAGES, JSON.stringify([]));
