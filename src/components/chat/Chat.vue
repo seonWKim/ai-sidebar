@@ -263,14 +263,14 @@ const sendChatMessage = async () => {
         initialized = true;
       }
 
-      receivedMessage.text.push(res);
+      hookedMessages.pushMessageText(res);
     },
     () => {
       isMessageBeingStreamed.value = true;
       return null;
     },
     () => {
-      if (receivedMessage.meta.canceled) {
+      if (hookedMessages.isCanceled()) {
         return new ListenerEvent(ListenerEventType.STOP_STREAM, '');
       }
 
@@ -281,9 +281,9 @@ const sendChatMessage = async () => {
       return null;
     },
     () => {
-      completeMessage(receivedMessage);
-      if (rememberContext.value) {
-        addContext(OpenaiChatMessage.of(receivedMessage.text.join(''), OpenaiRole.system));
+      hookedMessages.pushMessageCompleted();
+      if (rememberContext.value && hookedMessages.hasMessages()) {
+        addContext(OpenaiChatMessage.of(hookedMessages.lastMessage()!!.text.join(''), OpenaiRole.system));
       }
 
       isMessageBeingStreamed.value = false;

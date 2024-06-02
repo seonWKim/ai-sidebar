@@ -1,23 +1,37 @@
 import { OpenaiChatMessage } from '@/service/openai';
-import { Message } from '@/common/message';
+import { completeMessage, Message } from '@/common/message';
 
 /**
  * A class that holds chat messages and notifies listeners when messages are pushed or cleared.
  */
 class HookedMessages {
   messages: Message[];
-  onPushed: (messages: Message[]) => void;
+  onPushCompleted: (messages: Message[]) => void;
   onCleared: () => void;
 
   constructor(onPushed: (messages: Message[]) => void, onCleared: () => void) {
     this.messages = [];
-    this.onPushed = onPushed;
+    this.onPushCompleted = onPushed;
     this.onCleared = onCleared;
   }
 
   public pushMessage(message: Message) {
     this.messages.push(message);
-    this.onPushed(this.messages);
+  }
+
+  public pushMessageText(text: string) {
+    this.lastMessage()?.text.push(text);
+  }
+
+  public pushMessageCompleted() {
+    if (this.lastMessage() != null) {
+      completeMessage(this.lastMessage()!!);
+    }
+    this.onPushCompleted(this.messages);
+  }
+
+  public isCanceled() {
+    return !!this.lastMessage()?.meta.canceled;
   }
 
   public clearMessages() {
