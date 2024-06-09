@@ -108,38 +108,39 @@ function updateOpenaiApiKeyGuideDialog(value: boolean) {
       <v-container class="fill-height">
         <v-responsive class="fill-height">
           <v-form class="inner-container">
-            <div class="d-flex justify-space-between align-center">
-              <div class="text-subtitle-1 text-medium-emphasis mb-2">Open SideBar Short Cut</div>
-              <div>
-                <v-switch
-                  v-model="shortCutEnabled"
-                  color="primary"
-                  hide-details
-                  @update:modelValue="onShortCutEnabledUpdate"
-                  :label="shortCutEnabled ? 'On' : 'Off'"
-                />
-              </div>
-            </div>
-            <div class="d-flex">
-              <v-text-field
-                class="defaultShortCutPrefixTextField"
-                density="compact"
-                placeholder="Control + Shift + "
-                prepend-inner-icon="mdi-keyboard-outline"
-                variant="outlined"
-                readonly
-              />
-              <v-text-field
-                class="customShortCutPostfixTextField"
-                v-model="shortCutKey"
-                density="compact"
-                placeholder="Custom Key"
-                variant="outlined"
-                @update:modelValue="onShortCutKeyUpdate"
-                :maxLength="1"
-                :hint="`${shortCutKeyHint}`"
-              />
-            </div>
+<!--            TODO: For now, let's disable shortcut feature. We will enable it if needed-->
+<!--            <div class="d-flex justify-space-between align-center">-->
+<!--              <div class="text-subtitle-1 text-medium-emphasis mb-2">Open SideBar Short Cut</div>-->
+<!--              <div>-->
+<!--                <v-switch-->
+<!--                  v-model="shortCutEnabled"-->
+<!--                  color="primary"-->
+<!--                  hide-details-->
+<!--                  @update:modelValue="onShortCutEnabledUpdate"-->
+<!--                  :label="shortCutEnabled ? 'On' : 'Off'"-->
+<!--                />-->
+<!--              </div>-->
+<!--            </div>-->
+<!--            <div class="d-flex">-->
+<!--              <v-text-field-->
+<!--                class="defaultShortCutPrefixTextField"-->
+<!--                density="compact"-->
+<!--                placeholder="Control + Shift + "-->
+<!--                prepend-inner-icon="mdi-keyboard-outline"-->
+<!--                variant="outlined"-->
+<!--                readonly-->
+<!--              />-->
+<!--              <v-text-field-->
+<!--                class="customShortCutPostfixTextField"-->
+<!--                v-model="shortCutKey"-->
+<!--                density="compact"-->
+<!--                placeholder="Custom Key"-->
+<!--                variant="outlined"-->
+<!--                @update:modelValue="onShortCutKeyUpdate"-->
+<!--                :maxLength="1"-->
+<!--                :hint="`${shortCutKeyHint}`"-->
+<!--              />-->
+<!--            </div>-->
 
             <div class="text-subtitle-1 text-medium-emphasis mb-2">OpenAI API Key</div>
             <v-text-field
