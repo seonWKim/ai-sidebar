@@ -22,15 +22,24 @@ onMounted(async () => {
   shortCutEnabled.value = await getOpenSidePanelEventTriggerEnabled();
   shortCutKey.value = (await getCustomOpenSidePanelEventTriggerKeyNames()).join('');
   setShortCutKeyHint(shortCutKey.value);
-});
 
-watch(apiKey, (newValue, _) => {
-  store.setOpenAiKey(newValue);
+  temperature.value =
+    parseFloat(await store.getFromChromeStorage(ChromeStorageKeys.TEMPERATURE)) ||
+    store.openaiSettings.temperature;
 });
 
 const shortCutKey = ref('');
 const shortCutKeyHint = ref('');
 const shortCutEnabled = ref(true);
+const temperature = ref(1.0);
+
+watch(apiKey, (newValue, _) => {
+  store.setOpenAiKey(newValue);
+});
+watch(temperature, (newVal) => {
+  store.saveToChromeStorage(ChromeStorageKeys.TEMPERATURE, newVal.toString());
+  store.updateTemperature(newVal);
+});
 
 async function getOpenSidePanelEventTriggerEnabled(): Promise<boolean> {
   const enabled = await store.getFromChromeStorage(
@@ -51,25 +60,6 @@ async function getCustomOpenSidePanelEventTriggerKeyNames(): Promise<string[]> {
   return openSidePanelEventTriggerKeyNames.slice(2);
 }
 
-function onShortCutKeyUpdate(value: string) {
-  shortCutKey.value = value ? value : '';
-  setShortCutKeyHint(shortCutKey.value);
-
-  const customKey = shortCutKey.value ? shortCutKey.value : 'O';
-  const customKeyMap = ['Control', 'Shift', customKey];
-  store.saveToChromeStorage(
-    ChromeStorageKeys.OPEN_SIDE_PANEL_EVENT_TRIGGER_KEYS,
-    JSON.stringify(customKeyMap)
-  );
-}
-
-function onShortCutEnabledUpdate() {
-  store.saveToChromeStorage(
-    ChromeStorageKeys.OPEN_SIDE_PANEL_EVENT_TRIGGER_ENABLED,
-    shortCutEnabled.value.toString()
-  );
-}
-
 function setShortCutKeyHint(value: string) {
   if (value) {
     shortCutKeyHint.value =
@@ -87,7 +77,7 @@ function updateOpenaiApiKeyGuideDialog(value: boolean) {
 <template>
   <v-dialog v-model="dialog" fullscreen :scrim="false" transition="scroll-x-reverse-transition">
     <template v-slot:activator="{ props }">
-      <v-icon v-bind="props"> mdi-cog </v-icon>
+      <v-icon v-bind="props"> mdi-cog</v-icon>
     </template>
     <openai-api-key-guide
       hidden
@@ -108,40 +98,6 @@ function updateOpenaiApiKeyGuideDialog(value: boolean) {
       <v-container class="fill-height">
         <v-responsive class="fill-height">
           <v-form class="inner-container">
-<!--            TODO: For now, let's disable shortcut feature. We will enable it if needed-->
-<!--            <div class="d-flex justify-space-between align-center">-->
-<!--              <div class="text-subtitle-1 text-medium-emphasis mb-2">Open SideBar Short Cut</div>-->
-<!--              <div>-->
-<!--                <v-switch-->
-<!--                  v-model="shortCutEnabled"-->
-<!--                  color="primary"-->
-<!--                  hide-details-->
-<!--                  @update:modelValue="onShortCutEnabledUpdate"-->
-<!--                  :label="shortCutEnabled ? 'On' : 'Off'"-->
-<!--                />-->
-<!--              </div>-->
-<!--            </div>-->
-<!--            <div class="d-flex">-->
-<!--              <v-text-field-->
-<!--                class="defaultShortCutPrefixTextField"-->
-<!--                density="compact"-->
-<!--                placeholder="Control + Shift + "-->
-<!--                prepend-inner-icon="mdi-keyboard-outline"-->
-<!--                variant="outlined"-->
-<!--                readonly-->
-<!--              />-->
-<!--              <v-text-field-->
-<!--                class="customShortCutPostfixTextField"-->
-<!--                v-model="shortCutKey"-->
-<!--                density="compact"-->
-<!--                placeholder="Custom Key"-->
-<!--                variant="outlined"-->
-<!--                @update:modelValue="onShortCutKeyUpdate"-->
-<!--                :maxLength="1"-->
-<!--                :hint="`${shortCutKeyHint}`"-->
-<!--              />-->
-<!--            </div>-->
-
             <div class="text-subtitle-1 text-medium-emphasis mb-2">OpenAI API Key</div>
             <v-text-field
               density="compact"
@@ -167,6 +123,41 @@ function updateOpenaiApiKeyGuideDialog(value: boolean) {
                   OpenAi API Key Guide
                 </span>
                 for more information.
+              </v-card-text>
+            </v-card>
+
+            <div class="text-subtitle-1 text-medium-emphasis mb-2">Temperature</div>
+            <div class="temperature">
+              <v-slider
+                class="slider"
+                max="2"
+                min="0"
+                :step="0.1"
+                v-model="temperature"
+                color="primary"
+                thumb-label
+                :ticks="{
+                  0: '',
+                  1: '',
+                  2: '',
+                }"
+                show-ticks="always"
+              >
+                <template v-slot:prepend>
+                  <div>
+                    <v-icon class="ml-1" color="primary"> mdi-thermometer</v-icon>
+                  </div>
+                </template>
+              </v-slider>
+            </div>
+            <v-card color="primary" variant="tonal">
+              <v-card-item class="mt-2">
+                <template v-slot:subtitle> Note</template>
+              </v-card-item>
+              <v-card-text class="text-medium-emphasis text-caption">
+                Configure temperature which should be between 0 and 2. Higher values like 0.8 will
+                make the output more random, while lower values like 0.2 will make it more focused
+                and deterministic.
               </v-card-text>
             </v-card>
           </v-form>

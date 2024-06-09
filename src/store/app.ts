@@ -7,6 +7,9 @@ export const appStore = defineStore('app', {
   state: () => ({
     openai: null as Openai | null,
     customTemplates: [] as Template[],
+    openaiSettings: {
+      temperature: 1.0,
+    },
   }),
   getters: {
     openaiReadOny: (state) => state.openai,
@@ -63,6 +66,9 @@ export const appStore = defineStore('app', {
           JSON.stringify(this.customTemplates)
         );
       }
+    },
+    updateTemperature(temperature: number) {
+      this.openaiSettings.temperature = temperature;
     },
   },
 });

@@ -20,7 +20,6 @@ import { eventBus, EventName } from '@/common/event';
 import ChatMessage from '@/components/chat/message/ChatMessage.vue';
 import OpenaiModelSelector from '@/components/chat/config/OpenaiModelSelector.vue';
 import MessageTemplateModal from '@/components/chat/config/MessageTemplateModal.vue';
-import OpenaiTemperatureModal from '@/components/chat/config/OpenaiTemperatureModal.vue';
 import _ from 'lodash';
 import OpenaiContextMemorizerModal from '@/components/chat/config/OpenaiContextMemorizerModal.vue';
 import { messageTemplateInputPlaceholder } from '@/common/templates';
@@ -34,6 +33,7 @@ import OpenaiImageConfigurationModal from '@/components/chat/config/OpenaiImageC
 import { HookedMessages } from '@/service/messages';
 import { ChromeStorageKeys } from '@/common/keys';
 import { appStore } from '@/store/app';
+
 const store = appStore();
 
 class ChatTypeInformation {
@@ -72,7 +72,7 @@ const hookedMessages = reactive(
 const newMessage = ref('');
 const isMessageBeingStreamed = ref(false);
 const selectedModel: Ref<OpenaiModel> = ref(OpenaiModel['gpt-3.5-turbo']);
-const selectedTemperature: Ref<number> = ref(1.0);
+const selectedTemperature = store.openaiSettings.temperature;
 const selectedImageCount = ref<number>(1);
 const selectedImageSize = ref<OpenaiImageSize>(OpenaiImageSize.SMALL);
 
@@ -179,14 +179,6 @@ const updateContextMaxNo = (maxNo: number) => {
 };
 
 /**
- * Update the {@link selectedTemperature} of OpenAI API.
- * @param temperature Temperature
- */
-const updateOpenaiTemperature = (temperature: number) => {
-  selectedTemperature.value = temperature;
-};
-
-/**
  * Update the {@link selectedImageCount} which determines the number of images to generate.
  * @param imageCount
  */
@@ -257,8 +249,9 @@ const sendChatMessage = async () => {
   const prompt = new OpenaiChatPrompt(
     await constructMessageWithPreviousContext(),
     selectedModel.value,
-    selectedTemperature.value
+    selectedTemperature
   );
+  console.log(prompt);
 
   // Send message and receive stream response
   let initialized = false;
@@ -411,7 +404,7 @@ const constructMessageWithPreviousContext = async (): Promise<OpenaiChatMessage[
     const prompt = new OpenaiChatPrompt(
       [...messageContexts, summarizeContextOpenaiMessage],
       selectedModel.value,
-      selectedTemperature.value
+      selectedTemperature
     );
 
     const summarizedContext: string[] = [];
@@ -515,13 +508,6 @@ const getPosition = (message: Message) => {
             class="cy-openai-model-selector"
             :selected-model="selectedModel"
             @update-openai-model="updateOpenaiModel"
-          />
-        </v-slide-group-item>
-        <v-slide-group-item v-if="availability[selectedChatType].has(buttons.TEMPERATURE)">
-          <openai-temperature-modal
-            class="cy-openai-temperature-modal"
-            :selected-temperature="selectedTemperature"
-            @update-openai-temperature="updateOpenaiTemperature"
           />
         </v-slide-group-item>
         <v-slide-group-item v-if="availability[selectedChatType].has(buttons.IMAGE_CONFIG)">

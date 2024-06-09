@@ -19,7 +19,7 @@ async function getShowSidePanel(): Promise<boolean> {
   const showSidePanelStr = await store.getFromChromeStorage(ChromeStorageKeys.SHOW_SIDE_PANEL);
   if (!showSidePanelStr) {
     // show side panel by default
-    return true
+    return true;
   }
 
   return showSidePanelStr === 'true';
