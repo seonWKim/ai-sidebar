@@ -26,12 +26,24 @@ onMounted(async () => {
   temperature.value =
     parseFloat(await store.getFromChromeStorage(ChromeStorageKeys.TEMPERATURE)) ||
     store.openaiSettings.temperature;
+
+  const rememberContextValue = await store.getFromChromeStorage(ChromeStorageKeys.REMEMBER_CONTEXT);
+  if (rememberContextValue != null && rememberContextValue === 'false') {
+    rememberContext.value = false;
+  } else {
+    rememberContext.value = true;
+  }
+
+  contextMaxNo.value =
+    parseInt(await store.getFromChromeStorage(ChromeStorageKeys.CONTEXT_MAX_NO)) || 10;
 });
 
 const shortCutKey = ref('');
 const shortCutKeyHint = ref('');
 const shortCutEnabled = ref(true);
 const temperature = ref(1.0);
+const rememberContext = ref(true);
+const contextMaxNo = ref(10);
 
 watch(apiKey, (newValue, _) => {
   store.setOpenAiKey(newValue);
@@ -39,6 +51,14 @@ watch(apiKey, (newValue, _) => {
 watch(temperature, (newVal) => {
   store.saveToChromeStorage(ChromeStorageKeys.TEMPERATURE, newVal.toString());
   store.updateTemperature(newVal);
+});
+watch(rememberContext, (newVal) => {
+  store.saveToChromeStorage(ChromeStorageKeys.REMEMBER_CONTEXT, newVal.toString());
+  store.updateRememberContext(newVal);
+});
+watch(contextMaxNo, (newVal) => {
+  store.saveToChromeStorage(ChromeStorageKeys.CONTEXT_MAX_NO, newVal.toString());
+  store.updateContextMaxNo(newVal);
 });
 
 async function getOpenSidePanelEventTriggerEnabled(): Promise<boolean> {
@@ -71,6 +91,10 @@ function setShortCutKeyHint(value: string) {
 
 function updateOpenaiApiKeyGuideDialog(value: boolean) {
   openaiApiKeyGuideDialog.value = value;
+}
+
+function flip() {
+  rememberContext.value = !rememberContext.value;
 }
 </script>
 
@@ -113,7 +137,7 @@ function updateOpenaiApiKeyGuideDialog(value: boolean) {
               :rules="[(value) => (value && value.length > 0 ? true : 'Set your OpenAI API key.')]"
             />
 
-            <v-card class="mb-6" color="primary" variant="tonal">
+            <v-card class="mb-10" color="primary" variant="tonal">
               <v-card-item class="mt-2">
                 <template v-slot:subtitle> Note</template>
               </v-card-item>
@@ -150,7 +174,7 @@ function updateOpenaiApiKeyGuideDialog(value: boolean) {
                 </template>
               </v-slider>
             </div>
-            <v-card color="primary" variant="tonal">
+            <v-card class="mb-10" color="primary" variant="tonal">
               <v-card-item class="mt-2">
                 <template v-slot:subtitle> Note</template>
               </v-card-item>
@@ -158,6 +182,42 @@ function updateOpenaiApiKeyGuideDialog(value: boolean) {
                 Configure temperature which should be between 0 and 2. Higher values like 0.8 will
                 make the output more random, while lower values like 0.2 will make it more focused
                 and deterministic.
+              </v-card-text>
+            </v-card>
+
+            <div>
+              <v-checkbox
+                v-model="rememberContext"
+                @click="flip"
+                label="Memorize Previous Contexts"
+                color="primary"
+                hide-details
+              >
+              </v-checkbox>
+              <v-slider
+                v-model="contextMaxNo"
+                color="primary"
+                :max="50"
+                :step="1"
+                thumb-label
+                :ticks="{
+                  10: '',
+                  20: '',
+                  30: '',
+                  40: '',
+                  50: '',
+                }"
+                show-ticks="always"
+              />
+            </div>
+            <v-card color="primary" variant="tonal">
+              <v-card-item class="mt-2">
+                <template v-slot:subtitle> Note</template>
+              </v-card-item>
+              <v-card-text class="text-medium-emphasis text-caption">
+                If "Memorize Previous Contexts" is set, previous messages are also sent to OpenAI
+                API with the current message. You can configure how many previous messages should be
+                sent by using the slider.
               </v-card-text>
             </v-card>
           </v-form>

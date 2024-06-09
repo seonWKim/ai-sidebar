@@ -7,6 +7,8 @@ export const appStore = defineStore('app', {
   state: () => ({
     openai: null as Openai | null,
     customTemplates: [] as Template[],
+    rememberContext: true,
+    contextMaxNo: 10,
     openaiSettings: {
       temperature: 1.0,
     },
@@ -69,6 +71,12 @@ export const appStore = defineStore('app', {
     },
     updateTemperature(temperature: number) {
       this.openaiSettings.temperature = temperature;
+    },
+    updateRememberContext(rememberContext: boolean) {
+      this.rememberContext = rememberContext;
+    },
+    updateContextMaxNo(contextMaxNo: number) {
+      this.contextMaxNo = contextMaxNo;
     },
   },
 });

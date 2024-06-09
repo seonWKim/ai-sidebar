@@ -21,7 +21,6 @@ import ChatMessage from '@/components/chat/message/ChatMessage.vue';
 import OpenaiModelSelector from '@/components/chat/config/OpenaiModelSelector.vue';
 import MessageTemplateModal from '@/components/chat/config/MessageTemplateModal.vue';
 import _ from 'lodash';
-import OpenaiContextMemorizerModal from '@/components/chat/config/OpenaiContextMemorizerModal.vue';
 import { messageTemplateInputPlaceholder } from '@/common/templates';
 import {
   ChatType,
@@ -72,7 +71,6 @@ const hookedMessages = reactive(
 const newMessage = ref('');
 const isMessageBeingStreamed = ref(false);
 const selectedModel: Ref<OpenaiModel> = ref(OpenaiModel['gpt-3.5-turbo']);
-const selectedTemperature = store.openaiSettings.temperature;
 const selectedImageCount = ref<number>(1);
 const selectedImageSize = ref<OpenaiImageSize>(OpenaiImageSize.SMALL);
 
@@ -82,8 +80,6 @@ const summarizeContextOpenaiMessage = OpenaiChatMessage.of(
     "'Previous context: {{previousContext}}\n",
   OpenaiRole.user
 );
-const contextMaxNo: Ref<number> = ref(5);
-const rememberContext: Ref<boolean> = ref(true);
 
 const lastScrollTop = ref(0);
 /**
@@ -163,20 +159,20 @@ const updateOpenaiModel = (model: OpenaiModel) => {
  * Update {@link rememberContext}
  * @param shouldRememberContext Whether to remember context or not
  */
-const updateRememberContext = (shouldRememberContext: boolean) => {
-  if (!shouldRememberContext) {
-    messageContexts = [];
-  }
-  rememberContext.value = shouldRememberContext;
-};
+// const updateRememberContext = (shouldRememberContext: boolean) => {
+//   if (!shouldRememberContext) {
+//     messageContexts = [];
+//   }
+//   rememberContext.value = shouldRememberContext;
+// };
 
 /**
  * Update the {@link contextMaxNo} which determines the maximum number of previous context to remember.
  * @param maxNo Maximum number of previous context to remember
  */
-const updateContextMaxNo = (maxNo: number) => {
-  contextMaxNo.value = maxNo;
-};
+// const updateContextMaxNo = (maxNo: number) => {
+//   contextMaxNo.value = maxNo;
+// };
 
 /**
  * Update the {@link selectedImageCount} which determines the number of images to generate.
@@ -249,9 +245,8 @@ const sendChatMessage = async () => {
   const prompt = new OpenaiChatPrompt(
     await constructMessageWithPreviousContext(),
     selectedModel.value,
-    selectedTemperature
+    store.openaiSettings.temperature
   );
-  console.log(prompt);
 
   // Send message and receive stream response
   let initialized = false;
@@ -285,7 +280,7 @@ const sendChatMessage = async () => {
     },
     () => {
       hookedMessages.pushMessageCompleted();
-      if (rememberContext.value && hookedMessages.hasMessages()) {
+      if (store.rememberContext && hookedMessages.hasMessages()) {
         addContext(
           OpenaiChatMessage.of(hookedMessages.lastMessage()!!.text.join(''), OpenaiRole.system)
         );
@@ -395,16 +390,16 @@ const constructMessageWithPreviousContext = async (): Promise<OpenaiChatMessage[
   // We can assure that lastMessage exists
   const messageToBeSent = hookedMessages.lastMessage()!!;
 
-  if (!rememberContext.value) {
+  if (!store.rememberContext) {
     return [OpenaiChatMessage.of(messageToBeSent.text.join(''), OpenaiRole.user)];
   }
 
   // Summarize the context if it is too long
-  if (messageContexts.length > contextMaxNo.value) {
+  if (messageContexts.length > store.contextMaxNo) {
     const prompt = new OpenaiChatPrompt(
       [...messageContexts, summarizeContextOpenaiMessage],
       selectedModel.value,
-      selectedTemperature
+      store.openaiSettings.temperature
     );
 
     const summarizedContext: string[] = [];
@@ -496,13 +491,13 @@ const getPosition = (message: Message) => {
             @update-show-message-template="updateShowMessageTemplate"
           />
         </v-slide-group-item>
-        <v-slide-group-item v-if="availability[selectedChatType].has(buttons.REMEMBER_CONTEXT)">
-          <openai-context-memorizer-modal
-            class="cy-openai-context-memorizer-modal"
-            @update-remember-context="updateRememberContext"
-            @update-context-max-no="updateContextMaxNo"
-          />
-        </v-slide-group-item>
+        <!--        <v-slide-group-item v-if="availability[selectedChatType].has(buttons.REMEMBER_CONTEXT)">-->
+        <!--          <openai-context-memorizer-modal-->
+        <!--            class="cy-openai-context-memorizer-modal"-->
+        <!--            @update-remember-context="updateRememberContext"-->
+        <!--            @update-context-max-no="updateContextMaxNo"-->
+        <!--          />-->
+        <!--        </v-slide-group-item>-->
         <v-slide-group-item v-if="availability[selectedChatType].has(buttons.OPENAI_MODEL)">
           <openai-model-selector
             class="cy-openai-model-selector"
