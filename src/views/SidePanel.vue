@@ -5,7 +5,7 @@ import SidePanelThemes from '@/components/chat/config/SidePanelThemes.vue';
 import OpenOrClose from '@/components/chat/config/OpenOrClose.vue';
 import { ref } from 'vue';
 
-const showSidePanel = ref(false);
+const showSidePanel = ref(true);
 const SHOW_STYLE = '1fr 36px 16px';
 const HIDE_STYLE = '1fr 0px 16px';
 const gridTemplateColumns = ref(HIDE_STYLE);

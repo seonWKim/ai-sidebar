@@ -6,7 +6,7 @@ import { ChromeStorageKeys } from '@/common/keys';
 const store = appStore();
 const showIcon = 'mdi-chevron-left';
 const hideIcon = 'mdi-chevron-right';
-const showSidePanel = ref(false);
+const showSidePanel = ref(true);
 
 const emits = defineEmits(['showOrHideSidePanel']);
 
@@ -17,6 +17,11 @@ onMounted(async () => {
 
 async function getShowSidePanel(): Promise<boolean> {
   const showSidePanelStr = await store.getFromChromeStorage(ChromeStorageKeys.SHOW_SIDE_PANEL);
+  if (!showSidePanelStr) {
+    // show side panel by default
+    return true;
+  }
+
   return showSidePanelStr === 'true';
 }
 

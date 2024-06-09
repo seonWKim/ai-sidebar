@@ -2,11 +2,18 @@ import { defineStore } from 'pinia';
 import Openai from 'openai';
 import { ChromeStorageKeys } from '@/common/keys';
 import { Template } from '@/common/templates';
+import { OpenaiModel } from '@/service/openai';
 
 export const appStore = defineStore('app', {
   state: () => ({
     openai: null as Openai | null,
     customTemplates: [] as Template[],
+    rememberContext: true,
+    contextMaxNo: 10,
+    openaiSettings: {
+      model: 'gpt-3.5-turbo' as OpenaiModel,
+      temperature: 1.0,
+    },
   }),
   getters: {
     openaiReadOny: (state) => state.openai,
@@ -63,6 +70,18 @@ export const appStore = defineStore('app', {
           JSON.stringify(this.customTemplates)
         );
       }
+    },
+    updateOpenaiModel(model: OpenaiModel) {
+      this.openaiSettings.model = model;
+    },
+    updateTemperature(temperature: number) {
+      this.openaiSettings.temperature = temperature;
+    },
+    updateRememberContext(rememberContext: boolean) {
+      this.rememberContext = rememberContext;
+    },
+    updateContextMaxNo(contextMaxNo: number) {
+      this.contextMaxNo = contextMaxNo;
     },
   },
 });
