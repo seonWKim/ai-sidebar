@@ -1,18 +1,15 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { OpenaiModel } from '@/service/openai';
+import { appStore } from '@/store/app';
 
-const props = defineProps({
-  selectedModel: {
-    type: String,
-    default: OpenaiModel['gpt-3.5-turbo'],
-  },
-});
-
-const emits = defineEmits(['updateOpenaiModel']);
-
+const store = appStore();
 const models = ref(Object.values(OpenaiModel));
-const selectedModel = ref<String>(props.selectedModel!);
+const selectedModel = ref<OpenaiModel>(OpenaiModel['gpt-3.5-turbo']);
+
+watch(selectedModel, (newVal) => {
+  store.updateOpenaiModel(newVal);
+});
 
 /**
  * Select a role from the list of {@link OpenaiModel} values.
@@ -23,7 +20,6 @@ function selectModel(modelStr: string) {
   selectedModel.value =
     Object.values(OpenaiModel).find((key) => OpenaiModel[key] === modelStr) ||
     OpenaiModel['gpt-3.5-turbo'];
-  emits('updateOpenaiModel', selectedModel.value);
 }
 </script>
 
