@@ -10,7 +10,6 @@ import {
   OpenaiChatPrompt,
   OpenaiImageGenerationPrompt,
   OpenaiImageSize,
-  OpenaiModel,
   OpenaiRole,
 } from '@/service/openai';
 import { VBtn, VTextarea } from 'vuetify/components';
